@@ -1,0 +1,1388 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ADDRS_PER_BLOCK	include/f2fs_fs.h	608;"	d
+ADDRS_PER_INODE	include/f2fs_fs.h	605;"	d
+ADDRS_PER_PAGE	fsck/node.h	21;"	d
+ALIGN	include/f2fs_fs.h	1115;"	d
+ALLOC_NODE	fsck/node.h	/^	ALLOC_NODE,	\/* allocate a new node page if needed *\/$/;"	e	enum:__anon4
+ASSERT	include/f2fs_fs.h	135;"	d
+ASSERT_MSG	include/f2fs_fs.h	128;"	d
+BITMAP_FIRST_BYTE_MASK	lib/libf2fs.c	329;"	d	file:
+BITS_PER_BYTE	include/f2fs_fs.h	222;"	d
+BITS_PER_LONG	include/f2fs_fs.h	325;"	d
+BITS_PER_LONG	include/f2fs_fs.h	327;"	d
+BIT_MASK	include/f2fs_fs.h	330;"	d
+BIT_WORD	include/f2fs_fs.h	331;"	d
+BLKDISCARD	mkfs/f2fs_format_utils.c	31;"	d	file:
+BLKOFF_FROM_MAIN	fsck/f2fs.h	/^static inline u64 BLKOFF_FROM_MAIN(struct f2fs_sb_info *sbi, u64 blk_addr)$/;"	f
+BLKSECDISCARD	mkfs/f2fs_format_utils.c	34;"	d	file:
+BLOCK_SZ	fsck/fsck.h	90;"	d
+BUF_DISP_u32	include/f2fs_fs.h	200;"	d
+BUF_DISP_u64	include/f2fs_fs.h	208;"	d
+BUF_DISP_utf	include/f2fs_fs.h	216;"	d
+BUF_SZ	fsck/dump.c	16;"	d	file:
+CHECKSUM_OFFSET	include/f2fs_fs.h	224;"	d
+CMD	tools/f2fscrypt.c	858;"	d	file:
+CMD_HIDDEN	tools/f2fscrypt.c	669;"	d	file:
+COLD_BIT_SHIFT	include/f2fs_fs.h	/^	COLD_BIT_SHIFT = 0,$/;"	e	enum:__anon8
+CONST64	tools/sha512.c	41;"	d	file:
+CP_COMPACT_SUM_FLAG	include/f2fs_fs.h	542;"	d
+CP_CRC_RECOVERY_FLAG	include/f2fs_fs.h	538;"	d
+CP_ERROR_FLAG	include/f2fs_fs.h	541;"	d
+CP_FASTBOOT_FLAG	include/f2fs_fs.h	539;"	d
+CP_FSCK_FLAG	include/f2fs_fs.h	540;"	d
+CP_NAT_BITS_FLAG	include/f2fs_fs.h	537;"	d
+CP_ORPHAN_PRESENT_FLAG	include/f2fs_fs.h	543;"	d
+CP_TRIMMED_FLAG	include/f2fs_fs.h	536;"	d
+CP_UMOUNT_FLAG	include/f2fs_fs.h	544;"	d
+CRCPOLY_LE	lib/libf2fs.c	467;"	d	file:
+CURSEG_COLD_DATA	include/f2fs_fs.h	/^	CURSEG_COLD_DATA,	\/* multimedia or GCed data blocks *\/$/;"	e	enum:__anon5
+CURSEG_COLD_NODE	include/f2fs_fs.h	/^	CURSEG_COLD_NODE,	\/* indirect node blocks *\/$/;"	e	enum:__anon5
+CURSEG_HOT_DATA	include/f2fs_fs.h	/^	CURSEG_HOT_DATA	= 0,	\/* directory entry blocks *\/$/;"	e	enum:__anon5
+CURSEG_HOT_NODE	include/f2fs_fs.h	/^	CURSEG_HOT_NODE,	\/* direct node blocks of directory files *\/$/;"	e	enum:__anon5
+CURSEG_I	fsck/f2fs.h	/^static inline struct curseg_info *CURSEG_I(struct f2fs_sb_info *sbi, int type)$/;"	f
+CURSEG_WARM_DATA	include/f2fs_fs.h	/^	CURSEG_WARM_DATA,	\/* data blocks *\/$/;"	e	enum:__anon5
+CURSEG_WARM_NODE	include/f2fs_fs.h	/^	CURSEG_WARM_NODE,	\/* direct node blocks of normal files *\/$/;"	e	enum:__anon5
+CUR_ADDRS_PER_INODE	include/f2fs_fs.h	603;"	d
+Ch	tools/sha512.c	84;"	d	file:
+DBG	include/f2fs_fs.h	156;"	d
+DEFAULT_BLOCKS_PER_SEGMENT	include/f2fs_fs.h	235;"	d
+DEFAULT_SECTORS_PER_BLOCK	include/f2fs_fs.h	234;"	d
+DEFAULT_SECTOR_SIZE	include/f2fs_fs.h	233;"	d
+DEFAULT_SEGMENTS_PER_SECTION	include/f2fs_fs.h	236;"	d
+DEFRAG	include/f2fs_fs.h	/^	DEFRAG,$/;"	e	enum:f2fs_config_func
+DEF_ADDRS_PER_INODE	include/f2fs_fs.h	602;"	d
+DEF_ADDRS_PER_INODE_INLINE_XATTR	include/f2fs_fs.h	606;"	d
+DEF_DIR_LEVEL	include/f2fs_fs.h	646;"	d
+DEF_INLINE_RESERVED_SIZE	include/f2fs_fs.h	955;"	d
+DEF_MAX_INLINE_DATA	include/f2fs_fs.h	638;"	d
+DELTA	lib/libf2fs.c	369;"	d	file:
+DENT_BIT_SHIFT	include/f2fs_fs.h	/^	DENT_BIT_SHIFT,$/;"	e	enum:__anon8
+DISP	include/f2fs_fs.h	165;"	d
+DISP_label	fsck/mount.c	/^static void DISP_label(u_int16_t *name)$/;"	f	file:
+DISP_u16	include/f2fs_fs.h	170;"	d
+DISP_u32	include/f2fs_fs.h	178;"	d
+DISP_u64	include/f2fs_fs.h	186;"	d
+DISP_utf	include/f2fs_fs.h	194;"	d
+DUMP	include/f2fs_fs.h	/^	DUMP,$/;"	e	enum:f2fs_config_func
+ENEED_ARG	fsck/fsck.h	/^	ENEED_ARG,$/;"	e	enum:__anon2
+ENTRIES_IN_SUM	include/f2fs_fs.h	808;"	d
+ENTRY_SIZE	fsck/xattr.h	50;"	d
+ERR_MSG	include/f2fs_fs.h	144;"	d
+EUNKNOWN_ARG	fsck/fsck.h	/^	EUNKNOWN_ARG,$/;"	e	enum:__anon2
+EUNKNOWN_OPT	fsck/fsck.h	/^	EUNKNOWN_OPT,$/;"	e	enum:__anon2
+EWRONG_OPT	fsck/fsck.h	/^	EWRONG_OPT,$/;"	e	enum:__anon2
+EXIT_ERR_CODE	fsck/f2fs.h	29;"	d
+EXTRA_INFO_RESERVED	include/f2fs_fs.h	849;"	d
+F2FS_AES_256_CBC_KEY_SIZE	tools/f2fscrypt.c	64;"	d	file:
+F2FS_AES_256_CTS_KEY_SIZE	tools/f2fscrypt.c	65;"	d	file:
+F2FS_AES_256_GCM_KEY_SIZE	tools/f2fscrypt.c	63;"	d	file:
+F2FS_AES_256_XTS_KEY_SIZE	tools/f2fscrypt.c	62;"	d	file:
+F2FS_BLKSIZE	include/f2fs_fs.h	450;"	d
+F2FS_BLKSIZE_BITS	include/f2fs_fs.h	229;"	d
+F2FS_BLK_ALIGN	include/f2fs_fs.h	452;"	d
+F2FS_BYTES_TO_BLK	include/f2fs_fs.h	228;"	d
+F2FS_CKPT	fsck/f2fs.h	/^static inline struct f2fs_checkpoint *F2FS_CKPT(struct f2fs_sb_info *sbi)$/;"	f
+F2FS_DATA_EXIST	include/f2fs_fs.h	620;"	d
+F2FS_DDOT_HASH	include/f2fs_fs.h	909;"	d
+F2FS_DEF_PROJID	include/f2fs_fs.h	632;"	d
+F2FS_DOT_HASH	include/f2fs_fs.h	908;"	d
+F2FS_ENCRYPTION_MODE_AES_256_CBC	tools/f2fscrypt.c	59;"	d	file:
+F2FS_ENCRYPTION_MODE_AES_256_CTS	tools/f2fscrypt.c	60;"	d	file:
+F2FS_ENCRYPTION_MODE_AES_256_GCM	tools/f2fscrypt.c	58;"	d	file:
+F2FS_ENCRYPTION_MODE_AES_256_XTS	tools/f2fscrypt.c	57;"	d	file:
+F2FS_ENCRYPTION_MODE_INVALID	tools/f2fscrypt.c	56;"	d	file:
+F2FS_EXTRA_ATTR	include/f2fs_fs.h	622;"	d
+F2FS_FEATURE_ATOMIC_WRITE	include/f2fs_fs.h	476;"	d
+F2FS_FEATURE_BLKZONED	include/f2fs_fs.h	475;"	d
+F2FS_FEATURE_ENCRYPT	include/f2fs_fs.h	474;"	d
+F2FS_FEATURE_EXTRA_ATTR	include/f2fs_fs.h	477;"	d
+F2FS_FEATURE_INODE_CHKSUM	include/f2fs_fs.h	479;"	d
+F2FS_FEATURE_PRJQUOTA	include/f2fs_fs.h	478;"	d
+F2FS_FSCK	fsck/f2fs.h	/^static inline struct f2fs_fsck *F2FS_FSCK(struct f2fs_sb_info *sbi)$/;"	f
+F2FS_FT_BLKDEV	include/f2fs_fs.h	/^	F2FS_FT_BLKDEV,$/;"	e	enum:FILE_TYPE
+F2FS_FT_CHRDEV	include/f2fs_fs.h	/^	F2FS_FT_CHRDEV,$/;"	e	enum:FILE_TYPE
+F2FS_FT_DIR	include/f2fs_fs.h	/^	F2FS_FT_DIR,$/;"	e	enum:FILE_TYPE
+F2FS_FT_FIFO	include/f2fs_fs.h	/^	F2FS_FT_FIFO,$/;"	e	enum:FILE_TYPE
+F2FS_FT_LAST_FILE_TYPE	include/f2fs_fs.h	/^	F2FS_FT_LAST_FILE_TYPE = F2FS_FT_XATTR,$/;"	e	enum:FILE_TYPE
+F2FS_FT_MAX	include/f2fs_fs.h	/^	F2FS_FT_MAX,$/;"	e	enum:FILE_TYPE
+F2FS_FT_ORPHAN	include/f2fs_fs.h	/^	F2FS_FT_ORPHAN,$/;"	e	enum:FILE_TYPE
+F2FS_FT_REG_FILE	include/f2fs_fs.h	/^	F2FS_FT_REG_FILE,$/;"	e	enum:FILE_TYPE
+F2FS_FT_SOCK	include/f2fs_fs.h	/^	F2FS_FT_SOCK,$/;"	e	enum:FILE_TYPE
+F2FS_FT_SYMLINK	include/f2fs_fs.h	/^	F2FS_FT_SYMLINK,$/;"	e	enum:FILE_TYPE
+F2FS_FT_UNKNOWN	include/f2fs_fs.h	/^	F2FS_FT_UNKNOWN,$/;"	e	enum:FILE_TYPE
+F2FS_FT_XATTR	include/f2fs_fs.h	/^	F2FS_FT_XATTR,$/;"	e	enum:FILE_TYPE
+F2FS_HASH_COL_BIT	include/f2fs_fs.h	911;"	d
+F2FS_INLINE_DATA	include/f2fs_fs.h	618;"	d
+F2FS_INLINE_DENTRY	include/f2fs_fs.h	619;"	d
+F2FS_INLINE_DOTS	include/f2fs_fs.h	621;"	d
+F2FS_INLINE_XATTR	include/f2fs_fs.h	617;"	d
+F2FS_INLINE_XATTR_ADDRS	include/f2fs_fs.h	601;"	d
+F2FS_IOC_GET_ENCRYPTION_POLICY	tools/f2fscrypt.c	104;"	d	file:
+F2FS_IOC_GET_ENCRYPTION_PWSALT	tools/f2fscrypt.c	103;"	d	file:
+F2FS_IOC_SET_ENCRYPTION_POLICY	tools/f2fscrypt.c	102;"	d	file:
+F2FS_KEY_DESCRIPTOR_SIZE	tools/f2fscrypt.c	91;"	d	file:
+F2FS_KEY_DESC_PREFIX	tools/f2fscrypt.c	155;"	d	file:
+F2FS_KEY_DESC_PREFIX_SIZE	tools/f2fscrypt.c	156;"	d	file:
+F2FS_KEY_REF_STR_BUF_SIZE	tools/f2fscrypt.c	92;"	d	file:
+F2FS_KEY_TYPE_LOGON	tools/f2fscrypt.c	154;"	d	file:
+F2FS_MAX_EXTENSION	include/f2fs_fs.h	451;"	d
+F2FS_MAX_HASH	include/f2fs_fs.h	910;"	d
+F2FS_MAX_KEY_SIZE	tools/f2fscrypt.c	51;"	d	file:
+F2FS_MAX_KEY_SIZE	tools/f2fscrypt.c	66;"	d	file:
+F2FS_MAX_LOG_SECTOR_SIZE	include/f2fs_fs.h	449;"	d
+F2FS_MAX_PASSPHRASE_SIZE	tools/f2fscrypt.c	52;"	d	file:
+F2FS_MAX_PASSPHRASE_SIZE	tools/f2fscrypt.c	69;"	d	file:
+F2FS_MAX_SALT_SIZE	tools/f2fscrypt.c	53;"	d	file:
+F2FS_MAX_SALT_SIZE	tools/f2fscrypt.c	70;"	d	file:
+F2FS_MAX_SEGMENT	include/f2fs_fs.h	765;"	d
+F2FS_META_INO	include/f2fs_fs.h	459;"	d
+F2FS_MIN_LOG_SECTOR_SIZE	include/f2fs_fs.h	448;"	d
+F2FS_MIN_SEGMENTS	include/f2fs_fs.h	436;"	d
+F2FS_NAME_LEN	include/f2fs_fs.h	600;"	d
+F2FS_NODE_INO	include/f2fs_fs.h	458;"	d
+F2FS_NUMBER_OF_CHECKPOINT_PACK	include/f2fs_fs.h	232;"	d
+F2FS_ORPHANS_PER_BLOCK	include/f2fs_fs.h	580;"	d
+F2FS_PBKDF2_ITERATIONS	tools/f2fscrypt.c	71;"	d	file:
+F2FS_RAW_SUPER	fsck/f2fs.h	/^static inline struct f2fs_super_block *F2FS_RAW_SUPER(struct f2fs_sb_info *sbi)$/;"	f
+F2FS_REPORT_ZONES_BUFSZ	lib/libf2fs_zoned.c	103;"	d	file:
+F2FS_ROOT_INO	include/f2fs_fs.h	457;"	d
+F2FS_SHA512_LENGTH	tools/sha512.c	38;"	d	file:
+F2FS_SLOT_LEN	include/f2fs_fs.h	916;"	d
+F2FS_SLOT_LEN_BITS	include/f2fs_fs.h	917;"	d
+F2FS_STATUS	tools/f2fstat.c	17;"	d	file:
+F2FS_SUPER_MAGIC	include/f2fs_fs.h	223;"	d
+F2FS_SUPER_OFFSET	include/f2fs_fs.h	447;"	d
+F2FS_TOTAL_EXTRA_ATTR_SIZE	include/f2fs_fs.h	628;"	d
+F2FS_XATTR_INDEX_SECURITY	fsck/xattr.h	37;"	d
+F2FS_XATTR_MAGIC	fsck/xattr.h	42;"	d
+F2FS_ZONED_HA	include/f2fs_fs.h	1047;"	d
+F2FS_ZONED_HM	include/f2fs_fs.h	1048;"	d
+F2FS_ZONED_NONE	include/f2fs_fs.h	1046;"	d
+FADVISE_COLD_BIT	include/f2fs_fs.h	651;"	d
+FADVISE_ENCRYPT_BIT	include/f2fs_fs.h	653;"	d
+FADVISE_ENC_NAME_BIT	include/f2fs_fs.h	654;"	d
+FADVISE_LOST_PINO_BIT	include/f2fs_fs.h	652;"	d
+FILE_TYPE	include/f2fs_fs.h	/^enum FILE_TYPE {$/;"	g
+FIX_MSG	include/f2fs_fs.h	122;"	d
+FREE_I_START_SEGNO	fsck/f2fs.h	325;"	d
+FSCK	include/f2fs_fs.h	/^	FSCK,$/;"	e	enum:f2fs_config_func
+FSCK_UNMATCHED_EXTENT	fsck/fsck.h	16;"	d
+FSYNC_BIT_SHIFT	include/f2fs_fs.h	/^	FSYNC_BIT_SHIFT,$/;"	e	enum:__anon8
+GET_BLKOFF_FROM_SEG0	fsck/f2fs.h	322;"	d
+GET_DENTRY_SLOTS	include/f2fs_fs.h	919;"	d
+GET_R2L_SEGNO	fsck/f2fs.h	327;"	d
+GET_SEGNO	fsck/f2fs.h	/^static inline u32 GET_SEGNO(struct f2fs_sb_info *sbi, u64 blk_addr)$/;"	f
+GET_SEGNO_FROM_SEG0	fsck/f2fs.h	319;"	d
+GET_SEGOFF_FROM_SEG0	fsck/f2fs.h	316;"	d
+GET_SIT_TYPE	include/f2fs_fs.h	779;"	d
+GET_SIT_VBLOCKS	include/f2fs_fs.h	777;"	d
+GET_SUM_BLKADDR	fsck/f2fs.h	313;"	d
+GET_SUM_TYPE	include/f2fs_fs.h	441;"	d
+GET_ZONENO_FROM_SEGNO	fsck/f2fs.h	302;"	d
+GFP_F2FS_ZERO	include/f2fs_fs.h	462;"	d
+Gamma0	tools/sha512.c	90;"	d	file:
+Gamma1	tools/sha512.c	91;"	d	file:
+INIT_LIST_HEAD	include/list.h	/^static inline void INIT_LIST_HEAD(struct list_head *list)$/;"	f
+INLINE_DATA_OFFSET	include/f2fs_fs.h	642;"	d
+INLINE_DENTRY_BITMAP_SIZE	include/f2fs_fs.h	961;"	d
+INLINE_RESERVED_SIZE	include/f2fs_fs.h	963;"	d
+IS_CUR_SEGNO	fsck/f2fs.h	/^static inline int IS_CUR_SEGNO(struct f2fs_sb_info *sbi, u32 segno, int type)$/;"	f
+IS_DATASEG	fsck/f2fs.h	305;"	d
+IS_DNODE	fsck/node.h	/^static inline int IS_DNODE(struct f2fs_node *node_page)$/;"	f
+IS_INODE	fsck/node.h	/^static inline int IS_INODE(struct f2fs_node *node)$/;"	f
+IS_NODESEG	fsck/f2fs.h	309;"	d
+IS_SUM_DATA_SEG	fsck/f2fs.h	469;"	d
+IS_SUM_NODE_SEG	fsck/f2fs.h	468;"	d
+IS_VALID_BLK_ADDR	fsck/f2fs.h	/^static inline bool IS_VALID_BLK_ADDR(struct f2fs_sb_info *sbi, u32 addr)$/;"	f
+IS_VALID_NID	fsck/f2fs.h	/^static inline bool IS_VALID_NID(struct f2fs_sb_info *sbi, u32 nid)$/;"	f
+IS_XATTR_LAST_ENTRY	fsck/xattr.h	38;"	d
+K	tools/sha512.c	/^static const __u64 K[80] = {$/;"	v	file:
+KEYCTL_DESCRIBE	tools/f2fscrypt.c	83;"	d	file:
+KEYCTL_GET_KEYRING_ID	tools/f2fscrypt.c	81;"	d	file:
+KEYCTL_JOIN_SESSION_KEYRING	tools/f2fscrypt.c	82;"	d	file:
+KEYCTL_SEARCH	tools/f2fscrypt.c	84;"	d	file:
+KEYCTL_SESSION_TO_PARENT	tools/f2fscrypt.c	85;"	d	file:
+KEY_META	tools/f2fstat.c	20;"	d	file:
+KEY_NODE	tools/f2fstat.c	19;"	d	file:
+KEY_SPEC_GROUP_KEYRING	tools/f2fscrypt.c	79;"	d	file:
+KEY_SPEC_PROCESS_KEYRING	tools/f2fscrypt.c	75;"	d	file:
+KEY_SPEC_SESSION_KEYRING	tools/f2fscrypt.c	76;"	d	file:
+KEY_SPEC_THREAD_KEYRING	tools/f2fscrypt.c	74;"	d	file:
+KEY_SPEC_USER_KEYRING	tools/f2fscrypt.c	77;"	d	file:
+KEY_SPEC_USER_SESSION_KEYRING	tools/f2fscrypt.c	78;"	d	file:
+LFS	include/f2fs_fs.h	/^	LFS = 0,$/;"	e	enum:__anon15
+LIST_HEAD	include/list.h	19;"	d
+LIST_HEAD_INIT	include/list.h	17;"	d
+LIST_POISON1	include/list.h	3;"	d
+LIST_POISON2	include/list.h	4;"	d
+LOAD64H	tools/sha512.c	108;"	d	file:
+LOOKUP_NODE	fsck/node.h	/^	LOOKUP_NODE,	\/* lookup up a node without readahead *\/$/;"	e	enum:__anon4
+LOOKUP_NODE_RA	fsck/node.h	/^	LOOKUP_NODE_RA,$/;"	e	enum:__anon4
+MAX_ACTIVE_DATA_LOGS	include/f2fs_fs.h	472;"	d
+MAX_ACTIVE_LOGS	include/f2fs_fs.h	470;"	d
+MAX_ACTIVE_NODE_LOGS	include/f2fs_fs.h	471;"	d
+MAX_DEVICES	include/f2fs_fs.h	226;"	d
+MAX_DIR_BUCKETS	include/f2fs_fs.h	928;"	d
+MAX_DIR_HASH_DEPTH	include/f2fs_fs.h	925;"	d
+MAX_INLINE_DATA	include/f2fs_fs.h	634;"	d
+MAX_PATH_LEN	include/f2fs_fs.h	225;"	d
+MAX_RW	tools/f2fs_io_parse.c	/^	MAX_RW,$/;"	e	enum:rw_type	file:
+MAX_SIT_BITMAP_SIZE	include/f2fs_fs.h	766;"	d
+MAX_VALUE_LEN	fsck/xattr.h	61;"	d
+MAX_VOLUME_NAME	include/f2fs_fs.h	481;"	d
+MIN	tools/sha512.c	224;"	d	file:
+MIN_OFFSET	fsck/xattr.h	58;"	d
+MODELINQUIRY	lib/libf2fs.c	32;"	d	file:
+MSG	include/f2fs_fs.h	149;"	d
+Maj	tools/sha512.c	85;"	d	file:
+NAT_BITMAP	fsck/f2fs.h	/^	NAT_BITMAP,$/;"	e	enum:__anon3
+NAT_BLOCK_OFFSET	include/f2fs_fs.h	739;"	d
+NAT_ENTRY_PER_BLOCK	include/f2fs_fs.h	738;"	d
+NAT_JOURNAL	include/f2fs_fs.h	/^	NAT_JOURNAL = 0,$/;"	e	enum:__anon12
+NAT_JOURNAL_ENTRIES	include/f2fs_fs.h	836;"	d
+NAT_JOURNAL_RESERVED	include/f2fs_fs.h	838;"	d
+NEW_ADDR	include/f2fs_fs.h	455;"	d
+NIDS_PER_BLOCK	include/f2fs_fs.h	609;"	d
+NM_I	fsck/f2fs.h	/^static inline struct f2fs_nm_info *NM_I(struct f2fs_sb_info *sbi)$/;"	f
+NODE_DIND_BLOCK	include/f2fs_fs.h	615;"	d
+NODE_DIR1_BLOCK	include/f2fs_fs.h	611;"	d
+NODE_DIR2_BLOCK	include/f2fs_fs.h	612;"	d
+NODE_IND1_BLOCK	include/f2fs_fs.h	613;"	d
+NODE_IND2_BLOCK	include/f2fs_fs.h	614;"	d
+NODE_TYPE	fsck/fsck.h	/^enum NODE_TYPE {$/;"	g
+NOERROR	fsck/fsck.h	/^	NOERROR,$/;"	e	enum:__anon2
+NO_CHECK_TYPE	include/f2fs_fs.h	/^	NO_CHECK_TYPE$/;"	e	enum:__anon5
+NR_CURSEG_DATA_TYPE	include/f2fs_fs.h	422;"	d
+NR_CURSEG_NODE_TYPE	include/f2fs_fs.h	423;"	d
+NR_CURSEG_TYPE	include/f2fs_fs.h	424;"	d
+NR_DENTRY_IN_BLOCK	include/f2fs_fs.h	922;"	d
+NR_INLINE_DENTRY	include/f2fs_fs.h	958;"	d
+NULL_ADDR	include/f2fs_fs.h	454;"	d
+NULL_SEGNO	include/f2fs_fs.h	117;"	d
+OFFSET_BIT_SHIFT	include/f2fs_fs.h	/^	OFFSET_BIT_SHIFT$/;"	e	enum:__anon8
+OFFSET_IN_SEG	fsck/f2fs.h	/^static inline u32 OFFSET_IN_SEG(struct f2fs_sb_info *sbi, u64 blk_addr)$/;"	f
+OPT_QUIET	tools/f2fscrypt.c	111;"	d	file:
+OPT_VERBOSE	tools/f2fscrypt.c	110;"	d	file:
+O_BINARY	lib/libf2fs.c	36;"	d	file:
+PAGE_CACHE_SIZE	include/f2fs_fs.h	221;"	d
+PAGE_SIZE	include/f2fs_fs.h	220;"	d
+PARSE_FLAGS_FORCE_FN	tools/f2fscrypt.c	311;"	d	file:
+PARSE_FLAGS_NOTSUPP_OK	tools/f2fscrypt.c	310;"	d	file:
+POISON_POINTER_DELTA	include/list.h	2;"	d
+PREEN_MODE_0	fsck/fsck.h	/^	PREEN_MODE_0,$/;"	e	enum:__anon1
+PREEN_MODE_1	fsck/fsck.h	/^	PREEN_MODE_1,$/;"	e	enum:__anon1
+PREEN_MODE_MAX	fsck/fsck.h	/^	PREEN_MODE_MAX$/;"	e	enum:__anon1
+P_NAMELEN	tools/f2fs_io_parse.c	20;"	d	file:
+R	tools/sha512.c	87;"	d	file:
+READ	tools/f2fs_io_parse.c	/^	READ,$/;"	e	enum:rw_type	file:
+RESIZE	include/f2fs_fs.h	/^	RESIZE,$/;"	e	enum:f2fs_config_func
+RND	tools/sha512.c	92;"	d	file:
+ROR64c	tools/sha512.c	120;"	d	file:
+S	tools/sha512.c	86;"	d	file:
+SEG_ALIGN	include/f2fs_fs.h	1116;"	d
+SEG_TYPE_CUR_DATA	fsck/fsck.h	/^	SEG_TYPE_CUR_DATA,$/;"	e	enum:seg_type
+SEG_TYPE_CUR_NODE	fsck/fsck.h	/^	SEG_TYPE_CUR_NODE,$/;"	e	enum:seg_type
+SEG_TYPE_DATA	fsck/fsck.h	/^	SEG_TYPE_DATA,$/;"	e	enum:seg_type
+SEG_TYPE_MAX	fsck/fsck.h	/^	SEG_TYPE_MAX,$/;"	e	enum:seg_type
+SEG_TYPE_NODE	fsck/fsck.h	/^	SEG_TYPE_NODE,$/;"	e	enum:seg_type
+SET_SUM_TYPE	include/f2fs_fs.h	442;"	d
+SHA512_BLOCKSIZE	tools/sha512.c	225;"	d	file:
+SHA512_LENGTH	tools/f2fscrypt.c	153;"	d	file:
+SHOW_ALL	tools/f2fs_io_parse.c	/^	SHOW_ALL,$/;"	e	enum:show_type	file:
+SHOW_FTYPE	tools/f2fs_io_parse.c	/^	SHOW_FTYPE,$/;"	e	enum:show_type	file:
+SHOW_PID	tools/f2fs_io_parse.c	/^	SHOW_PID,$/;"	e	enum:show_type	file:
+SIT_BITMAP	fsck/f2fs.h	/^	SIT_BITMAP$/;"	e	enum:__anon3
+SIT_BLOCK_OFFSET	fsck/f2fs.h	358;"	d
+SIT_ENTRY_OFFSET	fsck/f2fs.h	356;"	d
+SIT_ENTRY_PER_BLOCK	include/f2fs_fs.h	759;"	d
+SIT_I	fsck/f2fs.h	/^static inline struct sit_info *SIT_I(struct f2fs_sb_info *sbi)$/;"	f
+SIT_JOURNAL	include/f2fs_fs.h	/^	SIT_JOURNAL$/;"	e	enum:__anon12
+SIT_JOURNAL_ENTRIES	include/f2fs_fs.h	840;"	d
+SIT_JOURNAL_RESERVED	include/f2fs_fs.h	842;"	d
+SIT_VBLOCKS_MASK	include/f2fs_fs.h	776;"	d
+SIT_VBLOCKS_SHIFT	include/f2fs_fs.h	775;"	d
+SIT_VBLOCK_MAP_SIZE	include/f2fs_fs.h	758;"	d
+SIZE_OF_DENTRY_BITMAP	include/f2fs_fs.h	931;"	d
+SIZE_OF_DIR_ENTRY	include/f2fs_fs.h	930;"	d
+SIZE_OF_RESERVED	include/f2fs_fs.h	933;"	d
+SLOAD	include/f2fs_fs.h	/^	SLOAD,$/;"	e	enum:f2fs_config_func
+SM_I	fsck/f2fs.h	/^static inline struct f2fs_sm_info *SM_I(struct f2fs_sb_info *sbi)$/;"	f
+SSR	include/f2fs_fs.h	/^	SSR$/;"	e	enum:__anon15
+START_BLOCK	fsck/f2fs.h	329;"	d
+STORE64H	tools/sha512.c	97;"	d	file:
+SUMMARY_SIZE	include/f2fs_fs.h	809;"	d
+SUM_ENTRIES_SIZE	include/f2fs_fs.h	811;"	d
+SUM_FOOTER_SIZE	include/f2fs_fs.h	810;"	d
+SUM_JOURNAL_SIZE	include/f2fs_fs.h	834;"	d
+SUM_TYPE_DATA	include/f2fs_fs.h	827;"	d
+SUM_TYPE_NODE	include/f2fs_fs.h	826;"	d
+S_SHIFT	fsck/f2fs.h	439;"	d
+Sigma0	tools/sha512.c	88;"	d	file:
+Sigma1	tools/sha512.c	89;"	d	file:
+TEA_transform	lib/libf2fs.c	/^static void TEA_transform(unsigned int buf[4], unsigned int const in[])$/;"	f	file:
+TOTAL_SEGS	fsck/f2fs.h	360;"	d
+TP_IOS	tools/f2fs_io_parse.c	/^	TP_IOS,$/;"	e	enum:trace_types	file:
+TP_MAX	tools/f2fs_io_parse.c	/^	TP_MAX,$/;"	e	enum:trace_types	file:
+TP_PID	tools/f2fs_io_parse.c	/^	TP_PID,$/;"	e	enum:trace_types	file:
+TYPE_DIRECT_NODE	fsck/fsck.h	/^	TYPE_DIRECT_NODE = 43,$/;"	e	enum:NODE_TYPE
+TYPE_DOUBLE_INDIRECT_NODE	fsck/fsck.h	/^	TYPE_DOUBLE_INDIRECT_NODE = 67,$/;"	e	enum:NODE_TYPE
+TYPE_INDIRECT_NODE	fsck/fsck.h	/^	TYPE_INDIRECT_NODE = 53,$/;"	e	enum:NODE_TYPE
+TYPE_INODE	fsck/fsck.h	/^	TYPE_INODE = 37,$/;"	e	enum:NODE_TYPE
+TYPE_XATTR	fsck/fsck.h	/^	TYPE_XATTR = 77$/;"	e	enum:NODE_TYPE
+VERSION_LEN	include/f2fs_fs.h	238;"	d
+WRITE	tools/f2fs_io_parse.c	/^	WRITE,$/;"	e	enum:rw_type	file:
+XATTR_ALIGN	fsck/xattr.h	48;"	d
+XATTR_CREATE	fsck/xattr.c	20;"	d	file:
+XATTR_ENTRY	fsck/xattr.h	41;"	d
+XATTR_FIRST_ENTRY	fsck/xattr.h	46;"	d
+XATTR_HDR	fsck/xattr.h	40;"	d
+XATTR_NEXT_ENTRY	fsck/xattr.h	44;"	d
+XATTR_NODE_OFFSET	include/f2fs_fs.h	714;"	d
+XATTR_REPLACE	fsck/xattr.c	21;"	d	file:
+XATTR_ROUND	fsck/xattr.h	34;"	d
+XATTR_SELINUX_SUFFIX	fsck/xattr.h	36;"	d
+ZONE_ALIGN	include/f2fs_fs.h	1117;"	d
+_CMD	tools/f2fscrypt.c	859;"	d	file:
+_F2FS_H_	fsck/f2fs.h	12;"	d
+_FSCK_H_	fsck/fsck.h	12;"	d
+_GNU_SOURCE	fsck/sload.c	14;"	d	file:
+_GNU_SOURCE	mkfs/f2fs_format_utils.c	12;"	d	file:
+_GNU_SOURCE	tools/f2fscrypt.c	20;"	d	file:
+_LARGEFILE64_SOURCE	lib/libf2fs.c	9;"	d	file:
+_LARGEFILE64_SOURCE	lib/libf2fs_io.c	9;"	d	file:
+_LARGEFILE64_SOURCE	lib/libf2fs_zoned.c	9;"	d	file:
+_LARGEFILE64_SOURCE	mkfs/f2fs_format.c	9;"	d	file:
+_LARGEFILE64_SOURCE	mkfs/f2fs_format_main.c	9;"	d	file:
+_LARGEFILE64_SOURCE	mkfs/f2fs_format_utils.c	10;"	d	file:
+_LARGEFILE64_SOURCE	mkfs/f2fs_format_utils.h	9;"	d
+_LARGEFILE64_SOURCE	tools/f2fs_io_parse.c	11;"	d	file:
+_LARGEFILE64_SOURCE	tools/f2fscrypt.c	16;"	d	file:
+_LARGEFILE64_SOURCE	tools/fibmap.c	1;"	d	file:
+_LARGEFILE_SOURCE	mkfs/f2fs_format_utils.c	9;"	d	file:
+_LARGEFILE_SOURCE	tools/f2fscrypt.c	12;"	d	file:
+_NODE_H_	fsck/node.h	17;"	d
+_XATTR_H_	fsck/xattr.h	17;"	d
+__ATOMIC_FILE	tools/f2fs_io_parse.c	/^	__ATOMIC_FILE,$/;"	e	enum:file_type	file:
+__DIR_FILE	tools/f2fs_io_parse.c	/^	__DIR_FILE,$/;"	e	enum:file_type	file:
+__F2FS_FS_H__	include/f2fs_fs.h	13;"	d
+__META_FILE	tools/f2fs_io_parse.c	/^	__META_FILE,$/;"	e	enum:file_type	file:
+__MISC_FILE	tools/f2fs_io_parse.c	/^	__MISC_FILE,$/;"	e	enum:file_type	file:
+__NODE_FILE	tools/f2fs_io_parse.c	/^	__NODE_FILE,$/;"	e	enum:file_type	file:
+__NORMAL_FILE	tools/f2fs_io_parse.c	/^	__NORMAL_FILE,$/;"	e	enum:file_type	file:
+__NR_FILES	tools/f2fs_io_parse.c	/^	__NR_FILES,$/;"	e	enum:file_type	file:
+__VOLATILE_FILE	tools/f2fs_io_parse.c	/^	__VOLATILE_FILE,$/;"	e	enum:file_type	file:
+__bitmap_ptr	fsck/f2fs.h	/^static inline void *__bitmap_ptr(struct f2fs_sb_info *sbi, int flag)$/;"	f
+__bitmap_size	fsck/f2fs.h	/^static inline unsigned long __bitmap_size(struct f2fs_sb_info *sbi, int flag)$/;"	f
+__check_inode_mode	fsck/fsck.c	/^static int __check_inode_mode(u32 nid, enum FILE_TYPE ftype, u32 mode)$/;"	f	file:
+__chk_dentries	fsck/fsck.c	/^static int __chk_dentries(struct f2fs_sb_info *sbi, struct child_info *child,$/;"	f	file:
+__chk_dots_dentries	fsck/fsck.c	/^static int __chk_dots_dentries(struct f2fs_sb_info *sbi,$/;"	f	file:
+__end_block_addr	fsck/f2fs.h	/^static inline block_t __end_block_addr(struct f2fs_sb_info *sbi)$/;"	f
+__ffs	lib/libf2fs.c	/^static inline u64 __ffs(u8 word)$/;"	f	file:
+__find_xattr	fsck/xattr.c	/^static struct f2fs_xattr_entry *__find_xattr(void *base_addr, int index,$/;"	f	file:
+__get_current_level	fsck/fsck.c	/^static int __get_current_level(int dir_level, u32 pgofs)$/;"	f	file:
+__get_device_fd	lib/libf2fs_io.c	/^static int __get_device_fd(__u64 *offset)$/;"	f	file:
+__get_extra_isize	include/f2fs_fs.h	/^static inline int __get_extra_isize(struct f2fs_inode *inode)$/;"	f
+__list_add	include/list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
+__list_del	include/list.h	/^static inline void __list_del(struct list_head * prev, struct list_head * next)$/;"	f
+__list_del_entry	include/list.h	/^static inline void __list_del_entry(struct list_head *entry)$/;"	f
+__make_head	tools/f2fstat.c	/^void __make_head(char *head, int index, int i, int len)$/;"	f
+__print_ftype	tools/f2fs_io_parse.c	/^static void __print_ftype()$/;"	f	file:
+__print_pid	tools/f2fs_io_parse.c	/^static void __print_pid()$/;"	f	file:
+__round_mask	include/f2fs_fs.h	405;"	d
+__start_cp_addr	fsck/f2fs.h	/^static inline block_t __start_cp_addr(struct f2fs_sb_info *sbi)$/;"	f
+__start_sum_addr	fsck/f2fs.h	/^static inline block_t __start_sum_addr(struct f2fs_sb_info *sbi)$/;"	f
+_check_out	scripts/verify.sh	/^_check_out()$/;"	f
+_find_next_bit_le	lib/libf2fs.c	/^static u64 _find_next_bit_le(const u8 *addr, u64 nbits, u64 start, char invert)$/;"	f	file:
+_fsck	scripts/verify.sh	/^_fsck()$/;"	f
+_fsstress	scripts/verify.sh	/^_fsstress()$/;"	f
+_get_sec	scripts/verify.sh	/^_get_sec()$/;"	f
+_mkfs	scripts/verify.sh	/^_mkfs()$/;"	f
+_mount	scripts/verify.sh	/^_mount()$/;"	f
+_resize	scripts/verify.sh	/^_resize()$/;"	f
+_resize_tests	scripts/verify.sh	/^_resize_tests()$/;"	f
+_sload	scripts/verify.sh	/^_sload()$/;"	f
+active_logs	fsck/f2fs.h	/^	int active_logs;                        \/* # of active logs *\/$/;"	m	struct:f2fs_sb_info
+actual_links	fsck/fsck.h	/^	u32 actual_links;$/;"	m	struct:hard_link_node
+add_into_hard_link_list	fsck/fsck.c	/^static int add_into_hard_link_list(struct f2fs_sb_info *sbi,$/;"	f	file:
+add_key	tools/f2fscrypt.c	/^static key_serial_t add_key(const char *type, const char *description,$/;"	f	file:
+add_key_desc	tools/f2fscrypt.c	673;"	d	file:
+add_key_help	tools/f2fscrypt.c	674;"	d	file:
+add_salt	tools/f2fscrypt.c	/^static void add_salt(unsigned char *salt, size_t salt_len)$/;"	f	file:
+addr	include/f2fs_fs.h	/^	__le32 addr[ADDRS_PER_BLOCK];	\/* array of data block address *\/$/;"	m	struct:direct_node
+addrs_per_inode	lib/libf2fs.c	/^unsigned int addrs_per_inode(struct f2fs_inode *i)$/;"	f
+alloc_type	fsck/f2fs.h	/^	unsigned char alloc_type;               \/* current allocation type *\/$/;"	m	struct:curseg_info
+alloc_type	include/f2fs_fs.h	/^	unsigned char alloc_type[MAX_ACTIVE_LOGS];$/;"	m	struct:f2fs_checkpoint
+alloc_valid_block_count	fsck/f2fs.h	/^	block_t alloc_valid_block_count;        \/* # of allocated blocks *\/$/;"	m	struct:f2fs_sb_info
+atoh	tools/f2fs_io_parse.c	/^static inline int atoh(char *str)$/;"	f	file:
+auto_fix	include/f2fs_fs.h	/^	int auto_fix;$/;"	m	struct:f2fs_configuration
+bg_gc	tools/f2fstat.c	/^unsigned long gc, bg_gc;$/;"	v
+bitmap	fsck/f2fs.h	/^	u8 *bitmap;$/;"	m	struct:f2fs_dentry_ptr
+bitmap_size	fsck/f2fs.h	/^	int bitmap_size;$/;"	m	struct:f2fs_nm_info
+bitmap_size	fsck/f2fs.h	/^	unsigned int bitmap_size;       \/* SIT bitmap size *\/$/;"	m	struct:sit_info
+bits_in_byte	lib/libf2fs.c	/^static const int bits_in_byte[256] = {$/;"	v	file:
+blk	fsck/fsck.h	/^	u32 blk;		\/* start block address of the extent *\/$/;"	m	struct:extent_info
+blk_addr	fsck/f2fs.h	/^	u32 blk_addr;$/;"	m	struct:node_info
+blk_addr	fsck/fsck.h	/^	int32_t blk_addr;$/;"	m	struct:dump_option
+blk_addr	include/f2fs_fs.h	/^	__le16 blk_addr;	\/* block index in current CP *\/$/;"	m	struct:f2fs_orphan_block
+blk_addr	include/f2fs_fs.h	/^	__le32 blk_addr;	\/* start block address of the extent *\/$/;"	m	struct:f2fs_extent
+blk_count	include/f2fs_fs.h	/^	__le16 blk_count;	\/* Number of orphan inode blocks in CP *\/$/;"	m	struct:f2fs_orphan_block
+blk_count	tools/fibmap.c	/^	__u32 blk_count;$/;"	m	struct:file_ext	file:
+blk_zone_cond	include/f2fs_fs.h	1072;"	d
+blk_zone_cond_str	include/f2fs_fs.h	/^blk_zone_cond_str(struct blk_zone *blkz)$/;"	f
+blk_zone_conv	include/f2fs_fs.h	1053;"	d
+blk_zone_empty	include/f2fs_fs.h	1098;"	d
+blk_zone_length	include/f2fs_fs.h	1101;"	d
+blk_zone_need_reset	include/f2fs_fs.h	1103;"	d
+blk_zone_non_seq	include/f2fs_fs.h	1104;"	d
+blk_zone_sector	include/f2fs_fs.h	1100;"	d
+blk_zone_seq	include/f2fs_fs.h	1056;"	d
+blk_zone_seq_pref	include/f2fs_fs.h	1055;"	d
+blk_zone_seq_req	include/f2fs_fs.h	1054;"	d
+blk_zone_type	include/f2fs_fs.h	1052;"	d
+blk_zone_type_str	include/f2fs_fs.h	/^blk_zone_type_str(struct blk_zone *blkz)$/;"	f
+blk_zone_wp_sector	include/f2fs_fs.h	1102;"	d
+blkaddr_in_inode	fsck/node.h	/^static inline __le32 *blkaddr_in_inode(struct f2fs_node *node)$/;"	f
+blkaddr_in_node	fsck/node.h	/^static inline __le32 *blkaddr_in_node(struct f2fs_node *node)$/;"	f
+blks_per_seg	include/f2fs_fs.h	/^	u_int32_t blks_per_seg;$/;"	m	struct:f2fs_configuration
+block	fsck/fsck.h	/^struct block {$/;"	s
+block_addr	include/f2fs_fs.h	/^	__le32 block_addr;	\/* block address *\/$/;"	m	struct:f2fs_nat_entry
+block_count	include/f2fs_fs.h	/^	__le64 block_count;		\/* total # of user blocks *\/$/;"	m	struct:f2fs_super_block
+block_t	include/f2fs_fs.h	/^typedef u32		block_t;$/;"	t
+blocks_per_seg	fsck/f2fs.h	/^	unsigned int blocks_per_seg;            \/* blocks per segment *\/$/;"	m	struct:f2fs_sb_info
+blocksize	fsck/f2fs.h	/^	unsigned int blocksize;                 \/* block size *\/$/;"	m	struct:f2fs_sb_info
+bool	include/f2fs_fs.h	/^typedef u8		bool;$/;"	t
+bswap_16	include/f2fs_fs.h	/^static inline uint16_t bswap_16(uint16_t val)$/;"	f
+bswap_32	include/f2fs_fs.h	/^static inline uint32_t bswap_32(uint32_t val)$/;"	f
+bswap_64	include/f2fs_fs.h	/^static inline uint64_t bswap_64(uint64_t val)$/;"	f
+bucket_blocks	fsck/f2fs.h	/^static inline unsigned int bucket_blocks(unsigned int level)$/;"	f
+buf	fsck/fsck.h	/^	unsigned char buf[BLOCK_SZ];$/;"	m	struct:block
+buf	lib/libf2fs_io.c	/^	void *buf;$/;"	m	struct:buf_item	file:
+buf	tools/sha512.c	/^	unsigned char buf[128];$/;"	m	struct:sha512_state	file:
+buf_item	lib/libf2fs_io.c	/^struct buf_item {$/;"	s	file:
+buf_list	lib/libf2fs_io.c	/^struct buf_item *buf_list;$/;"	v	typeref:struct:buf_item
+bug_on	include/f2fs_fs.h	/^	int bug_on;$/;"	m	struct:f2fs_configuration
+build_curseg	fsck/mount.c	/^static void build_curseg(struct f2fs_sb_info *sbi)$/;"	f	file:
+build_directory	fsck/sload.c	/^static int build_directory(struct f2fs_sb_info *sbi, const char *full_path,$/;"	f	file:
+build_nat_area_bitmap	fsck/mount.c	/^void build_nat_area_bitmap(struct f2fs_sb_info *sbi)$/;"	f
+build_node_manager	fsck/mount.c	/^int build_node_manager(struct f2fs_sb_info *sbi)$/;"	f
+build_segment_manager	fsck/mount.c	/^int build_segment_manager(struct f2fs_sb_info *sbi)$/;"	f
+build_sit_area_bitmap	fsck/mount.c	/^void build_sit_area_bitmap(struct f2fs_sb_info *sbi)$/;"	f
+build_sit_entries	fsck/mount.c	/^void build_sit_entries(struct f2fs_sb_info *sbi)$/;"	f
+build_sit_info	fsck/mount.c	/^int build_sit_info(struct f2fs_sb_info *sbi)$/;"	f
+c	lib/libf2fs_io.c	/^struct f2fs_configuration c;$/;"	v	typeref:struct:f2fs_configuration
+capabilities	fsck/f2fs.h	/^	uint64_t capabilities;$/;"	m	struct:dentry
+check_block_count	fsck/mount.c	/^void check_block_count(struct f2fs_sb_info *sbi,$/;"	f
+check_curseg_offset	fsck/fsck.c	/^int check_curseg_offset(struct f2fs_sb_info *sbi)$/;"	f
+check_extent_info	fsck/fsck.c	/^static void check_extent_info(struct child_info *child,$/;"	f	file:
+check_sector_size	fsck/mount.c	/^static int check_sector_size(struct f2fs_super_block *sb)$/;"	f	file:
+check_seg_range	fsck/mount.c	/^static inline void check_seg_range(struct f2fs_sb_info *sbi, unsigned int segno)$/;"	f	file:
+check_sit_types	fsck/fsck.c	/^int check_sit_types(struct f2fs_sb_info *sbi)$/;"	f
+check_stop	scripts/spo_test.sh	/^check_stop() {$/;"	f
+check_sum	include/f2fs_fs.h	/^	__le32 check_sum;		\/* summary checksum *\/$/;"	m	struct:summary_footer
+check_sum	include/f2fs_fs.h	/^	__le32 check_sum;	\/* CRC32 for orphan inode block *\/$/;"	m	struct:f2fs_orphan_block
+checkpoint_ver	include/f2fs_fs.h	/^	__le64 checkpoint_ver;		\/* checkpoint block version number *\/$/;"	m	struct:f2fs_checkpoint
+checksum_offset	include/f2fs_fs.h	/^	__le32 checksum_offset;		\/* checksum offset inside cp block *\/$/;"	m	struct:f2fs_checkpoint
+checksum_offset	include/f2fs_fs.h	/^	__le32 checksum_offset;		\/* checksum offset inside super block *\/$/;"	m	struct:f2fs_super_block
+child_info	fsck/fsck.h	/^struct child_info {$/;"	s
+chk	fsck/fsck.h	/^	} chk;$/;"	m	struct:f2fs_fsck	typeref:struct:f2fs_fsck::chk_result
+chk_result	fsck/fsck.h	/^	struct chk_result {$/;"	s	struct:f2fs_fsck
+chksum_seed	include/f2fs_fs.h	/^	u_int32_t chksum_seed;$/;"	m	struct:f2fs_configuration
+ckpt	fsck/f2fs.h	/^	struct f2fs_checkpoint *ckpt;$/;"	m	struct:f2fs_sb_info	typeref:struct:f2fs_sb_info::f2fs_checkpoint
+ckpt_flags	include/f2fs_fs.h	/^	__le32 ckpt_flags;		\/* Flags : umount and journal_present *\/$/;"	m	struct:f2fs_checkpoint
+ckpt_valid_blocks	fsck/f2fs.h	/^	unsigned short ckpt_valid_blocks;$/;"	m	struct:seg_entry
+ckpt_valid_map	fsck/f2fs.h	/^	unsigned char *ckpt_valid_map;$/;"	m	struct:seg_entry
+clear_secrets	tools/f2fscrypt.c	/^static void clear_secrets(void)$/;"	f	file:
+cmd_desc	tools/f2fscrypt.c	/^	const char *cmd_desc;$/;"	m	struct:cmd_desc	file:
+cmd_desc	tools/f2fscrypt.c	/^struct cmd_desc {$/;"	s	file:
+cmd_flags	tools/f2fscrypt.c	/^	int cmd_flags;$/;"	m	struct:cmd_desc	file:
+cmd_func	tools/f2fscrypt.c	/^	void (*cmd_func)(int, char **, const struct cmd_desc *);$/;"	m	struct:cmd_desc	file:
+cmd_help	tools/f2fscrypt.c	/^	const char *cmd_help;$/;"	m	struct:cmd_desc	file:
+cmd_list	tools/f2fscrypt.c	/^const struct cmd_desc cmd_list[] = {$/;"	v	typeref:struct:cmd_desc
+cmd_name	tools/f2fscrypt.c	/^	const char *cmd_name;$/;"	m	struct:cmd_desc	file:
+code	tools/f2fscrypt.c	/^	int code;$/;"	m	struct:keyring_map	file:
+compare_mm_table	tools/f2fstat.c	/^static int compare_mm_table(const void *a, const void *b)$/;"	f	file:
+container_of	include/list.h	9;"	d
+contents_encryption_mode	tools/f2fscrypt.c	/^	__u8 contents_encryption_mode;$/;"	m	struct:f2fs_fscrypt_policy	file:
+convert_encrypted_name	fsck/fsck.c	/^int convert_encrypted_name(unsigned char *name, int len,$/;"	f
+convert_inline_dentry	fsck/dir.c	/^int convert_inline_dentry(struct f2fs_sb_info *sbi, struct f2fs_node *node,$/;"	f
+cp	mkfs/f2fs_format.c	/^struct f2fs_checkpoint *cp;$/;"	v	typeref:struct:f2fs_checkpoint
+cp	tools/f2fstat.c	/^unsigned long cp;$/;"	v
+cp_blkaddr	include/f2fs_fs.h	/^	__le32 cp_blkaddr;		\/* start block address of checkpoint *\/$/;"	m	struct:f2fs_super_block
+cp_pack_start_sum	include/f2fs_fs.h	/^	__le32 cp_pack_start_sum;	\/* start block number of data summary *\/$/;"	m	struct:f2fs_checkpoint
+cp_pack_total_block_count	include/f2fs_fs.h	/^	__le32 cp_pack_total_block_count;	\/* total # of one cp pack *\/$/;"	m	struct:f2fs_checkpoint
+cp_payload	include/f2fs_fs.h	/^	__le32 cp_payload;$/;"	m	struct:f2fs_super_block
+cp_ver	include/f2fs_fs.h	/^	__le64 cp_ver;		\/* checkpoint version *\/$/;"	m	struct:node_footer
+cpu_to_le16	include/f2fs_fs.h	105;"	d
+cpu_to_le16	include/f2fs_fs.h	98;"	d
+cpu_to_le32	include/f2fs_fs.h	106;"	d
+cpu_to_le32	include/f2fs_fs.h	99;"	d
+cpu_to_le64	include/f2fs_fs.h	100;"	d
+cpu_to_le64	include/f2fs_fs.h	107;"	d
+cur_cp	fsck/f2fs.h	/^	int cur_cp;$/;"	m	struct:f2fs_sb_info
+cur_data_blkoff	include/f2fs_fs.h	/^	__le16 cur_data_blkoff[MAX_ACTIVE_DATA_LOGS];$/;"	m	struct:f2fs_checkpoint
+cur_data_segno	include/f2fs_fs.h	/^	__le32 cur_data_segno[MAX_ACTIVE_DATA_LOGS];$/;"	m	struct:f2fs_checkpoint
+cur_node_blkoff	include/f2fs_fs.h	/^	__le16 cur_node_blkoff[MAX_ACTIVE_NODE_LOGS];$/;"	m	struct:f2fs_checkpoint
+cur_node_segno	include/f2fs_fs.h	/^	__le32 cur_node_segno[MAX_ACTIVE_NODE_LOGS];$/;"	m	struct:f2fs_checkpoint
+cur_seg	include/f2fs_fs.h	/^	u_int32_t cur_seg[6];$/;"	m	struct:f2fs_configuration
+cur_valid_map	fsck/f2fs.h	/^	unsigned char *cur_valid_map;   \/* validity bitmap of blocks *\/$/;"	m	struct:seg_entry
+cur_victim_sec	fsck/f2fs.h	/^	unsigned int cur_victim_sec;            \/* current victim section num *\/$/;"	m	struct:f2fs_sb_info
+cure_extension_list	mkfs/f2fs_format.c	/^static void cure_extension_list(void)$/;"	f	file:
+curlen	tools/sha512.c	/^	unsigned long curlen;$/;"	m	struct:sha512_state	file:
+current_nat_addr	fsck/mount.c	/^static pgoff_t current_nat_addr(struct f2fs_sb_info *sbi, nid_t start)$/;"	f	file:
+curseg_array	fsck/f2fs.h	/^	struct curseg_info *curseg_array;$/;"	m	struct:f2fs_sm_info	typeref:struct:f2fs_sm_info::curseg_info
+curseg_info	fsck/f2fs.h	/^struct curseg_info {$/;"	s
+data_blkaddr	fsck/f2fs.h	/^	block_t data_blkaddr;$/;"	m	struct:dnode_of_data
+datablock_addr	fsck/node.h	/^static inline block_t datablock_addr(struct f2fs_node *node_page,$/;"	f
+dbg	tools/f2fstat.c	11;"	d	file:
+dbg	tools/f2fstat.c	9;"	d	file:
+dbg_lv	include/f2fs_fs.h	/^	int dbg_lv;$/;"	m	struct:f2fs_configuration
+defrag_len	include/f2fs_fs.h	/^	u_int64_t defrag_len;$/;"	m	struct:f2fs_configuration
+defrag_shrink	include/f2fs_fs.h	/^	int defrag_shrink;$/;"	m	struct:f2fs_configuration
+defrag_start	include/f2fs_fs.h	/^	u_int64_t defrag_start;$/;"	m	struct:f2fs_configuration
+defrag_target	include/f2fs_fs.h	/^	u_int64_t defrag_target;$/;"	m	struct:f2fs_configuration
+defrag_usage	fsck/main.c	/^void defrag_usage()$/;"	f
+delay	tools/f2fstat.c	/^	int delay;$/;"	m	struct:options	file:
+dentry	fsck/f2fs.h	/^	struct f2fs_dir_entry *dentry;$/;"	m	struct:f2fs_dentry_ptr	typeref:struct:f2fs_dentry_ptr::f2fs_dir_entry
+dentry	fsck/f2fs.h	/^struct dentry {$/;"	s
+dentry	include/f2fs_fs.h	/^	struct f2fs_dir_entry dentry[NR_DENTRY_IN_BLOCK];$/;"	m	struct:f2fs_dentry_block	typeref:struct:f2fs_dentry_block::f2fs_dir_entry
+dentry_bitmap	include/f2fs_fs.h	/^	__u8 dentry_bitmap[SIZE_OF_DENTRY_BITMAP];$/;"	m	struct:f2fs_dentry_block
+dentry_depth	fsck/fsck.h	/^	u32 dentry_depth;$/;"	m	struct:f2fs_fsck
+dev_fill	lib/libf2fs_io.c	/^int dev_fill(void *buf, __u64 offset, size_t len)$/;"	f
+dev_fill_block	lib/libf2fs_io.c	/^int dev_fill_block(void *buf, __u64 blk_addr)$/;"	f
+dev_read	lib/libf2fs_io.c	/^int dev_read(void *buf, __u64 offset, size_t len)$/;"	f
+dev_read_block	lib/libf2fs_io.c	/^int dev_read_block(void *buf, __u64 blk_addr)$/;"	f
+dev_read_version	lib/libf2fs_io.c	/^int dev_read_version(void *buf, __u64 offset, size_t len)$/;"	f
+dev_reada_block	lib/libf2fs_io.c	/^int dev_reada_block(__u64 blk_addr)$/;"	f
+dev_readahead	lib/libf2fs_io.c	/^int dev_readahead(__u64 offset, size_t len)$/;"	f
+dev_write	lib/libf2fs_io.c	/^int dev_write(void *buf, __u64 offset, size_t len)$/;"	f
+dev_write_block	lib/libf2fs_io.c	/^int dev_write_block(void *buf, __u64 blk_addr)$/;"	f
+dev_write_dump	lib/libf2fs_io.c	/^int dev_write_dump(void *buf, __u64 offset, size_t len)$/;"	f
+dev_write_sparse	lib/libf2fs_io.c	/^static int dev_write_sparse(void *buf, __u64 byte_offset, size_t byte_len) { return 0; }$/;"	f	file:
+dev_write_sparse	lib/libf2fs_io.c	/^static int dev_write_sparse(void *buf, __u64 byte_offset, size_t byte_len)$/;"	f	file:
+device_info	include/f2fs_fs.h	/^struct device_info {$/;"	s
+device_size	include/f2fs_fs.h	/^	u_int64_t device_size;$/;"	m	struct:f2fs_configuration
+devices	include/f2fs_fs.h	/^	struct device_info devices[MAX_DEVICES];$/;"	m	struct:f2fs_configuration	typeref:struct:f2fs_configuration::device_info
+devs	include/f2fs_fs.h	/^	struct f2fs_device devs[MAX_DEVICES];	\/* device list *\/$/;"	m	struct:f2fs_super_block	typeref:struct:f2fs_super_block::f2fs_device
+die_signal_handler	tools/f2fscrypt.c	/^static void die_signal_handler(int signum, siginfo_t *siginfo, void *context)$/;"	f	file:
+digest_encode	fsck/fsck.c	/^static int digest_encode(const char *src, int len, char *dst)$/;"	f	file:
+dir_block_index	fsck/f2fs.h	/^static inline unsigned long dir_block_index(unsigned int level,$/;"	f
+dir_buckets	fsck/f2fs.h	/^static inline unsigned int dir_buckets(unsigned int level, int dir_level)$/;"	f
+dir_level	fsck/fsck.h	/^	u8 dir_level;$/;"	m	struct:child_info
+direct_node	include/f2fs_fs.h	/^struct direct_node {$/;"	s
+dirty	fsck/f2fs.h	/^	int dirty;$/;"	m	struct:seg_entry
+dirty_dents	tools/f2fstat.c	/^unsigned long dirty_dents;$/;"	v
+dirty_meta	tools/f2fstat.c	/^unsigned long dirty_meta, meta_kb;$/;"	v
+dirty_node	tools/f2fstat.c	/^unsigned long dirty_node, node_kb;$/;"	v
+dirty_segs	tools/f2fstat.c	/^unsigned long dirty_segs;$/;"	v
+dirty_sentries	fsck/f2fs.h	/^	unsigned int dirty_sentries;            \/* # of dirty sentries *\/$/;"	m	struct:sit_info
+dirty_sentries_bitmap	fsck/f2fs.h	/^	unsigned long *dirty_sentries_bitmap;   \/* bitmap for dirty sentries *\/$/;"	m	struct:sit_info
+dirty_sit	tools/f2fstat.c	/^unsigned long dirty_sit;$/;"	v
+disable_echo	tools/f2fscrypt.c	/^static int disable_echo(struct termios *saved_settings)$/;"	f	file:
+discard_obsolete_dnode	mkfs/f2fs_format.c	/^static int discard_obsolete_dnode(struct f2fs_node *raw_node, u_int64_t offset)$/;"	f	file:
+dn	include/f2fs_fs.h	/^		struct direct_node dn;$/;"	m	union:f2fs_node::__anon9	typeref:struct:f2fs_node::__anon9::direct_node
+dnode_of_data	fsck/f2fs.h	/^struct dnode_of_data {$/;"	s
+do_add_key	tools/f2fscrypt.c	/^static void do_add_key(int argc, char **argv, const struct cmd_desc *cmd)$/;"	f	file:
+do_defrag	fsck/main.c	/^static int do_defrag(struct f2fs_sb_info *sbi)$/;"	f	file:
+do_dump	fsck/main.c	/^static void do_dump(struct f2fs_sb_info *sbi)$/;"	f	file:
+do_fsck	fsck/main.c	/^static void do_fsck(struct f2fs_sb_info *sbi)$/;"	f	file:
+do_get_policy	tools/f2fscrypt.c	/^static void do_get_policy(int argc, char **argv, const struct cmd_desc *cmd)$/;"	f	file:
+do_help	tools/f2fscrypt.c	/^static void do_help(int argc, char **argv, const struct cmd_desc *cmd)$/;"	f	file:
+do_init	tools/f2fs_io_parse.c	/^static void do_init()$/;"	f	file:
+do_new_session	tools/f2fscrypt.c	/^static void do_new_session(int argc, char **argv, const struct cmd_desc *cmd)$/;"	f	file:
+do_parse	tools/f2fs_io_parse.c	/^static void do_parse(FILE *file)$/;"	f	file:
+do_print	tools/f2fs_io_parse.c	/^static void do_print()$/;"	f	file:
+do_resize	fsck/main.c	/^static int do_resize(struct f2fs_sb_info *sbi)$/;"	f	file:
+do_set_policy	tools/f2fscrypt.c	/^static void do_set_policy(int argc, char **argv, const struct cmd_desc *cmd)$/;"	f	file:
+do_sload	fsck/main.c	/^static int do_sload(struct f2fs_sb_info *sbi)$/;"	f	file:
+dots	fsck/fsck.h	/^	u8 dots;$/;"	m	struct:child_info
+dump_data_blk	fsck/dump.c	/^static void dump_data_blk(struct f2fs_sb_info *sbi, __u64 offset, u32 blkaddr)$/;"	f	file:
+dump_data_offset	fsck/dump.c	/^static void dump_data_offset(u32 blk_addr, int ofs_in_node)$/;"	f	file:
+dump_fd	include/f2fs_fs.h	/^	int32_t dump_fd;$/;"	m	struct:f2fs_configuration
+dump_file	fsck/dump.c	/^static void dump_file(struct f2fs_sb_info *sbi, struct node_info *ni,$/;"	f	file:
+dump_info_from_blkaddr	fsck/dump.c	/^int dump_info_from_blkaddr(struct f2fs_sb_info *sbi, u32 blk_addr)$/;"	f
+dump_inode_blk	fsck/dump.c	/^static void dump_inode_blk(struct f2fs_sb_info *sbi, u32 nid,$/;"	f	file:
+dump_node	fsck/dump.c	/^void dump_node(struct f2fs_sb_info *sbi, nid_t nid, int force)$/;"	f
+dump_node_blk	fsck/dump.c	/^static void dump_node_blk(struct f2fs_sb_info *sbi, int ntype,$/;"	f	file:
+dump_node_from_blkaddr	fsck/dump.c	/^static void dump_node_from_blkaddr(u32 blk_addr)$/;"	f	file:
+dump_node_offset	fsck/dump.c	/^static void dump_node_offset(u32 blk_addr)$/;"	f	file:
+dump_option	fsck/fsck.h	/^struct dump_option {$/;"	s
+dump_usage	fsck/main.c	/^void dump_usage()$/;"	f
+e_name	fsck/xattr.h	/^	char e_name[0];		\/* attribute name *\/$/;"	m	struct:f2fs_xattr_entry
+e_name_index	fsck/xattr.h	/^	__u8 e_name_index;$/;"	m	struct:f2fs_xattr_entry
+e_name_len	fsck/xattr.h	/^	__u8 e_name_len;$/;"	m	struct:f2fs_xattr_entry
+e_value_size	fsck/xattr.h	/^	__le16 e_value_size;	\/* size of attribute value *\/$/;"	m	struct:f2fs_xattr_entry
+ei	fsck/fsck.h	/^	struct extent_info ei;$/;"	m	struct:child_info	typeref:struct:child_info::extent_info
+elapsed_time	fsck/f2fs.h	/^	unsigned long long elapsed_time;        \/* elapsed time after mount *\/$/;"	m	struct:sit_info
+elapsed_time	include/f2fs_fs.h	/^	__le64 elapsed_time;		\/* mounted time *\/$/;"	m	struct:f2fs_checkpoint
+encrypt_pw_salt	include/f2fs_fs.h	/^	__u8 encrypt_pw_salt[16];	\/* Salt used for string2key algorithm *\/$/;"	m	struct:f2fs_super_block
+encryption_level	include/f2fs_fs.h	/^	__u8 encryption_level;		\/* versioning level for encryption *\/$/;"	m	struct:f2fs_super_block
+end_blk	tools/fibmap.c	/^	__u32 end_blk;$/;"	m	struct:file_ext	file:
+end_blkaddr	include/f2fs_fs.h	/^	u_int64_t end_blkaddr;$/;"	m	struct:device_info
+end_nat	fsck/fsck.h	/^	int end_nat;$/;"	m	struct:dump_option
+end_sit	fsck/fsck.h	/^	int end_sit;$/;"	m	struct:dump_option
+end_ssa	fsck/fsck.h	/^	int end_ssa;$/;"	m	struct:dump_option
+entries	fsck/fsck.h	/^	struct f2fs_nat_entry *entries;$/;"	m	struct:f2fs_fsck	typeref:struct:f2fs_fsck::f2fs_nat_entry
+entries	include/f2fs_fs.h	/^	struct f2fs_nat_entry entries[NAT_ENTRY_PER_BLOCK];$/;"	m	struct:f2fs_nat_block	typeref:struct:f2fs_nat_block::f2fs_nat_entry
+entries	include/f2fs_fs.h	/^	struct f2fs_sit_entry entries[SIT_ENTRY_PER_BLOCK];$/;"	m	struct:f2fs_sit_block	typeref:struct:f2fs_sit_block::f2fs_sit_entry
+entries	include/f2fs_fs.h	/^	struct f2fs_summary entries[ENTRIES_IN_SUM];$/;"	m	struct:f2fs_summary_block	typeref:struct:f2fs_summary_block::f2fs_summary
+entries	include/f2fs_fs.h	/^	struct nat_journal_entry entries[NAT_JOURNAL_ENTRIES];$/;"	m	struct:nat_journal	typeref:struct:nat_journal::nat_journal_entry
+entries	include/f2fs_fs.h	/^	struct sit_journal_entry entries[SIT_JOURNAL_ENTRIES];$/;"	m	struct:sit_journal	typeref:struct:sit_journal::sit_journal_entry
+entry_count	include/f2fs_fs.h	/^	__le32 entry_count;	\/* Total number of orphan nodes in current CP *\/$/;"	m	struct:f2fs_orphan_block
+entry_type	include/f2fs_fs.h	/^	unsigned char entry_type;	\/* SUM_TYPE_XXX *\/$/;"	m	struct:summary_footer
+error_out	fsck/main.c	/^static void error_out(char *prog)$/;"	f	file:
+extension_count	include/f2fs_fs.h	/^	__le32 extension_count;		\/* # of extensions below *\/$/;"	m	struct:f2fs_super_block
+extension_list	include/f2fs_fs.h	/^	__u8 extension_list[F2FS_MAX_EXTENSION][8];	\/* extension array *\/$/;"	m	struct:f2fs_super_block
+extension_list	include/f2fs_fs.h	/^	char *extension_list;$/;"	m	struct:f2fs_configuration
+extent_info	fsck/fsck.h	/^struct extent_info {$/;"	s
+f2fs_add_default_dentry_root	mkfs/f2fs_format.c	/^static int f2fs_add_default_dentry_root(void)$/;"	f	file:
+f2fs_add_link	fsck/dir.c	/^static int f2fs_add_link(struct f2fs_sb_info *sbi, struct f2fs_node *parent,$/;"	f	file:
+f2fs_alloc_nid	fsck/node.c	/^void f2fs_alloc_nid(struct f2fs_sb_info *sbi, nid_t *nid, int inode)$/;"	f
+f2fs_build_file	fsck/segment.c	/^int f2fs_build_file(struct f2fs_sb_info *sbi, struct dentry *de)$/;"	f
+f2fs_cal_crc32	lib/libf2fs.c	/^u_int32_t f2fs_cal_crc32(u_int32_t crc, void *buf, int len)$/;"	f
+f2fs_check_dirent_position	fsck/fsck.c	/^static int f2fs_check_dirent_position(u8 *name, u16 name_len, u32 pgofs,$/;"	f	file:
+f2fs_check_hash_code	fsck/fsck.c	/^static int f2fs_check_hash_code(struct f2fs_dir_entry *dentry,$/;"	f	file:
+f2fs_check_overwrite	mkfs/f2fs_format_main.c	/^static int f2fs_check_overwrite(void)$/;"	f	file:
+f2fs_check_zones	lib/libf2fs_zoned.c	/^int f2fs_check_zones(int i)$/;"	f
+f2fs_check_zones	lib/libf2fs_zoned.c	/^int f2fs_check_zones(int j)$/;"	f
+f2fs_checkpoint	include/f2fs_fs.h	/^struct f2fs_checkpoint {$/;"	s
+f2fs_clear_bit	lib/libf2fs.c	/^int f2fs_clear_bit(unsigned int nr, char *addr)$/;"	f
+f2fs_config_func	include/f2fs_fs.h	/^enum f2fs_config_func {$/;"	g
+f2fs_configuration	include/f2fs_fs.h	/^struct f2fs_configuration {$/;"	s
+f2fs_crc_valid	lib/libf2fs.c	/^int f2fs_crc_valid(u_int32_t blk_crc, void *buf, int len)$/;"	f
+f2fs_create	fsck/dir.c	/^int f2fs_create(struct f2fs_sb_info *sbi, struct dentry *de)$/;"	f
+f2fs_create_root_dir	mkfs/f2fs_format.c	/^static int f2fs_create_root_dir(void)$/;"	f	file:
+f2fs_defragment	fsck/defrag.c	/^int f2fs_defragment(struct f2fs_sb_info *sbi, u64 from, u64 len, u64 to, int left)$/;"	f
+f2fs_dentry_block	include/f2fs_fs.h	/^struct f2fs_dentry_block {$/;"	s
+f2fs_dentry_hash	lib/libf2fs.c	/^f2fs_hash_t f2fs_dentry_hash(const unsigned char *name, int len)$/;"	f
+f2fs_dentry_ptr	fsck/f2fs.h	/^struct f2fs_dentry_ptr {$/;"	s
+f2fs_dev_is_overwrite	mkfs/f2fs_format_main.c	/^static int f2fs_dev_is_overwrite(const char *device)$/;"	f	file:
+f2fs_dev_is_umounted	lib/libf2fs.c	/^int f2fs_dev_is_umounted(char *path)$/;"	f
+f2fs_device	include/f2fs_fs.h	/^struct f2fs_device {$/;"	s
+f2fs_devs_are_umounted	lib/libf2fs.c	/^int f2fs_devs_are_umounted(void)$/;"	f
+f2fs_dir_entry	include/f2fs_fs.h	/^struct f2fs_dir_entry {$/;"	s
+f2fs_do_mount	fsck/mount.c	/^int f2fs_do_mount(struct f2fs_sb_info *sbi)$/;"	f
+f2fs_do_umount	fsck/mount.c	/^void f2fs_do_umount(struct f2fs_sb_info *sbi)$/;"	f
+f2fs_encryption_key	tools/f2fscrypt.c	/^struct f2fs_encryption_key {$/;"	s	file:
+f2fs_extent	include/f2fs_fs.h	/^struct f2fs_extent {$/;"	s
+f2fs_extra_info	include/f2fs_fs.h	/^struct f2fs_extra_info {$/;"	s
+f2fs_finalize_device	lib/libf2fs_io.c	/^void f2fs_finalize_device(void)$/;"	f
+f2fs_find_entry	fsck/dir.c	/^static int f2fs_find_entry(struct f2fs_sb_info *sbi,$/;"	f	file:
+f2fs_find_path	fsck/dir.c	/^int f2fs_find_path(struct f2fs_sb_info *sbi, char *path, nid_t *ino)$/;"	f
+f2fs_format_device	mkfs/f2fs_format.c	/^int f2fs_format_device(void)$/;"	f
+f2fs_fsck	fsck/fsck.h	/^struct f2fs_fsck {$/;"	s
+f2fs_fscrypt_policy	tools/f2fscrypt.c	/^struct f2fs_fscrypt_policy {$/;"	s	file:
+f2fs_get_device_info	lib/libf2fs.c	/^int f2fs_get_device_info(void)$/;"	f
+f2fs_get_zone_blocks	lib/libf2fs_zoned.c	/^int f2fs_get_zone_blocks(int i)$/;"	f
+f2fs_get_zoned_model	lib/libf2fs_zoned.c	/^void f2fs_get_zoned_model(int i)$/;"	f
+f2fs_has_extra_isize	include/f2fs_fs.h	/^static inline bool f2fs_has_extra_isize(struct f2fs_inode *inode)$/;"	f
+f2fs_hash_t	include/f2fs_fs.h	/^typedef __le32	f2fs_hash_t;$/;"	t
+f2fs_init_configuration	lib/libf2fs.c	/^void f2fs_init_configuration(void)$/;"	f
+f2fs_init_nat_area	mkfs/f2fs_format.c	/^static int f2fs_init_nat_area(void)$/;"	f	file:
+f2fs_init_nid_bitmap	fsck/mount.c	/^static int f2fs_init_nid_bitmap(struct f2fs_sb_info *sbi)$/;"	f	file:
+f2fs_init_sit_area	mkfs/f2fs_format.c	/^static int f2fs_init_sit_area(void)$/;"	f	file:
+f2fs_inode	include/f2fs_fs.h	/^struct f2fs_inode {$/;"	s
+f2fs_inode_chksum	lib/libf2fs.c	/^__u32 f2fs_inode_chksum(struct f2fs_node *node)$/;"	f
+f2fs_journal	include/f2fs_fs.h	/^struct f2fs_journal {$/;"	s
+f2fs_make_directory	fsck/sload.c	/^static void f2fs_make_directory(struct f2fs_sb_info *sbi,$/;"	f	file:
+f2fs_mkdir	fsck/dir.c	/^int f2fs_mkdir(struct f2fs_sb_info *sbi, struct dentry *de)$/;"	f
+f2fs_nat_block	include/f2fs_fs.h	/^struct f2fs_nat_block {$/;"	s
+f2fs_nat_entry	include/f2fs_fs.h	/^struct f2fs_nat_entry {$/;"	s
+f2fs_nm_info	fsck/f2fs.h	/^struct f2fs_nm_info {$/;"	s
+f2fs_node	include/f2fs_fs.h	/^struct f2fs_node {$/;"	s
+f2fs_orphan_block	include/f2fs_fs.h	/^struct f2fs_orphan_block {$/;"	s
+f2fs_parse_options	fsck/main.c	/^void f2fs_parse_options(int argc, char *argv[])$/;"	f
+f2fs_parse_options	mkfs/f2fs_format_main.c	/^static void f2fs_parse_options(int argc, char *argv[])$/;"	f	file:
+f2fs_prepare_super_block	mkfs/f2fs_format.c	/^static int f2fs_prepare_super_block(void)$/;"	f	file:
+f2fs_reset_zones	lib/libf2fs_zoned.c	/^int f2fs_reset_zones(int i)$/;"	f
+f2fs_reset_zones	lib/libf2fs_zoned.c	/^int f2fs_reset_zones(int j)$/;"	f
+f2fs_resize	fsck/resize.c	/^int f2fs_resize(struct f2fs_sb_info *sbi)$/;"	f
+f2fs_sb_info	fsck/f2fs.h	/^struct f2fs_sb_info {$/;"	s
+f2fs_set_bit	lib/libf2fs.c	/^int f2fs_set_bit(unsigned int nr, char *addr)$/;"	f
+f2fs_set_main_bitmap	fsck/fsck.c	/^static inline int f2fs_set_main_bitmap(struct f2fs_sb_info *sbi, u32 blk,$/;"	f	file:
+f2fs_setxattr	fsck/xattr.c	/^int f2fs_setxattr(struct f2fs_sb_info *sbi, nid_t ino, int index, const char *name,$/;"	f
+f2fs_sha512	tools/sha512.c	/^void f2fs_sha512(const unsigned char *in, unsigned long in_size,$/;"	f
+f2fs_show_info	mkfs/f2fs_format_main.c	/^static void f2fs_show_info()$/;"	f	file:
+f2fs_sit_block	include/f2fs_fs.h	/^struct f2fs_sit_block {$/;"	s
+f2fs_sit_entry	include/f2fs_fs.h	/^struct f2fs_sit_entry {$/;"	s
+f2fs_sload	fsck/sload.c	/^int f2fs_sload(struct f2fs_sb_info *sbi, const char *from_dir,$/;"	f
+f2fs_sm_info	fsck/f2fs.h	/^struct f2fs_sm_info {$/;"	s
+f2fs_sparse_file	lib/libf2fs_io.c	/^struct sparse_file *f2fs_sparse_file;$/;"	v	typeref:struct:sparse_file
+f2fs_summary	include/f2fs_fs.h	/^struct f2fs_summary {$/;"	s
+f2fs_summary_block	include/f2fs_fs.h	/^struct f2fs_summary_block {$/;"	s
+f2fs_super_block	include/f2fs_fs.h	/^struct f2fs_super_block {$/;"	s
+f2fs_symlink	fsck/dir.c	/^int f2fs_symlink(struct f2fs_sb_info *sbi, struct dentry *de)$/;"	f
+f2fs_test_bit	lib/libf2fs.c	/^int f2fs_test_bit(unsigned int nr, const char *p)$/;"	f
+f2fs_test_main_bitmap	fsck/fsck.c	/^static inline int f2fs_test_main_bitmap(struct f2fs_sb_info *sbi, u32 blk)$/;"	f	file:
+f2fs_test_sit_bitmap	fsck/fsck.c	/^static inline int f2fs_test_sit_bitmap(struct f2fs_sb_info *sbi, u32 blk)$/;"	f	file:
+f2fs_trim_devices	mkfs/f2fs_format_utils.c	/^int f2fs_trim_devices(void)$/;"	f
+f2fs_type_by_mode	fsck/f2fs.h	/^static unsigned char f2fs_type_by_mode[S_IFMT >> S_SHIFT] = {$/;"	v
+f2fs_update_dentry	fsck/dir.c	/^static void f2fs_update_dentry(nid_t ino, int file_type,$/;"	f	file:
+f2fs_update_nat_root	mkfs/f2fs_format.c	/^static int f2fs_update_nat_root(void)$/;"	f	file:
+f2fs_write_block	fsck/segment.c	/^static void f2fs_write_block(struct f2fs_sb_info *sbi, nid_t ino, void *buffer,$/;"	f	file:
+f2fs_write_check_point_pack	mkfs/f2fs_format.c	/^static int f2fs_write_check_point_pack(void)$/;"	f	file:
+f2fs_write_root_inode	mkfs/f2fs_format.c	/^static int f2fs_write_root_inode(void)$/;"	f	file:
+f2fs_write_super_block	mkfs/f2fs_format.c	/^static int f2fs_write_super_block(void)$/;"	f	file:
+f2fs_xattr_entry	fsck/xattr.h	/^struct f2fs_xattr_entry {$/;"	s
+f2fs_xattr_header	fsck/xattr.h	/^struct f2fs_xattr_header {$/;"	s
+f2fstat	tools/f2fstat.c	/^void f2fstat(struct options *opt)$/;"	f
+f_pos	tools/fibmap.c	/^	__u32 f_pos;$/;"	m	struct:file_ext	file:
+fcnt	fsck/f2fs.h	/^	unsigned int fcnt;$/;"	m	struct:f2fs_nm_info
+fd	include/f2fs_fs.h	/^	int32_t fd;$/;"	m	struct:device_info
+feature	include/f2fs_fs.h	/^	__le32 feature;			\/* defined features *\/$/;"	m	struct:f2fs_configuration
+feature	include/f2fs_fs.h	/^	__le32 feature;			\/* defined features *\/$/;"	m	struct:f2fs_super_block
+file_enc_name	include/f2fs_fs.h	657;"	d
+file_ext	tools/fibmap.c	/^struct file_ext {$/;"	s	file:
+file_is_encrypt	include/f2fs_fs.h	656;"	d
+file_type	fsck/f2fs.h	/^	u8 file_type;$/;"	m	struct:dentry
+file_type	include/f2fs_fs.h	/^	__u8 file_type;		\/* file type *\/$/;"	m	struct:f2fs_dir_entry
+file_type	tools/f2fs_io_parse.c	/^enum file_type {$/;"	g	file:
+file_type_string	tools/f2fs_io_parse.c	/^char *file_type_string[] = {$/;"	v
+filename	fsck/f2fs.h	/^	__u8 (*filename)[F2FS_SLOT_LEN];$/;"	m	struct:f2fs_dentry_ptr
+filename	include/f2fs_fs.h	/^	__u8 filename[NR_DENTRY_IN_BLOCK][F2FS_SLOT_LEN];$/;"	m	struct:f2fs_dentry_block
+filenames_encryption_mode	tools/f2fscrypt.c	/^	__u8 filenames_encryption_mode;$/;"	m	struct:f2fs_fscrypt_policy	file:
+files	fsck/fsck.h	/^	u32 files;$/;"	m	struct:child_info
+filter_dot	fsck/sload.c	/^static int filter_dot(const struct dirent *d)$/;"	f	file:
+find_and_dec_hard_link_list	fsck/fsck.c	/^static int find_and_dec_hard_link_list(struct f2fs_sb_info *sbi, u32 nid)$/;"	f	file:
+find_by_salt	tools/f2fscrypt.c	/^static struct salt *find_by_salt(unsigned char *salt, size_t salt_len)$/;"	f	file:
+find_in_block	fsck/dir.c	/^static struct f2fs_dir_entry *find_in_block(void *block,$/;"	f	file:
+find_in_level	fsck/dir.c	/^static int find_in_level(struct f2fs_sb_info *sbi,struct f2fs_node *dir,$/;"	f	file:
+find_next_bit_le	lib/libf2fs.c	/^u64 find_next_bit_le(const u8 *addr, u64 size, u64 offset)$/;"	f
+find_next_free_block	fsck/mount.c	/^int find_next_free_block(struct f2fs_sb_info *sbi, u64 *to, int left, int type)$/;"	f
+find_next_zero_bit_le	lib/libf2fs.c	/^u64 find_next_zero_bit_le(const u8 *addr, u64 size, u64 offset)$/;"	f
+find_target_dentry	fsck/dir.c	/^static struct f2fs_dir_entry *find_target_dentry(const u8 *name,$/;"	f	file:
+fix_checkpoint	fsck/fsck.c	/^static void fix_checkpoint(struct f2fs_sb_info *sbi)$/;"	f	file:
+fix_hard_links	fsck/fsck.c	/^static void fix_hard_links(struct f2fs_sb_info *sbi)$/;"	f	file:
+fix_nat_entries	fsck/fsck.c	/^static void fix_nat_entries(struct f2fs_sb_info *sbi)$/;"	f	file:
+fix_on	include/f2fs_fs.h	/^	int fix_on;$/;"	m	struct:f2fs_configuration
+flag	include/f2fs_fs.h	/^	__le32 flag;		\/* include cold\/fsync\/dentry marks and offset *\/$/;"	m	struct:node_footer
+flag	tools/f2fstat.c	/^	int flag;$/;"	m	struct:mm_table	file:
+flags	tools/f2fscrypt.c	/^	__u8 flags;$/;"	m	struct:f2fs_fscrypt_policy	file:
+flush_curseg_sit_entries	fsck/fsck.c	/^static void flush_curseg_sit_entries(struct f2fs_sb_info *sbi)$/;"	f	file:
+flush_journal_entries	fsck/mount.c	/^void flush_journal_entries(struct f2fs_sb_info *sbi)$/;"	f
+flush_nat_journal_entries	fsck/mount.c	/^static int flush_nat_journal_entries(struct f2fs_sb_info *sbi)$/;"	f	file:
+flush_sit_entries	fsck/mount.c	/^void flush_sit_entries(struct f2fs_sb_info *sbi)$/;"	f
+flush_sit_journal_entries	fsck/mount.c	/^static int flush_sit_journal_entries(struct f2fs_sb_info *sbi)$/;"	f	file:
+fofs	fsck/fsck.h	/^	u32 fofs;		\/* start offset in a file *\/$/;"	m	struct:extent_info
+fofs	include/f2fs_fs.h	/^	__le32 fofs;		\/* start file offset of the extent *\/$/;"	m	struct:f2fs_extent
+footer	include/f2fs_fs.h	/^	struct node_footer footer;$/;"	m	struct:f2fs_node	typeref:struct:f2fs_node::node_footer
+footer	include/f2fs_fs.h	/^	struct summary_footer footer;$/;"	m	struct:f2fs_summary_block	typeref:struct:f2fs_summary_block::summary_footer
+force_overwrite	mkfs/f2fs_format_main.c	/^static int force_overwrite = 0;$/;"	v	file:
+free_nids	tools/f2fstat.c	/^unsigned long free_nids;$/;"	v
+free_segment_count	include/f2fs_fs.h	/^	__le32 free_segment_count;	\/* # of free segments in main area *\/$/;"	m	struct:f2fs_checkpoint
+free_segments	fsck/f2fs.h	/^	u32 free_segments;$/;"	m	struct:f2fs_sb_info
+free_segs	tools/f2fstat.c	/^unsigned long free_segs;$/;"	v
+from_dir	include/f2fs_fs.h	/^	char *from_dir;$/;"	m	struct:f2fs_configuration
+from_mount	scripts/verify.sh	/^from_mount()$/;"	f
+from_sload	scripts/verify.sh	/^from_sload()$/;"	f
+fsck	fsck/f2fs.h	/^	struct f2fs_fsck *fsck;$/;"	m	struct:f2fs_sb_info	typeref:struct:f2fs_sb_info::f2fs_fsck
+fsck_chk_data_blk	fsck/fsck.c	/^int fsck_chk_data_blk(struct f2fs_sb_info *sbi, u32 blk_addr,$/;"	f
+fsck_chk_dentry_blk	fsck/fsck.c	/^int fsck_chk_dentry_blk(struct f2fs_sb_info *sbi, u32 blk_addr,$/;"	f
+fsck_chk_didnode_blk	fsck/fsck.c	/^int fsck_chk_didnode_blk(struct f2fs_sb_info *sbi, struct f2fs_inode *inode,$/;"	f
+fsck_chk_dnode_blk	fsck/fsck.c	/^int fsck_chk_dnode_blk(struct f2fs_sb_info *sbi, struct f2fs_inode *inode,$/;"	f
+fsck_chk_idnode_blk	fsck/fsck.c	/^int fsck_chk_idnode_blk(struct f2fs_sb_info *sbi, struct f2fs_inode *inode,$/;"	f
+fsck_chk_inline_dentries	fsck/fsck.c	/^int fsck_chk_inline_dentries(struct f2fs_sb_info *sbi,$/;"	f
+fsck_chk_inode_blk	fsck/fsck.c	/^void fsck_chk_inode_blk(struct f2fs_sb_info *sbi, u32 nid,$/;"	f
+fsck_chk_meta	fsck/fsck.c	/^int fsck_chk_meta(struct f2fs_sb_info *sbi)$/;"	f
+fsck_chk_node_blk	fsck/fsck.c	/^int fsck_chk_node_blk(struct f2fs_sb_info *sbi, struct f2fs_inode *inode,$/;"	f
+fsck_chk_orphan_node	fsck/fsck.c	/^int fsck_chk_orphan_node(struct f2fs_sb_info *sbi)$/;"	f
+fsck_chk_xattr_blk	fsck/fsck.c	/^static int fsck_chk_xattr_blk(struct f2fs_sb_info *sbi, u32 ino,$/;"	f	file:
+fsck_free	fsck/fsck.c	/^void fsck_free(struct f2fs_sb_info *sbi)$/;"	f
+fsck_init	fsck/fsck.c	/^void fsck_init(struct f2fs_sb_info *sbi)$/;"	f
+fsck_usage	fsck/main.c	/^void fsck_usage()$/;"	f
+fsck_verify	fsck/fsck.c	/^int fsck_verify(struct f2fs_sb_info *sbi)$/;"	f
+full_path	fsck/f2fs.h	/^	char *full_path;$/;"	m	struct:dentry
+func	include/f2fs_fs.h	/^	int func;$/;"	m	struct:f2fs_configuration
+gc	tools/f2fstat.c	/^unsigned long gc, bg_gc;$/;"	v
+gc_data_blks	tools/f2fstat.c	/^unsigned long gc_data_blks;$/;"	v
+gc_node_blks	tools/f2fstat.c	/^unsigned long gc_node_blks;$/;"	v
+generate_key_ref_str	tools/f2fscrypt.c	/^static void generate_key_ref_str(struct salt *salt)$/;"	f	file:
+get_best_overprovision	include/f2fs_fs.h	/^static inline double get_best_overprovision(struct f2fs_super_block *sb)$/;"	f
+get_bits_in_byte	lib/libf2fs.c	/^int get_bits_in_byte(unsigned char n)$/;"	f
+get_cp	include/f2fs_fs.h	391;"	d
+get_cp_crc	include/f2fs_fs.h	/^static inline __le64 get_cp_crc(struct f2fs_checkpoint *cp)$/;"	f
+get_cp_le16	include/f2fs_fs.h	379;"	d
+get_cp_le32	include/f2fs_fs.h	378;"	d
+get_cp_le64	include/f2fs_fs.h	377;"	d
+get_current_sit_page	fsck/mount.c	/^struct f2fs_sit_block *get_current_sit_page(struct f2fs_sb_info *sbi,$/;"	f
+get_default_salts	tools/f2fscrypt.c	/^static void get_default_salts(void)$/;"	f	file:
+get_device_info	lib/libf2fs.c	/^int get_device_info(int i)$/;"	f
+get_dnode_of_data	fsck/node.c	/^void get_dnode_of_data(struct f2fs_sb_info *sbi, struct dnode_of_data *dn,$/;"	f
+get_extent_info	fsck/fsck.c	/^static inline void get_extent_info(struct extent_info *ext,$/;"	f	file:
+get_extra_isize	include/f2fs_fs.h	1044;"	d
+get_free_segments	fsck/mount.c	/^u32 get_free_segments(struct f2fs_sb_info *sbi)$/;"	f
+get_kernel_version	lib/libf2fs.c	/^void get_kernel_version(__u8 *version)$/;"	f
+get_keyring_id	tools/f2fscrypt.c	/^static int get_keyring_id(const char *keyring)$/;"	f	file:
+get_nat_entry	fsck/mount.c	/^static void get_nat_entry(struct f2fs_sb_info *sbi, nid_t nid,$/;"	f	file:
+get_new_sb	fsck/resize.c	/^static int get_new_sb(struct f2fs_super_block *sb)$/;"	f	file:
+get_newsb	include/f2fs_fs.h	363;"	d
+get_newsb_le16	include/f2fs_fs.h	341;"	d
+get_newsb_le32	include/f2fs_fs.h	340;"	d
+get_newsb_le64	include/f2fs_fs.h	339;"	d
+get_nid	fsck/node.h	/^static inline nid_t get_nid(struct f2fs_node * rn, int off, int i)$/;"	f
+get_node_info	fsck/mount.c	/^void get_node_info(struct f2fs_sb_info *sbi, nid_t nid, struct node_info *ni)$/;"	f
+get_node_path	fsck/node.c	/^static int get_node_path(struct f2fs_node *node, unsigned long block,$/;"	f	file:
+get_passphrase	tools/f2fscrypt.c	/^static void get_passphrase(char *passphrase, int len)$/;"	f	file:
+get_pid_entry	tools/f2fs_io_parse.c	/^struct pid_ent *get_pid_entry(int pid)$/;"	f
+get_policy_desc	tools/f2fscrypt.c	784;"	d	file:
+get_policy_help	tools/f2fscrypt.c	785;"	d	file:
+get_rootdev	lib/libf2fs.c	/^const char *get_rootdev()$/;"	f
+get_sb	include/f2fs_fs.h	353;"	d
+get_sb_le16	include/f2fs_fs.h	338;"	d
+get_sb_le32	include/f2fs_fs.h	337;"	d
+get_sb_le64	include/f2fs_fs.h	336;"	d
+get_seg_entry	fsck/mount.c	/^struct seg_entry *get_seg_entry(struct f2fs_sb_info *sbi,$/;"	f
+get_sum_block	fsck/mount.c	/^struct f2fs_summary_block *get_sum_block(struct f2fs_sb_info *sbi,$/;"	f
+get_sum_entry	fsck/mount.c	/^int get_sum_entry(struct f2fs_sb_info *sbi, u32 blk_addr,$/;"	f
+get_valid_checkpoint	fsck/mount.c	/^int get_valid_checkpoint(struct f2fs_sb_info *sbi)$/;"	f
+gfsck	fsck/main.c	/^struct f2fs_fsck gfsck;$/;"	v	typeref:struct:f2fs_fsck
+gid	fsck/f2fs.h	/^	u16 gid;$/;"	m	struct:dentry
+h_magic	fsck/xattr.h	/^	__le32 h_magic;		\/* magic number for identification *\/$/;"	m	struct:f2fs_xattr_header
+h_refcount	fsck/xattr.h	/^	__le32 h_refcount;	\/* reference count *\/$/;"	m	struct:f2fs_xattr_header
+h_sloadd	fsck/xattr.h	/^	__u32 h_sloadd[4];	\/* zero right now *\/$/;"	m	struct:f2fs_xattr_header
+handle_selabel	fsck/sload.c	/^static void handle_selabel(struct dentry *de, int dir, char *target_out)$/;"	f	file:
+handle_selabel	fsck/sload.c	44;"	d	file:
+handle_tp_ios	tools/f2fs_io_parse.c	/^static void handle_tp_ios(char *ptr)$/;"	f	file:
+handle_tp_pid	tools/f2fs_io_parse.c	/^static void handle_tp_pid(char *ptr)$/;"	f	file:
+hard_link_list_head	fsck/fsck.h	/^	struct hard_link_node *hard_link_list_head;$/;"	m	struct:f2fs_fsck	typeref:struct:f2fs_fsck::hard_link_node
+hard_link_node	fsck/fsck.h	/^struct hard_link_node {$/;"	s
+hash	tools/sha512.c	/^	unsigned char hash[64];$/;"	m	struct:__anon16	file:
+hash_code	include/f2fs_fs.h	/^	__le32 hash_code;	\/* hash code of file name *\/$/;"	m	struct:f2fs_dir_entry
+hash_state	tools/sha512.c	/^struct hash_state {$/;"	s	file:
+heap	include/f2fs_fs.h	/^	int heap;$/;"	m	struct:f2fs_configuration
+hex2byte	tools/f2fscrypt.c	/^static int hex2byte(const char *hex, size_t hex_size, unsigned char *bytes,$/;"	f	file:
+hexchars	tools/f2fscrypt.c	/^static const unsigned char *hexchars = (const unsigned char *) "0123456789abcdef";$/;"	v	file:
+hexchars_size	tools/f2fscrypt.c	/^static const size_t hexchars_size = 16;$/;"	v	file:
+i	include/f2fs_fs.h	/^		struct f2fs_inode i;$/;"	m	union:f2fs_node::__anon9	typeref:struct:f2fs_node::__anon9::f2fs_inode
+i_addr	include/f2fs_fs.h	/^		__le32 i_addr[DEF_ADDRS_PER_INODE];	\/* Pointers to data blocks *\/$/;"	m	union:f2fs_inode::__anon6
+i_advise	include/f2fs_fs.h	/^	__u8 i_advise;			\/* file hints *\/$/;"	m	struct:f2fs_inode
+i_atime	include/f2fs_fs.h	/^	__le64 i_atime;			\/* access time *\/$/;"	m	struct:f2fs_inode
+i_atime_nsec	include/f2fs_fs.h	/^	__le32 i_atime_nsec;		\/* access time in nano scale *\/$/;"	m	struct:f2fs_inode
+i_blocks	include/f2fs_fs.h	/^	__le64 i_blocks;		\/* file size in blocks *\/$/;"	m	struct:f2fs_inode
+i_ctime	include/f2fs_fs.h	/^	__le64 i_ctime;			\/* change time *\/$/;"	m	struct:f2fs_inode
+i_ctime_nsec	include/f2fs_fs.h	/^	__le32 i_ctime_nsec;		\/* change time in nano scale *\/$/;"	m	struct:f2fs_inode
+i_current_depth	include/f2fs_fs.h	/^	__le32 i_current_depth;		\/* only for directory depth *\/$/;"	m	struct:f2fs_inode
+i_dir_level	include/f2fs_fs.h	/^	__u8 i_dir_level;		\/* dentry_level for large dir *\/$/;"	m	struct:f2fs_inode
+i_ext	include/f2fs_fs.h	/^	struct f2fs_extent i_ext;	\/* caching a largest extent *\/$/;"	m	struct:f2fs_inode	typeref:struct:f2fs_inode::f2fs_extent
+i_extra_end	include/f2fs_fs.h	/^			__le32 i_extra_end[0];	\/* for attribute size calculation *\/$/;"	m	struct:f2fs_inode::__anon6::__anon7
+i_extra_isize	include/f2fs_fs.h	/^			__le16 i_extra_isize;	\/* extra inode attribute size *\/$/;"	m	struct:f2fs_inode::__anon6::__anon7
+i_flags	include/f2fs_fs.h	/^	__le32 i_flags;			\/* file attributes *\/$/;"	m	struct:f2fs_inode
+i_generation	include/f2fs_fs.h	/^	__le32 i_generation;		\/* file version (for NFS) *\/$/;"	m	struct:f2fs_inode
+i_gid	include/f2fs_fs.h	/^	__le32 i_gid;			\/* group ID *\/$/;"	m	struct:f2fs_inode
+i_inline	include/f2fs_fs.h	/^	__u8 i_inline;			\/* file inline flags *\/$/;"	m	struct:f2fs_inode
+i_inode_checksum	include/f2fs_fs.h	/^			__le32 i_inode_checksum;\/* inode meta checksum *\/$/;"	m	struct:f2fs_inode::__anon6::__anon7
+i_links	include/f2fs_fs.h	/^	__le32 i_links;			\/* links count *\/$/;"	m	struct:f2fs_inode
+i_mode	include/f2fs_fs.h	/^	__le16 i_mode;			\/* file mode *\/$/;"	m	struct:f2fs_inode
+i_mtime	include/f2fs_fs.h	/^	__le64 i_mtime;			\/* modification time *\/$/;"	m	struct:f2fs_inode
+i_mtime_nsec	include/f2fs_fs.h	/^	__le32 i_mtime_nsec;		\/* modification time in nano scale *\/$/;"	m	struct:f2fs_inode
+i_name	include/f2fs_fs.h	/^	__u8 i_name[F2FS_NAME_LEN];	\/* file name for SPOR *\/$/;"	m	struct:f2fs_inode
+i_namelen	include/f2fs_fs.h	/^	__le32 i_namelen;		\/* file name length *\/$/;"	m	struct:f2fs_inode
+i_nid	include/f2fs_fs.h	/^	__le32 i_nid[5];		\/* direct(2), indirect(2),$/;"	m	struct:f2fs_inode
+i_padding	include/f2fs_fs.h	/^			__le16 i_padding;	\/* padding *\/$/;"	m	struct:f2fs_inode::__anon6::__anon7
+i_pino	include/f2fs_fs.h	/^	__le32 i_pino;			\/* parent inode number *\/$/;"	m	struct:f2fs_inode
+i_projid	include/f2fs_fs.h	/^			__le32 i_projid;	\/* project id *\/$/;"	m	struct:f2fs_inode::__anon6::__anon7
+i_size	include/f2fs_fs.h	/^	__le64 i_size;			\/* file size in bytes *\/$/;"	m	struct:f2fs_inode
+i_uid	include/f2fs_fs.h	/^	__le32 i_uid;			\/* user ID *\/$/;"	m	struct:f2fs_inode
+i_xattr_nid	include/f2fs_fs.h	/^	__le32 i_xattr_nid;		\/* nid to save xattr *\/$/;"	m	struct:f2fs_inode
+idirty	fsck/f2fs.h	/^	int idirty, ndirty;$/;"	m	struct:dnode_of_data
+in	include/f2fs_fs.h	/^		struct indirect_node in;$/;"	m	union:f2fs_node::__anon9	typeref:struct:f2fs_node::__anon9::indirect_node
+in_passphrase	tools/f2fscrypt.c	/^char in_passphrase[F2FS_MAX_PASSPHRASE_SIZE];$/;"	v
+inc_inode_blocks	fsck/node.h	/^static inline void inc_inode_blocks(struct dnode_of_data *dn)$/;"	f
+indirect_node	include/f2fs_fs.h	/^struct indirect_node {$/;"	s
+info	include/f2fs_fs.h	/^		struct f2fs_extra_info info;$/;"	m	union:f2fs_journal::__anon14	typeref:struct:f2fs_journal::__anon14::f2fs_extra_info
+init_inode_block	fsck/dir.c	/^static void init_inode_block(struct f2fs_sb_info *sbi,$/;"	f	file:
+init_node_manager	fsck/mount.c	/^int init_node_manager(struct f2fs_sb_info *sbi)$/;"	f
+init_sb_info	fsck/mount.c	/^int init_sb_info(struct f2fs_sb_info *sbi)$/;"	f
+init_scan_nid	fsck/f2fs.h	/^	nid_t init_scan_nid;$/;"	m	struct:f2fs_nm_info
+init_version	include/f2fs_fs.h	/^	__u8 init_version[VERSION_LEN + 1];$/;"	m	struct:f2fs_configuration
+init_version	include/f2fs_fs.h	/^	__u8 init_version[VERSION_LEN];	\/* the initial kernel version *\/$/;"	m	struct:f2fs_super_block
+inline_data_addr	fsck/f2fs.h	/^static inline void *inline_data_addr(struct f2fs_node *node_blk)$/;"	f
+inline_xattr_addr	fsck/f2fs.h	/^static inline void *inline_xattr_addr(struct f2fs_inode *inode)$/;"	f
+inline_xattr_size	fsck/f2fs.h	/^static inline int inline_xattr_size(struct f2fs_inode *inode)$/;"	f
+ino	fsck/f2fs.h	/^	nid_t ino;$/;"	m	struct:dentry
+ino	fsck/f2fs.h	/^	nid_t ino;$/;"	m	struct:node_info
+ino	include/f2fs_fs.h	/^	__le32 ino;		\/* inode number *\/$/;"	m	struct:f2fs_dir_entry
+ino	include/f2fs_fs.h	/^	__le32 ino;		\/* inode number *\/$/;"	m	struct:f2fs_nat_entry
+ino	include/f2fs_fs.h	/^	__le32 ino;		\/* inode nunmber *\/$/;"	m	struct:node_footer
+ino	include/f2fs_fs.h	/^	__le32 ino[F2FS_ORPHANS_PER_BLOCK];	\/* inode numbers *\/$/;"	m	struct:f2fs_orphan_block
+ino_list	fsck/fsck.h	/^	u32 *ino_list;$/;"	m	struct:orphan_info
+inode	fsck/f2fs.h	/^	struct inode *inode;$/;"	m	struct:f2fs_dentry_ptr	typeref:struct:f2fs_dentry_ptr::inode
+inode	fsck/f2fs.h	/^	u32 *inode;$/;"	m	struct:dentry
+inode_blk	fsck/f2fs.h	/^	struct f2fs_node *inode_blk;	\/* inode page *\/$/;"	m	struct:dnode_of_data	typeref:struct:dnode_of_data::f2fs_node
+inode_set_selinux	fsck/xattr.c	/^int inode_set_selinux(struct f2fs_sb_info *sbi, u32 ino, const char *secon)$/;"	f
+insert_key_into_keyring	tools/f2fscrypt.c	/^static void insert_key_into_keyring(const char *keyring, struct salt *salt)$/;"	f	file:
+int_log2	tools/f2fscrypt.c	/^static int int_log2(int arg)$/;"	f	file:
+interval	tools/f2fstat.c	/^	int interval;$/;"	m	struct:options	file:
+io	tools/f2fs_io_parse.c	/^	unsigned long long io[__NR_FILES][MAX_RW];$/;"	m	struct:pid_ent	file:
+is_digits	fsck/main.c	/^static int is_digits(char *optarg)$/;"	f	file:
+is_dot_dotdot	fsck/f2fs.h	/^static inline int is_dot_dotdot(const unsigned char *name, const int len)$/;"	f
+is_extension_exist	mkfs/f2fs_format.c	/^static bool is_extension_exist(const char *name)$/;"	f	file:
+is_mounted	lib/libf2fs.c	/^static int is_mounted(const char *mpt, const char *device)$/;"	f	file:
+is_set_ckpt_flags	fsck/f2fs.h	/^static inline bool is_set_ckpt_flags(struct f2fs_checkpoint *cp, unsigned int f)$/;"	f
+is_valid_ssa_data_blk	fsck/fsck.c	/^static int is_valid_ssa_data_blk(struct f2fs_sb_info *sbi, u32 blk_addr,$/;"	f	file:
+is_valid_ssa_node_blk	fsck/fsck.c	/^static int is_valid_ssa_node_blk(struct f2fs_sb_info *sbi, u32 nid,$/;"	f	file:
+is_valid_summary	fsck/fsck.c	/^static int is_valid_summary(struct f2fs_sb_info *sbi, struct f2fs_summary *sum,$/;"	f	file:
+journal	include/f2fs_fs.h	/^	struct f2fs_journal journal;$/;"	m	struct:f2fs_summary_block	typeref:struct:f2fs_summary_block::f2fs_journal
+kbytes_written	include/f2fs_fs.h	/^	__le64 kbytes_written;$/;"	m	struct:f2fs_extra_info
+kd	include/f2fs_fs.h	/^	int32_t kd;$/;"	m	struct:f2fs_configuration
+key	tools/f2fscrypt.c	/^	unsigned char key[F2FS_MAX_KEY_SIZE];$/;"	m	struct:salt	file:
+key_desc	tools/f2fscrypt.c	/^	unsigned char key_desc[F2FS_KEY_DESCRIPTOR_SIZE];$/;"	m	struct:salt	file:
+key_ref_str	tools/f2fscrypt.c	/^	char key_ref_str[F2FS_KEY_REF_STR_BUF_SIZE];$/;"	m	struct:salt	file:
+key_serial_t	tools/f2fscrypt.c	/^typedef int32_t key_serial_t;$/;"	t	file:
+keyctl	tools/f2fscrypt.c	/^static long keyctl(int cmd, ...)$/;"	f	file:
+keyring_map	tools/f2fscrypt.c	/^struct keyring_map {$/;"	s	file:
+keyrings	tools/f2fscrypt.c	/^static const struct keyring_map keyrings[] = {$/;"	v	typeref:struct:keyring_map	file:
+last_blk	fsck/fsck.h	/^	u32 last_blk;$/;"	m	struct:child_info
+last_section	mkfs/f2fs_format.c	33;"	d	file:
+last_valid_block_count	fsck/f2fs.h	/^	block_t last_valid_block_count;         \/* for recovery *\/$/;"	m	struct:f2fs_sb_info
+last_zone	mkfs/f2fs_format.c	32;"	d	file:
+le16_to_cpu	include/f2fs_fs.h	102;"	d
+le16_to_cpu	include/f2fs_fs.h	95;"	d
+le32_to_cpu	include/f2fs_fs.h	103;"	d
+le32_to_cpu	include/f2fs_fs.h	96;"	d
+le64_to_cpu	include/f2fs_fs.h	104;"	d
+le64_to_cpu	include/f2fs_fs.h	97;"	d
+len	fsck/f2fs.h	/^	int len;$/;"	m	struct:dentry
+len	fsck/fsck.h	/^	u32 len;		\/* length of the extent *\/$/;"	m	struct:extent_info
+len	include/f2fs_fs.h	/^	__le32 len;		\/* lengh of the extent *\/$/;"	m	struct:f2fs_extent
+len	lib/libf2fs_io.c	/^	size_t len;$/;"	m	struct:buf_item	file:
+length	tools/sha512.c	/^	__u64  length, state[8];$/;"	m	struct:sha512_state	file:
+lfs_blks	tools/f2fstat.c	/^unsigned long lfs_blks;$/;"	v
+link	fsck/f2fs.h	/^	char *link;$/;"	m	struct:dentry
+links	fsck/fsck.h	/^	u32 links;$/;"	m	struct:child_info
+links	fsck/fsck.h	/^	u32 links;$/;"	m	struct:hard_link_node
+list_add	include/list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
+list_add_tail	include/list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
+list_del	include/list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
+list_empty	include/list.h	/^static inline int list_empty(const struct list_head *head)$/;"	f
+list_entry	include/list.h	71;"	d
+list_for_each	include/list.h	74;"	d
+list_for_each_entry	include/list.h	80;"	d
+list_for_each_entry_safe	include/list.h	84;"	d
+list_for_each_safe	include/list.h	77;"	d
+list_for_each_xattr	fsck/xattr.h	53;"	d
+list_head	fsck/f2fs.h	/^struct list_head {$/;"	s
+list_head	include/list.h	/^struct list_head {$/;"	s
+log_base_2	lib/libf2fs.c	/^int log_base_2(u_int32_t num)$/;"	f
+log_blocks_per_seg	fsck/f2fs.h	/^	unsigned int log_blocks_per_seg;        \/* log2 blocks per segment *\/$/;"	m	struct:f2fs_sb_info
+log_blocks_per_seg	include/f2fs_fs.h	/^	__le32 log_blocks_per_seg;	\/* log2 # of blocks per segment *\/$/;"	m	struct:f2fs_super_block
+log_blocksize	fsck/f2fs.h	/^	unsigned int log_blocksize;             \/* log2 block size *\/$/;"	m	struct:f2fs_sb_info
+log_blocksize	include/f2fs_fs.h	/^	__le32 log_blocksize;		\/* log2 block size in bytes *\/$/;"	m	struct:f2fs_super_block
+log_sectors_per_block	fsck/f2fs.h	/^	unsigned int log_sectors_per_block;     \/* log2 sectors per block *\/$/;"	m	struct:f2fs_sb_info
+log_sectors_per_block	include/f2fs_fs.h	/^	__le32 log_sectors_per_block;	\/* log2 # of sectors per block *\/$/;"	m	struct:f2fs_super_block
+log_sectorsize	include/f2fs_fs.h	/^	__le32 log_sectorsize;		\/* log2 sector size in bytes *\/$/;"	m	struct:f2fs_super_block
+lookup_nat_in_journal	fsck/mount.c	/^int lookup_nat_in_journal(struct f2fs_sb_info *sbi, u32 nid,$/;"	f
+lookup_table	fsck/fsck.c	/^static const char *lookup_table =$/;"	v	file:
+magic	include/f2fs_fs.h	/^	__le32 magic;			\/* Magic Number *\/$/;"	m	struct:f2fs_super_block
+main	fsck/main.c	/^int main(int argc, char **argv)$/;"	f
+main	mkfs/f2fs_format_main.c	/^int main(int argc, char *argv[])$/;"	f
+main	tools/f2fs_io_parse.c	/^int main(int argc, char **argv)$/;"	f
+main	tools/f2fscrypt.c	/^int main(int argc, char *argv[])$/;"	f
+main	tools/f2fstat.c	/^int main(int argc, char *argv[])$/;"	f
+main	tools/fibmap.c	/^int main(int argc, char *argv[])$/;"	f
+main	tools/sha512.c	/^int main(int argc, char **argv)$/;"	f
+main_area_bitmap	fsck/fsck.h	/^	char *main_area_bitmap;$/;"	m	struct:f2fs_fsck
+main_area_bitmap_sz	fsck/fsck.h	/^	u64 main_area_bitmap_sz;$/;"	m	struct:f2fs_fsck
+main_blkaddr	fsck/f2fs.h	/^	block_t main_blkaddr;$/;"	m	struct:f2fs_sm_info
+main_blkaddr	include/f2fs_fs.h	/^	__le32 main_blkaddr;		\/* start block address of main area *\/$/;"	m	struct:f2fs_super_block
+main_seg_usage	fsck/fsck.h	/^	char *main_seg_usage;$/;"	m	struct:f2fs_fsck
+main_segments	fsck/f2fs.h	/^	unsigned int main_segments;$/;"	m	struct:f2fs_sm_info
+major	tools/f2fs_io_parse.c	/^int major = 0, minor = 0;$/;"	v
+major_ver	include/f2fs_fs.h	/^	__le16 major_ver;		\/* Major Version *\/$/;"	m	struct:f2fs_super_block
+make_dentry_ptr	fsck/dir.c	/^void make_dentry_ptr(struct f2fs_dentry_ptr *d, struct f2fs_node *node_blk,$/;"	f
+make_empty_dir	fsck/dir.c	/^static void make_empty_dir(struct f2fs_sb_info *sbi, struct f2fs_node *inode)$/;"	f	file:
+map_de_type	fsck/f2fs.h	/^static inline int map_de_type(umode_t mode)$/;"	f
+master_key_descriptor	tools/f2fscrypt.c	/^	__u8 master_key_descriptor[F2FS_KEY_DESCRIPTOR_SIZE];$/;"	m	struct:f2fs_fscrypt_policy	file:
+max	fsck/f2fs.h	/^	int max;$/;"	m	struct:f2fs_dentry_ptr
+max	include/f2fs_fs.h	413;"	d
+max_mtime	fsck/f2fs.h	/^	unsigned long long max_mtime;           \/* max. modification time *\/$/;"	m	struct:sit_info
+max_nid	fsck/f2fs.h	/^	nid_t max_nid;$/;"	m	struct:f2fs_nm_info
+max_salt	tools/f2fscrypt.c	/^unsigned max_salt;$/;"	v
+media_ext_lists	mkfs/f2fs_format.c	/^const char *media_ext_lists[] = {$/;"	v
+memory_kb	tools/f2fstat.c	/^unsigned long memory_kb;$/;"	v
+meta_ino	include/f2fs_fs.h	/^	__le32 meta_ino;		\/* meta inode number *\/$/;"	m	struct:f2fs_super_block
+meta_ino_num	fsck/f2fs.h	/^	unsigned int meta_ino_num;              \/* meta inode number*\/$/;"	m	struct:f2fs_sb_info
+meta_kb	tools/f2fstat.c	/^unsigned long dirty_meta, meta_kb;$/;"	v
+migrate_block	fsck/defrag.c	/^static int migrate_block(struct f2fs_sb_info *sbi, u64 from, u64 to)$/;"	f	file:
+migrate_main	fsck/resize.c	/^static void migrate_main(struct f2fs_sb_info *sbi, unsigned int offset)$/;"	f	file:
+migrate_nat	fsck/resize.c	/^static void migrate_nat(struct f2fs_sb_info *sbi,$/;"	f	file:
+migrate_sit	fsck/resize.c	/^static void migrate_sit(struct f2fs_sb_info *sbi,$/;"	f	file:
+migrate_ssa	fsck/resize.c	/^static void migrate_ssa(struct f2fs_sb_info *sbi,$/;"	f	file:
+min	include/f2fs_fs.h	407;"	d
+min_mtime	fsck/f2fs.h	/^	unsigned long long min_mtime;           \/* min. modification time *\/$/;"	m	struct:sit_info
+minor	tools/f2fs_io_parse.c	/^int major = 0, minor = 0;$/;"	v
+minor_ver	include/f2fs_fs.h	/^	__le16 minor_ver;		\/* Minor Version *\/$/;"	m	struct:f2fs_super_block
+mkfs_usage	mkfs/f2fs_format_main.c	/^static void mkfs_usage()$/;"	f	file:
+mm_table	tools/f2fstat.c	/^struct mm_table {$/;"	s	file:
+mode	fsck/f2fs.h	/^	u16 mode;$/;"	m	struct:dentry
+mode	tools/f2fscrypt.c	/^        __u32 mode;$/;"	m	struct:f2fs_encryption_key	file:
+mount_point	include/f2fs_fs.h	/^	char *mount_point;$/;"	m	struct:f2fs_configuration
+mounted_time	fsck/f2fs.h	/^	unsigned long long mounted_time;        \/* mount time *\/$/;"	m	struct:sit_info
+move_curseg_info	fsck/mount.c	/^void move_curseg_info(struct f2fs_sb_info *sbi, u64 from)$/;"	f
+move_ssa	fsck/resize.c	/^static void move_ssa(struct f2fs_sb_info *sbi, unsigned int segno,$/;"	f	file:
+msg	tools/sha512.c	/^	char *msg;$/;"	m	struct:__anon16	file:
+mtime	fsck/f2fs.h	/^	u32 mtime;$/;"	m	struct:dentry
+mtime	fsck/f2fs.h	/^	unsigned long long mtime;       \/* modification time of the segment *\/$/;"	m	struct:seg_entry
+mtime	include/f2fs_fs.h	/^	__le64 mtime;				\/* segment age for cleaning *\/$/;"	m	struct:f2fs_sit_entry
+multi_hard_link_files	fsck/fsck.h	/^		u32 multi_hard_link_files;$/;"	m	struct:f2fs_fsck::chk_result
+n_nats	include/f2fs_fs.h	/^		__le16 n_nats;$/;"	m	union:f2fs_journal::__anon13
+n_orphans	fsck/f2fs.h	/^	unsigned int n_orphans;$/;"	m	struct:f2fs_sb_info
+n_sits	include/f2fs_fs.h	/^		__le16 n_sits;$/;"	m	union:f2fs_journal::__anon13
+name	fsck/f2fs.h	/^	const u8 *name;$/;"	m	struct:dentry
+name	tools/f2fs_io_parse.c	/^	char name[P_NAMELEN];$/;"	m	struct:pid_ent	file:
+name	tools/f2fs_io_parse.c	/^	const char *name;$/;"	m	struct:tps	file:
+name	tools/f2fscrypt.c	/^	char name[4];$/;"	m	struct:keyring_map	file:
+name	tools/f2fstat.c	/^	const char *name;$/;"	m	struct:mm_table	file:
+name_len	include/f2fs_fs.h	/^	__le16 name_len;	\/* lengh of file name *\/$/;"	m	struct:f2fs_dir_entry
+name_len	tools/f2fscrypt.c	/^	size_t name_len;$/;"	m	struct:keyring_map	file:
+nat_area_bitmap	fsck/fsck.h	/^	char *nat_area_bitmap;$/;"	m	struct:f2fs_fsck
+nat_area_bitmap_sz	fsck/fsck.h	/^	u32 nat_area_bitmap_sz;$/;"	m	struct:f2fs_fsck
+nat_bitmap	fsck/f2fs.h	/^	char *nat_bitmap;$/;"	m	struct:f2fs_nm_info
+nat_blkaddr	fsck/f2fs.h	/^	block_t nat_blkaddr;$/;"	m	struct:f2fs_nm_info
+nat_blkaddr	include/f2fs_fs.h	/^	__le32 nat_blkaddr;		\/* start block address of NAT *\/$/;"	m	struct:f2fs_super_block
+nat_caches	tools/f2fstat.c	/^unsigned long nat_caches;$/;"	v
+nat_cnt	fsck/f2fs.h	/^	unsigned int nat_cnt;$/;"	m	struct:f2fs_nm_info
+nat_dump	fsck/dump.c	/^void nat_dump(struct f2fs_sb_info *sbi)$/;"	f
+nat_in_journal	fsck/f2fs.h	351;"	d
+nat_j	include/f2fs_fs.h	/^		struct nat_journal nat_j;$/;"	m	union:f2fs_journal::__anon14	typeref:struct:f2fs_journal::__anon14::nat_journal
+nat_journal	include/f2fs_fs.h	/^struct nat_journal {$/;"	s
+nat_journal_entry	include/f2fs_fs.h	/^struct nat_journal_entry {$/;"	s
+nat_valid_inode_cnt	fsck/fsck.h	/^	u32 nat_valid_inode_cnt;$/;"	m	struct:f2fs_fsck
+nat_ver_bitmap_bytesize	include/f2fs_fs.h	/^	__le32 nat_ver_bitmap_bytesize; \/* Default value 256 *\/$/;"	m	struct:f2fs_checkpoint
+nats_in_cursum	fsck/f2fs.h	348;"	d
+ndevs	include/f2fs_fs.h	/^	int ndevs;$/;"	m	struct:f2fs_configuration
+ndirty	fsck/f2fs.h	/^	int idirty, ndirty;$/;"	m	struct:dnode_of_data
+ne	include/f2fs_fs.h	/^	struct f2fs_nat_entry ne;$/;"	m	struct:nat_journal_entry	typeref:struct:nat_journal_entry::f2fs_nat_entry
+new_data_block	fsck/segment.c	/^void new_data_block(struct f2fs_sb_info *sbi, void *block,$/;"	f
+new_node_block	fsck/node.c	/^block_t new_node_block(struct f2fs_sb_info *sbi,$/;"	f
+new_overprovision	include/f2fs_fs.h	/^	double new_overprovision;$/;"	m	struct:f2fs_configuration
+new_reserved_segments	include/f2fs_fs.h	/^	u_int32_t new_reserved_segments;$/;"	m	struct:f2fs_configuration
+new_session_desc	tools/f2fscrypt.c	829;"	d	file:
+new_session_help	tools/f2fscrypt.c	830;"	d	file:
+next	fsck/f2fs.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
+next	fsck/fsck.h	/^	struct hard_link_node *next;$/;"	m	struct:hard_link_node	typeref:struct:hard_link_node::hard_link_node
+next	include/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
+next	lib/libf2fs_io.c	/^	struct buf_item *next;$/;"	m	struct:buf_item	typeref:struct:buf_item::buf_item	file:
+next_blkaddr	include/f2fs_fs.h	/^	__le32 next_blkaddr;	\/* next node page block address *\/$/;"	m	struct:node_footer
+next_blkoff	fsck/f2fs.h	/^	unsigned short next_blkoff;             \/* next block offset to write *\/$/;"	m	struct:curseg_info
+next_free_nid	include/f2fs_fs.h	/^	__le32 next_free_nid;		\/* Next free node number *\/$/;"	m	struct:f2fs_checkpoint
+next_scan_nid	fsck/f2fs.h	/^	nid_t next_scan_nid;$/;"	m	struct:f2fs_nm_info
+next_segno	fsck/f2fs.h	/^	unsigned int next_segno;                \/* preallocated segment *\/$/;"	m	struct:curseg_info
+next_zone	mkfs/f2fs_format.c	31;"	d	file:
+nid	fsck/f2fs.h	/^	nid_t nid;$/;"	m	struct:dnode_of_data
+nid	fsck/f2fs.h	/^	nid_t nid;$/;"	m	struct:node_info
+nid	fsck/fsck.h	/^	nid_t nid;$/;"	m	struct:dump_option
+nid	fsck/fsck.h	/^	u32 nid;$/;"	m	struct:hard_link_node
+nid	include/f2fs_fs.h	/^	__le32 nid;		\/* node id *\/$/;"	m	struct:node_footer
+nid	include/f2fs_fs.h	/^	__le32 nid;		\/* parent node id *\/$/;"	m	struct:f2fs_summary
+nid	include/f2fs_fs.h	/^	__le32 nid;$/;"	m	struct:nat_journal_entry
+nid	include/f2fs_fs.h	/^	__le32 nid[NIDS_PER_BLOCK];	\/* array of data block address *\/$/;"	m	struct:indirect_node
+nid_bitmap	fsck/f2fs.h	/^	char *nid_bitmap;$/;"	m	struct:f2fs_nm_info
+nid_in_journal	fsck/f2fs.h	352;"	d
+nid_t	include/f2fs_fs.h	/^typedef u32		nid_t;$/;"	t
+nm_info	fsck/f2fs.h	/^	struct f2fs_nm_info *nm_info;$/;"	m	struct:f2fs_sb_info	typeref:struct:f2fs_sb_info::f2fs_nm_info
+node_blk	fsck/f2fs.h	/^	struct f2fs_node *node_blk;	\/* cached direct node page *\/$/;"	m	struct:dnode_of_data	typeref:struct:dnode_of_data::f2fs_node
+node_blkaddr	fsck/f2fs.h	/^	block_t node_blkaddr;$/;"	m	struct:dnode_of_data
+node_footer	include/f2fs_fs.h	/^struct node_footer {$/;"	s
+node_info	fsck/f2fs.h	/^struct node_info {$/;"	s
+node_info_from_raw_nat	fsck/f2fs.h	/^static inline void node_info_from_raw_nat(struct node_info *ni,$/;"	f
+node_ino	include/f2fs_fs.h	/^	__le32 node_ino;		\/* node inode number *\/$/;"	m	struct:f2fs_super_block
+node_ino_num	fsck/f2fs.h	/^	unsigned int node_ino_num;              \/* node inode number*\/$/;"	m	struct:f2fs_sb_info
+node_kb	tools/f2fstat.c	/^unsigned long dirty_node, node_kb;$/;"	v
+nr_bitmap	fsck/f2fs.h	/^	int nr_bitmap;$/;"	m	struct:f2fs_dentry_ptr
+nr_inodes	fsck/fsck.h	/^	u32 nr_inodes;$/;"	m	struct:orphan_info
+nr_main_blks	fsck/fsck.h	/^	u64 nr_main_blks;$/;"	m	struct:f2fs_fsck
+nr_nat_entries	fsck/fsck.h	/^	u32 nr_nat_entries;$/;"	m	struct:f2fs_fsck
+nr_rnd_zones	include/f2fs_fs.h	/^	u_int32_t nr_rnd_zones;$/;"	m	struct:device_info
+nr_zones	include/f2fs_fs.h	/^	u_int32_t nr_zones;$/;"	m	struct:device_info
+nullify_dentry	fsck/fsck.c	/^static void nullify_dentry(struct f2fs_dir_entry *dentry, int offs,$/;"	f	file:
+nullify_nat_entry	fsck/mount.c	/^void nullify_nat_entry(struct f2fs_sb_info *sbi, u32 nid)$/;"	f
+num_salt	tools/f2fscrypt.c	/^unsigned num_salt;$/;"	v
+offsetof	include/f2fs_fs.h	625;"	d
+offsetof	include/list.h	7;"	d
+ofs_in_node	fsck/f2fs.h	/^	unsigned int ofs_in_node;$/;"	m	struct:dnode_of_data
+ofs_in_node	include/f2fs_fs.h	/^			__le16 ofs_in_node;	\/* block index in parent node *\/$/;"	m	struct:f2fs_summary::__anon10::__anon11
+ofs_of_node	fsck/f2fs.h	/^static inline unsigned int ofs_of_node(struct f2fs_node *node_blk)$/;"	f
+options	tools/f2fscrypt.c	/^int options;$/;"	v
+options	tools/f2fstat.c	/^struct options {$/;"	s	file:
+orig_type	fsck/f2fs.h	/^	unsigned char orig_type;        \/* segment type like CURSEG_XXX_TYPE *\/$/;"	m	struct:seg_entry
+orphan_info	fsck/fsck.h	/^struct orphan_info {$/;"	s
+orphan_inode_list	fsck/f2fs.h	/^	struct list_head orphan_inode_list;$/;"	m	struct:f2fs_sb_info	typeref:struct:f2fs_sb_info::list_head
+orphani	fsck/fsck.h	/^	struct orphan_info orphani;$/;"	m	struct:f2fs_fsck	typeref:struct:f2fs_fsck::orphan_info
+overprov_segment_count	include/f2fs_fs.h	/^	__le32 overprov_segment_count;	\/* # of overprovision segments *\/$/;"	m	struct:f2fs_checkpoint
+overprovision	include/f2fs_fs.h	/^	double overprovision;$/;"	m	struct:f2fs_configuration
+ovp_segments	fsck/f2fs.h	/^	unsigned int ovp_segments;$/;"	m	struct:f2fs_sm_info
+p_ino	fsck/fsck.h	/^	u32 p_ino;		\/*parent ino*\/$/;"	m	struct:child_info
+page_symlink	fsck/dir.c	/^static void page_symlink(struct f2fs_sb_info *sbi, struct f2fs_node *inode,$/;"	f	file:
+parse_feature	mkfs/f2fs_format_main.c	/^static void parse_feature(const char *features)$/;"	f	file:
+parse_option	tools/f2fstat.c	/^void parse_option(int argc, char *argv[], struct options *opt)$/;"	f
+parse_options	tools/f2fs_io_parse.c	/^static int parse_options(int argc, char *argv[])$/;"	f	file:
+parse_salt	tools/f2fscrypt.c	/^static void parse_salt(char *salt_str, int flags)$/;"	f	file:
+partname	tools/f2fstat.c	/^	char partname[32];$/;"	m	struct:options	file:
+path	fsck/f2fs.h	/^	char *path;$/;"	m	struct:dentry
+path	include/f2fs_fs.h	/^	__u8 path[MAX_PATH_LEN];$/;"	m	struct:f2fs_device
+path	include/f2fs_fs.h	/^	char *path;$/;"	m	struct:device_info
+pbkdf2_sha512	tools/f2fscrypt.c	/^static void pbkdf2_sha512(const char *passphrase, struct salt *salt,$/;"	f	file:
+pgoff_t	include/f2fs_fs.h	/^typedef unsigned long	pgoff_t;$/;"	t
+pgofs	fsck/fsck.h	/^	u32 pgofs;$/;"	m	struct:child_info
+pid	tools/f2fs_io_parse.c	/^	int pid;$/;"	m	struct:pid_ent	file:
+pid_ent	tools/f2fs_io_parse.c	/^struct pid_ent {$/;"	s	file:
+pino	fsck/f2fs.h	/^	nid_t pino;$/;"	m	struct:dentry
+pp_ino	fsck/fsck.h	/^	u32 pp_ino;		\/*parent parent ino*\/$/;"	m	struct:child_info
+preen_mode	include/f2fs_fs.h	/^	int preen_mode;$/;"	m	struct:f2fs_configuration
+prefree_segs	tools/f2fstat.c	/^unsigned long prefree_segs;$/;"	v
+prev	fsck/f2fs.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
+prev	include/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
+prev_zone	mkfs/f2fs_format.c	30;"	d	file:
+print_ckpt_info	fsck/mount.c	/^void print_ckpt_info(struct f2fs_sb_info *sbi)$/;"	f
+print_cp_state	fsck/mount.c	/^void print_cp_state(u32 flag)$/;"	f
+print_dentry	fsck/fsck.c	/^static void print_dentry(__u32 depth, __u8 *name,$/;"	f	file:
+print_ext	tools/fibmap.c	/^void print_ext(struct file_ext *ext)$/;"	f
+print_head	tools/f2fstat.c	/^void print_head(char *res)$/;"	f
+print_inode_info	fsck/mount.c	/^void print_inode_info(struct f2fs_inode *inode, int name)$/;"	f
+print_node_info	fsck/mount.c	/^void print_node_info(struct f2fs_node *node_block, int verbose)$/;"	f
+print_raw_sb_info	fsck/mount.c	/^void print_raw_sb_info(struct f2fs_super_block *sb)$/;"	f
+print_sb_state	fsck/mount.c	/^void print_sb_state(struct f2fs_super_block *sb)$/;"	f
+print_stat	tools/fibmap.c	/^void print_stat(struct stat64 *st)$/;"	f
+raw	tools/f2fscrypt.c	/^        char raw[F2FS_MAX_KEY_SIZE];$/;"	m	struct:f2fs_encryption_key	file:
+raw_sb	mkfs/f2fs_format.c	/^struct f2fs_super_block raw_sb;$/;"	v	typeref:struct:f2fs_super_block
+raw_super	fsck/f2fs.h	/^	struct f2fs_super_block *raw_super;$/;"	m	struct:f2fs_sb_info	typeref:struct:f2fs_sb_info::f2fs_super_block
+read_all_xattrs	fsck/xattr.c	/^static void *read_all_xattrs(struct f2fs_sb_info *sbi, struct f2fs_node *inode)$/;"	f	file:
+read_compacted_summaries	fsck/mount.c	/^static void read_compacted_summaries(struct f2fs_sb_info *sbi)$/;"	f	file:
+read_normal_summaries	fsck/mount.c	/^static void read_normal_summaries(struct f2fs_sb_info *sbi, int type)$/;"	f	file:
+rebuild_checkpoint	fsck/resize.c	/^static void rebuild_checkpoint(struct f2fs_sb_info *sbi,$/;"	f	file:
+rebuild_superblock	fsck/resize.c	/^static void rebuild_superblock(struct f2fs_super_block *new_sb)$/;"	f	file:
+remove_newline	tools/f2fstat.c	/^static inline void remove_newline(char **head)$/;"	f	file:
+reserve_new_block	fsck/segment.c	/^void reserve_new_block(struct f2fs_sb_info *sbi, block_t *to,$/;"	f
+reserved	include/f2fs_fs.h	/^		__u8 reserved[3];$/;"	m	union:f2fs_summary::__anon10
+reserved	include/f2fs_fs.h	/^	__le32 reserved;	\/* reserved *\/$/;"	m	struct:f2fs_orphan_block
+reserved	include/f2fs_fs.h	/^	__u8 reserved[327];		\/* valid reserved region *\/$/;"	m	struct:f2fs_super_block
+reserved	include/f2fs_fs.h	/^	__u8 reserved[EXTRA_INFO_RESERVED];$/;"	m	struct:f2fs_extra_info
+reserved	include/f2fs_fs.h	/^	__u8 reserved[NAT_JOURNAL_RESERVED];$/;"	m	struct:nat_journal
+reserved	include/f2fs_fs.h	/^	__u8 reserved[SIT_JOURNAL_RESERVED];$/;"	m	struct:sit_journal
+reserved	include/f2fs_fs.h	/^	__u8 reserved[SIZE_OF_RESERVED];$/;"	m	struct:f2fs_dentry_block
+reserved_segments	fsck/f2fs.h	/^	unsigned int reserved_segments;$/;"	m	struct:f2fs_sm_info
+reserved_segments	include/f2fs_fs.h	/^	u_int32_t reserved_segments;$/;"	m	struct:f2fs_configuration
+reset_curseg	fsck/mount.c	/^void reset_curseg(struct f2fs_sb_info *sbi, int type)$/;"	f
+resize_usage	fsck/main.c	/^void resize_usage()$/;"	f
+restore_curseg_summaries	fsck/mount.c	/^static void restore_curseg_summaries(struct f2fs_sb_info *sbi)$/;"	f	file:
+restore_node_summary	fsck/mount.c	/^static void restore_node_summary(struct f2fs_sb_info *sbi,$/;"	f	file:
+rewrite_current_sit_page	fsck/mount.c	/^void rewrite_current_sit_page(struct f2fs_sb_info *sbi,$/;"	f
+rewrite_sit_area_bitmap	fsck/mount.c	/^void rewrite_sit_area_bitmap(struct f2fs_sb_info *sbi)$/;"	f
+ro	include/f2fs_fs.h	/^	int ro;$/;"	m	struct:f2fs_configuration
+room_for_filename	fsck/dir.c	/^static int room_for_filename(const u8 *bitmap, int slots, int max_slots)$/;"	f	file:
+root_ino	include/f2fs_fs.h	/^	__le32 root_ino;		\/* root inode number *\/$/;"	m	struct:f2fs_super_block
+root_ino_num	fsck/f2fs.h	/^	unsigned int root_ino_num;              \/* root inode number*\/$/;"	m	struct:f2fs_sb_info
+rootdev_name	include/f2fs_fs.h	/^	const char *rootdev_name;$/;"	m	struct:f2fs_configuration
+round_down	include/f2fs_fs.h	406;"	d
+rsvd_segment_count	include/f2fs_fs.h	/^	__le32 rsvd_segment_count;	\/* # of reserved segments for gc *\/$/;"	m	struct:f2fs_checkpoint
+rw_type	tools/f2fs_io_parse.c	/^enum rw_type {$/;"	g	file:
+s_next_generation	fsck/f2fs.h	/^	u32 s_next_generation;                  \/* for NFS support *\/$/;"	m	struct:f2fs_sb_info
+salt	tools/f2fscrypt.c	/^	unsigned char *salt;$/;"	m	struct:salt	file:
+salt	tools/f2fscrypt.c	/^struct salt {$/;"	s	file:
+salt_len	tools/f2fscrypt.c	/^	size_t salt_len;$/;"	m	struct:salt	file:
+salt_list	tools/f2fscrypt.c	/^struct salt *salt_list;$/;"	v	typeref:struct:salt
+sanity_check_area_boundary	fsck/mount.c	/^static inline int sanity_check_area_boundary(struct f2fs_super_block *sb,$/;"	f	file:
+sanity_check_ckpt	fsck/mount.c	/^int sanity_check_ckpt(struct f2fs_sb_info *sbi)$/;"	f
+sanity_check_nid	fsck/fsck.c	/^static int sanity_check_nid(struct f2fs_sb_info *sbi, u32 nid,$/;"	f	file:
+sanity_check_raw_super	fsck/mount.c	/^int sanity_check_raw_super(struct f2fs_super_block *sb, u64 offset)$/;"	f
+sb	mkfs/f2fs_format.c	/^struct f2fs_super_block *sb = &raw_sb;$/;"	v	typeref:struct:f2fs_super_block
+sb_version	include/f2fs_fs.h	/^	__u8 sb_version[VERSION_LEN + 1];$/;"	m	struct:f2fs_configuration
+sbi	fsck/fsck.h	/^	struct f2fs_sb_info sbi;$/;"	m	struct:f2fs_fsck	typeref:struct:f2fs_fsck::f2fs_sb_info
+se	include/f2fs_fs.h	/^	struct f2fs_sit_entry se;$/;"	m	struct:sit_journal_entry	typeref:struct:sit_journal_entry::f2fs_sit_entry
+sec_entries	fsck/f2fs.h	/^	struct sec_entry *sec_entries;          \/* SIT section-level cache *\/$/;"	m	struct:sit_info	typeref:struct:sit_info::sec_entry
+sec_entry	fsck/f2fs.h	/^struct sec_entry {$/;"	s
+secon	fsck/f2fs.h	/^	char *secon;$/;"	m	struct:dentry
+secs_per_zone	fsck/f2fs.h	/^	unsigned int secs_per_zone;             \/* sections per zone *\/$/;"	m	struct:f2fs_sb_info
+secs_per_zone	include/f2fs_fs.h	/^	__le32 secs_per_zone;		\/* # of sections per zone *\/$/;"	m	struct:f2fs_super_block
+secs_per_zone	include/f2fs_fs.h	/^	u_int32_t secs_per_zone;$/;"	m	struct:f2fs_configuration
+section_count	include/f2fs_fs.h	/^	__le32 section_count;		\/* total # of sections *\/$/;"	m	struct:f2fs_super_block
+sector_size	include/f2fs_fs.h	/^	u_int32_t sector_size;$/;"	m	struct:device_info
+sector_size	include/f2fs_fs.h	/^	u_int32_t sector_size;$/;"	m	struct:f2fs_configuration
+sectors_per_blk	include/f2fs_fs.h	/^	u_int32_t sectors_per_blk;$/;"	m	struct:f2fs_configuration
+seg0_blkaddr	fsck/f2fs.h	/^	block_t seg0_blkaddr;$/;"	m	struct:f2fs_sm_info
+seg_entry	fsck/f2fs.h	/^struct seg_entry {$/;"	s
+seg_info_from_raw_sit	fsck/mount.c	/^void seg_info_from_raw_sit(struct seg_entry *se,$/;"	f
+seg_type	fsck/fsck.h	/^enum seg_type {$/;"	g
+seg_type_name	fsck/dump.c	/^const char *seg_type_name[SEG_TYPE_MAX + 1] = {$/;"	v
+segment0_blkaddr	include/f2fs_fs.h	/^	__le32 segment0_blkaddr;	\/* start block address of segment 0 *\/$/;"	m	struct:f2fs_super_block
+segment_count	fsck/f2fs.h	/^	unsigned int segment_count;$/;"	m	struct:f2fs_sm_info
+segment_count	include/f2fs_fs.h	/^	__le32 segment_count;		\/* total # of segments *\/$/;"	m	struct:f2fs_super_block
+segment_count_ckpt	include/f2fs_fs.h	/^	__le32 segment_count_ckpt;	\/* # of segments for checkpoint *\/$/;"	m	struct:f2fs_super_block
+segment_count_main	include/f2fs_fs.h	/^	__le32 segment_count_main;	\/* # of segments for main area *\/$/;"	m	struct:f2fs_super_block
+segment_count_nat	include/f2fs_fs.h	/^	__le32 segment_count_nat;	\/* # of segments for NAT *\/$/;"	m	struct:f2fs_super_block
+segment_count_sit	include/f2fs_fs.h	/^	__le32 segment_count_sit;	\/* # of segments for SIT *\/$/;"	m	struct:f2fs_super_block
+segment_count_ssa	include/f2fs_fs.h	/^	__le32 segment_count_ssa;	\/* # of segments for SSA *\/$/;"	m	struct:f2fs_super_block
+segno	fsck/f2fs.h	/^	unsigned int segno;                     \/* current segment number *\/$/;"	m	struct:curseg_info
+segno	include/f2fs_fs.h	/^	__le32 segno;$/;"	m	struct:sit_journal_entry
+segno_in_journal	fsck/f2fs.h	354;"	d
+segs_per_sec	fsck/f2fs.h	/^	unsigned int segs_per_sec;              \/* segments per section *\/$/;"	m	struct:f2fs_sb_info
+segs_per_sec	include/f2fs_fs.h	/^	__le32 segs_per_sec;		\/* # of segments per section *\/$/;"	m	struct:f2fs_super_block
+segs_per_sec	include/f2fs_fs.h	/^	u_int32_t segs_per_sec;$/;"	m	struct:f2fs_configuration
+segs_per_zone	include/f2fs_fs.h	/^	u_int32_t segs_per_zone;$/;"	m	struct:f2fs_configuration
+sentries	fsck/f2fs.h	/^	struct seg_entry *sentries;             \/* SIT segment-level cache *\/$/;"	m	struct:sit_info	typeref:struct:sit_info::seg_entry
+sents_per_block	fsck/f2fs.h	/^	unsigned int sents_per_block;           \/* # of SIT entries per block *\/$/;"	m	struct:sit_info
+set_cp	include/f2fs_fs.h	381;"	d
+set_cp_le16	include/f2fs_fs.h	376;"	d
+set_cp_le32	include/f2fs_fs.h	375;"	d
+set_cp_le64	include/f2fs_fs.h	374;"	d
+set_data_blkaddr	fsck/node.c	/^void set_data_blkaddr(struct dnode_of_data *dn)$/;"	f
+set_new_dnode	fsck/node.h	/^static inline void set_new_dnode(struct dnode_of_data *dn,$/;"	f
+set_nid	fsck/node.h	/^static inline void set_nid(struct f2fs_node * rn, int off, nid_t nid, int i)$/;"	f
+set_policy	tools/f2fscrypt.c	/^static void set_policy(struct salt *set_salt, int pad,$/;"	f	file:
+set_policy_desc	tools/f2fscrypt.c	740;"	d	file:
+set_policy_help	tools/f2fscrypt.c	741;"	d	file:
+set_sb	include/f2fs_fs.h	343;"	d
+set_sb_le16	include/f2fs_fs.h	335;"	d
+set_sb_le32	include/f2fs_fs.h	334;"	d
+set_sb_le64	include/f2fs_fs.h	333;"	d
+set_summary	fsck/f2fs.h	/^static inline void set_summary(struct f2fs_summary *sum, nid_t nid,$/;"	f
+sha512	tools/sha512.c	/^	struct sha512_state sha512;$/;"	m	struct:hash_state	typeref:struct:hash_state::sha512_state	file:
+sha512_compress	tools/sha512.c	/^static void sha512_compress(struct hash_state * md, const unsigned char *buf)$/;"	f	file:
+sha512_done	tools/sha512.c	/^static void sha512_done(struct hash_state * md, unsigned char *out)$/;"	f	file:
+sha512_init	tools/sha512.c	/^static void sha512_init(struct hash_state * md)$/;"	f	file:
+sha512_process	tools/sha512.c	/^static void sha512_process(struct hash_state * md,$/;"	f	file:
+sha512_state	tools/sha512.c	/^struct sha512_state {$/;"	s	file:
+show_dentry	include/f2fs_fs.h	/^	int show_dentry;$/;"	m	struct:f2fs_configuration
+show_option	tools/f2fs_io_parse.c	/^int show_option = SHOW_ALL;$/;"	v
+show_type	tools/f2fs_io_parse.c	/^enum show_type {$/;"	g	file:
+show_usage	tools/f2fs_io_parse.c	/^void show_usage()$/;"	f
+shrink_nats	fsck/resize.c	/^static int shrink_nats(struct f2fs_sb_info *sbi,$/;"	f	file:
+sigcatcher_setup	tools/f2fscrypt.c	/^static void sigcatcher_setup(void)$/;"	f	file:
+sit_area_bitmap	fsck/fsck.h	/^	char *sit_area_bitmap;$/;"	m	struct:f2fs_fsck
+sit_area_bitmap_sz	fsck/fsck.h	/^	u32 sit_area_bitmap_sz;$/;"	m	struct:f2fs_fsck
+sit_base_addr	fsck/f2fs.h	/^	block_t sit_base_addr;          \/* start block address of SIT area *\/$/;"	m	struct:sit_info
+sit_bitmap	fsck/f2fs.h	/^	char *sit_bitmap;               \/* SIT bitmap pointer *\/$/;"	m	struct:sit_info
+sit_blkaddr	include/f2fs_fs.h	/^	__le32 sit_blkaddr;		\/* start block address of SIT *\/$/;"	m	struct:f2fs_super_block
+sit_blocks	fsck/f2fs.h	/^	block_t sit_blocks;             \/* # of blocks used by SIT area *\/$/;"	m	struct:sit_info
+sit_dump	fsck/dump.c	/^void sit_dump(struct f2fs_sb_info *sbi, unsigned int start_sit,$/;"	f
+sit_free_segs	fsck/fsck.h	/^		u32 sit_free_segs;$/;"	m	struct:f2fs_fsck::chk_result
+sit_in_journal	fsck/f2fs.h	353;"	d
+sit_info	fsck/f2fs.h	/^	struct sit_info *sit_info;$/;"	m	struct:f2fs_sm_info	typeref:struct:f2fs_sm_info::sit_info
+sit_info	fsck/f2fs.h	/^struct sit_info {$/;"	s
+sit_j	include/f2fs_fs.h	/^		struct sit_journal sit_j;$/;"	m	union:f2fs_journal::__anon14	typeref:struct:f2fs_journal::__anon14::sit_journal
+sit_journal	include/f2fs_fs.h	/^struct sit_journal {$/;"	s
+sit_journal_entry	include/f2fs_fs.h	/^struct sit_journal_entry {$/;"	s
+sit_nat_version_bitmap	include/f2fs_fs.h	/^	unsigned char sit_nat_version_bitmap[1];$/;"	m	struct:f2fs_checkpoint
+sit_valid_blocks	fsck/fsck.h	/^		u64 sit_valid_blocks;$/;"	m	struct:f2fs_fsck::chk_result
+sit_ver_bitmap_bytesize	include/f2fs_fs.h	/^	__le32 sit_ver_bitmap_bytesize;	\/* Default value 64 *\/$/;"	m	struct:f2fs_checkpoint
+sits_in_cursum	fsck/f2fs.h	349;"	d
+size	fsck/f2fs.h	/^	unsigned long size;$/;"	m	struct:dentry
+size	tools/f2fscrypt.c	/^        __u32 size;$/;"	m	struct:f2fs_encryption_key	file:
+sload_usage	fsck/main.c	/^void sload_usage()$/;"	f
+sm_info	fsck/f2fs.h	/^	struct f2fs_sm_info *sm_info;$/;"	m	struct:f2fs_sb_info	typeref:struct:f2fs_sb_info::f2fs_sm_info
+sparse_mode	include/f2fs_fs.h	/^	int sparse_mode;$/;"	m	struct:f2fs_configuration
+ssa_blkaddr	fsck/f2fs.h	/^	block_t ssa_blkaddr;$/;"	m	struct:f2fs_sm_info
+ssa_blkaddr	include/f2fs_fs.h	/^	__le32 ssa_blkaddr;		\/* start block address of SSA *\/$/;"	m	struct:f2fs_super_block
+ssa_dump	fsck/dump.c	/^void ssa_dump(struct f2fs_sb_info *sbi, int start_ssa, int end_ssa)$/;"	f
+ssr_blks	tools/f2fstat.c	/^unsigned long ssr_blks;$/;"	v
+start_blk	tools/fibmap.c	/^	__u32 start_blk;$/;"	m	struct:file_ext	file:
+start_blkaddr	include/f2fs_fs.h	/^	u_int64_t start_blkaddr;$/;"	m	struct:device_info
+start_nat	fsck/fsck.h	/^	int start_nat;$/;"	m	struct:dump_option
+start_sector	include/f2fs_fs.h	/^	u_int32_t start_sector;$/;"	m	struct:f2fs_configuration
+start_sit	fsck/fsck.h	/^	int start_sit;$/;"	m	struct:dump_option
+start_ssa	fsck/fsck.h	/^	int start_ssa;$/;"	m	struct:dump_option
+start_sum_block	fsck/f2fs.h	/^static inline block_t start_sum_block(struct f2fs_sb_info *sbi)$/;"	f
+stat_bdev	tools/fibmap.c	/^void stat_bdev(struct stat64 *st, unsigned int *start_lba)$/;"	f
+state	fsck/fsck.h	/^	u32 state;$/;"	m	struct:child_info
+state	tools/sha512.c	/^	__u64  length, state[8];$/;"	m	struct:sha512_state	file:
+str2hashbuf	lib/libf2fs.c	/^static void str2hashbuf(const unsigned char *msg, int len,$/;"	f	file:
+sum_blk	fsck/f2fs.h	/^	struct f2fs_summary_block *sum_blk;     \/* cached summary block *\/$/;"	m	struct:curseg_info	typeref:struct:curseg_info::f2fs_summary_block
+sum_blk_addr	fsck/f2fs.h	/^static inline block_t sum_blk_addr(struct f2fs_sb_info *sbi, int base, int type)$/;"	f
+summary_footer	include/f2fs_fs.h	/^struct summary_footer {$/;"	s
+target_sectors	include/f2fs_fs.h	/^	u_int64_t target_sectors;$/;"	m	struct:f2fs_configuration
+test_all	scripts/verify.sh	/^test_all()$/;"	f
+test_and_clear_bit_le	lib/libf2fs.c	/^int test_and_clear_bit_le(u32 nr, u8 *addr)$/;"	f
+test_and_set_bit_le	lib/libf2fs.c	/^int test_and_set_bit_le(u32 nr, u8 *addr)$/;"	f
+test_bit_le	lib/libf2fs.c	/^int test_bit_le(u32 nr, const u8 *addr)$/;"	f
+tests	tools/sha512.c	/^} tests[] = {$/;"	v	typeref:struct:__anon16	file:
+total_io	tools/f2fs_io_parse.c	/^	unsigned long long total_io[MAX_RW];$/;"	m	struct:pid_ent	file:
+total_io	tools/f2fs_io_parse.c	/^unsigned long long total_io[__NR_FILES][MAX_RW];$/;"	v
+total_node_count	fsck/f2fs.h	/^	unsigned int total_node_count;          \/* total node block count *\/$/;"	m	struct:f2fs_sb_info
+total_sections	fsck/f2fs.h	/^	unsigned int total_sections;            \/* total section count *\/$/;"	m	struct:f2fs_sb_info
+total_sectors	include/f2fs_fs.h	/^	u_int64_t total_sectors;	\/* got by get_device_info *\/$/;"	m	struct:device_info
+total_sectors	include/f2fs_fs.h	/^	u_int64_t total_sectors;$/;"	m	struct:f2fs_configuration
+total_segments	include/f2fs_fs.h	/^	__le32 total_segments;$/;"	m	struct:f2fs_device
+total_segments	include/f2fs_fs.h	/^	u_int32_t total_segments;$/;"	m	struct:device_info
+total_segments	include/f2fs_fs.h	/^	u_int32_t total_segments;$/;"	m	struct:f2fs_configuration
+total_valid_block_count	fsck/f2fs.h	/^	block_t total_valid_block_count;        \/* # of valid blocks *\/$/;"	m	struct:f2fs_sb_info
+total_valid_inode_count	fsck/f2fs.h	/^	unsigned int total_valid_inode_count;   \/* valid inode count *\/$/;"	m	struct:f2fs_sb_info
+total_valid_node_count	fsck/f2fs.h	/^	unsigned int total_valid_node_count;    \/* valid node block count *\/$/;"	m	struct:f2fs_sb_info
+tps	tools/f2fs_io_parse.c	/^struct tps {$/;"	s	file:
+trace_points	tools/f2fs_io_parse.c	/^struct tps trace_points[] = {$/;"	v	typeref:struct:tps
+trace_types	tools/f2fs_io_parse.c	/^enum trace_types {$/;"	g	file:
+tree_mark	fsck/fsck.c	/^char *tree_mark;$/;"	v
+tree_mark_size	fsck/fsck.c	/^uint32_t tree_mark_size = 256;$/;"	v
+trim	include/f2fs_fs.h	/^	int trim;$/;"	m	struct:f2fs_configuration
+trim_device	mkfs/f2fs_format_utils.c	/^static int trim_device(int i)$/;"	f	file:
+trimmed	include/f2fs_fs.h	/^	int trimmed;$/;"	m	struct:f2fs_configuration
+type	fsck/f2fs.h	/^	unsigned char type;             \/* segment type like CURSEG_XXX_TYPE *\/$/;"	m	struct:seg_entry
+type	tools/f2fs_io_parse.c	/^	enum trace_types type;$/;"	m	struct:tps	typeref:enum:tps::trace_types	file:
+typecheck	include/f2fs_fs.h	110;"	d
+u16	include/f2fs_fs.h	/^typedef u_int16_t	u16;$/;"	t
+u32	include/f2fs_fs.h	/^typedef u_int32_t	u32;$/;"	t
+u64	include/f2fs_fs.h	/^typedef u_int64_t	u64;$/;"	t
+u8	include/f2fs_fs.h	/^typedef u_int8_t	u8;$/;"	t
+uid	fsck/f2fs.h	/^	u16 uid;$/;"	m	struct:dentry
+umode_t	include/f2fs_fs.h	/^typedef unsigned short	umode_t;$/;"	t
+update_data_blkaddr	fsck/mount.c	/^void update_data_blkaddr(struct f2fs_sb_info *sbi, nid_t nid,$/;"	f
+update_free_segments	fsck/mount.c	/^void update_free_segments(struct f2fs_sb_info *sbi)$/;"	f
+update_nat_bits_flags	fsck/mount.c	/^u32 update_nat_bits_flags(struct f2fs_super_block *sb,$/;"	f
+update_nat_blkaddr	fsck/mount.c	/^void update_nat_blkaddr(struct f2fs_sb_info *sbi, nid_t ino,$/;"	f
+update_sum_entry	fsck/mount.c	/^void update_sum_entry(struct f2fs_sb_info *sbi, block_t blk_addr,$/;"	f
+usage	tools/f2fstat.c	/^void usage(void)$/;"	f
+used_data_blks	tools/f2fstat.c	/^unsigned long used_data_blks;$/;"	v
+used_node_blks	tools/f2fstat.c	/^unsigned long used_node_blks;$/;"	v
+user_block_count	fsck/f2fs.h	/^	block_t user_block_count;               \/* # of user blocks *\/$/;"	m	struct:f2fs_sb_info
+user_block_count	include/f2fs_fs.h	/^	__le64 user_block_count;	\/* # of user blocks *\/$/;"	m	struct:f2fs_checkpoint
+utf16_to_utf8	lib/libf2fs.c	/^int utf16_to_utf8(char *output, const u_int16_t *input, size_t outsize,$/;"	f
+utf16_to_wchar	lib/libf2fs.c	/^static const u_int16_t *utf16_to_wchar(const u_int16_t *input, wchar_t *wc,$/;"	f	file:
+utf8_to_utf16	lib/libf2fs.c	/^int utf8_to_utf16(u_int16_t *output, const char *input, size_t outsize,$/;"	f
+utf8_to_wchar	lib/libf2fs.c	/^static const char *utf8_to_wchar(const char *input, wchar_t *wc,$/;"	f	file:
+util	tools/f2fstat.c	/^unsigned long util;$/;"	v
+uuid	include/f2fs_fs.h	/^	__u8 uuid[16];			\/* 128-bit uuid for volume *\/$/;"	m	struct:f2fs_super_block
+val	tools/f2fstat.c	/^	unsigned long *val;$/;"	m	struct:mm_table	file:
+valid_blk_cnt	fsck/fsck.h	/^		u64 valid_blk_cnt;$/;"	m	struct:f2fs_fsck::chk_result
+valid_block_count	include/f2fs_fs.h	/^	__le64 valid_block_count;	\/* # of valid blocks in main area *\/$/;"	m	struct:f2fs_checkpoint
+valid_blocks	fsck/f2fs.h	/^	unsigned int valid_blocks;      \/* # of valid blocks in a section *\/$/;"	m	struct:sec_entry
+valid_blocks	fsck/f2fs.h	/^	unsigned short valid_blocks;    \/* # of valid blocks *\/$/;"	m	struct:seg_entry
+valid_inode_cnt	fsck/fsck.h	/^		u32 valid_inode_cnt;$/;"	m	struct:f2fs_fsck::chk_result
+valid_inode_count	include/f2fs_fs.h	/^	__le32 valid_inode_count;	\/* Total number of valid inodes *\/$/;"	m	struct:f2fs_checkpoint
+valid_map	include/f2fs_fs.h	/^	__u8 valid_map[SIT_VBLOCK_MAP_SIZE];	\/* bitmap for valid blocks *\/$/;"	m	struct:f2fs_sit_entry
+valid_nat_entry_cnt	fsck/fsck.h	/^		u32 valid_nat_entry_cnt;$/;"	m	struct:f2fs_fsck::chk_result
+valid_node_cnt	fsck/fsck.h	/^		u32 valid_node_cnt;$/;"	m	struct:f2fs_fsck::chk_result
+valid_node_count	include/f2fs_fs.h	/^	__le32 valid_node_count;	\/* Total number of valid nodes *\/$/;"	m	struct:f2fs_checkpoint
+valid_segs	tools/f2fstat.c	/^unsigned long valid_segs;$/;"	v
+validate_checkpoint	fsck/mount.c	/^void *validate_checkpoint(struct f2fs_sb_info *sbi, block_t cp_addr,$/;"	f
+validate_paths	tools/f2fscrypt.c	/^static void validate_paths(int argc, char *argv[], int path_start_index)$/;"	f	file:
+validate_super_block	fsck/mount.c	/^int validate_super_block(struct f2fs_sb_info *sbi, int block)$/;"	f
+vblocks	include/f2fs_fs.h	/^	__le16 vblocks;				\/* reference above *\/$/;"	m	struct:f2fs_sit_entry
+ver_after	fsck/f2fs.h	30;"	d
+verify_cur_segs	mkfs/f2fs_format.c	/^static void verify_cur_segs(void)$/;"	f	file:
+version	fsck/f2fs.h	/^	unsigned char version;$/;"	m	struct:node_info
+version	include/f2fs_fs.h	/^			__u8 version;		\/* node version number *\/$/;"	m	struct:f2fs_summary::__anon10::__anon11
+version	include/f2fs_fs.h	/^	__u8 version;		\/* latest version of cached nat entry *\/$/;"	m	struct:f2fs_nat_entry
+version	include/f2fs_fs.h	/^	__u8 version[VERSION_LEN + 1];$/;"	m	struct:f2fs_configuration
+version	include/f2fs_fs.h	/^	__u8 version[VERSION_LEN];	\/* the kernel version *\/$/;"	m	struct:f2fs_super_block
+version	tools/f2fscrypt.c	/^	__u8 version;$/;"	m	struct:f2fs_fscrypt_policy	file:
+vol_label	include/f2fs_fs.h	/^	char *vol_label;$/;"	m	struct:f2fs_configuration
+volume_name	include/f2fs_fs.h	/^	__le16 volume_name[MAX_VOLUME_NAME];	\/* volume name *\/$/;"	m	struct:f2fs_super_block
+wanted_total_sectors	include/f2fs_fs.h	/^	u_int64_t wanted_total_sectors;$/;"	m	struct:f2fs_configuration
+wchar_to_utf16	lib/libf2fs.c	/^static u_int16_t *wchar_to_utf16(u_int16_t *output, wchar_t wc, size_t outsize)$/;"	f	file:
+wchar_to_utf8	lib/libf2fs.c	/^static char *wchar_to_utf8(char *output, wchar_t wc, size_t outsize)$/;"	f	file:
+write_all_xattrs	fsck/xattr.c	/^static void write_all_xattrs(struct f2fs_sb_info *sbi,$/;"	f	file:
+write_checkpoint	fsck/mount.c	/^void write_checkpoint(struct f2fs_sb_info *sbi)$/;"	f
+write_curseg_info	fsck/mount.c	/^void write_curseg_info(struct f2fs_sb_info *sbi)$/;"	f
+write_nat_bits	fsck/mount.c	/^void write_nat_bits(struct f2fs_sb_info *sbi,$/;"	f
+written_valid_blocks	fsck/f2fs.h	/^	block_t written_valid_blocks;   \/* # of valid blocks in main area *\/$/;"	m	struct:sit_info
+zero_journal_entries	fsck/mount.c	/^void zero_journal_entries(struct f2fs_sb_info *sbi)$/;"	f
+zone	fsck/f2fs.h	/^	unsigned int zone;                      \/* current zone number *\/$/;"	m	struct:curseg_info
+zone_blocks	include/f2fs_fs.h	/^	size_t zone_blocks;$/;"	m	struct:device_info
+zone_blocks	include/f2fs_fs.h	/^	size_t zone_blocks;$/;"	m	struct:f2fs_configuration
+zoned_mode	include/f2fs_fs.h	/^	int zoned_mode;$/;"	m	struct:f2fs_configuration
+zoned_model	include/f2fs_fs.h	/^	int zoned_model;$/;"	m	struct:device_info
+zoned_model	include/f2fs_fs.h	/^	int zoned_model;$/;"	m	struct:f2fs_configuration
