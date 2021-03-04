@@ -584,6 +584,8 @@ struct dynamic_discard_map {
 
 struct dynamic_discard_map_control {
 	struct rb_root_cached root;		/* root of discard map rb-tree */
+	struct mutex ddm_lock;
+	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
 };
 
 

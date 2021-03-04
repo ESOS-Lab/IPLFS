@@ -1887,6 +1887,74 @@ static int f2fs_issue_discard(struct f2fs_sb_info *sbi,
 	return err;
 }
 
+
+static struct dynamic_discard_map* get_dynamic_discard_map(struct f2fs_sb_info *sbi,
+	       						unsigned long long segno)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct rb_node **p, *parent = NULL;
+	struct rb_entry *re;
+	bool left_most;
+	struct dynamic_discard_map* ddm;
+
+	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, segno, &left_most);
+	
+	re = rb_entry_safe(*p, struct rb_entry, rb_node);
+	ddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);
+	return ddm;
+}
+
+/*
+static void __remove_discard_cmd(struct f2fs_sb_info *sbi,
+							struct discard_cmd *dc)
+{
+	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
+	unsigned long flags;
+
+	trace_f2fs_remove_discard(dc->bdev, dc->start, dc->len);
+
+	spin_lock_irqsave(&dc->lock, flags);
+	if (dc->bio_ref) {
+		spin_unlock_irqrestore(&dc->lock, flags);
+		return;
+	}
+	spin_unlock_irqrestore(&dc->lock, flags);
+
+	f2fs_bug_on(sbi, dc->ref);
+
+	if (dc->error == -EOPNOTSUPP)
+		dc->error = 0;
+
+	if (dc->error)
+		printk_ratelimited(
+			"%sF2FS-fs (%s): Issue discard(%u, %u, %u) failed, ret: %d",
+			KERN_INFO, sbi->sb->s_id,
+			dc->lstart, dc->start, dc->len, dc->error);
+	__detach_discard_cmd(dcc, dc);
+}
+static void __detach_discard_cmd(struct discard_cmd_control *dcc,
+							struct discard_cmd *dc)
+{
+	if (dc->state == D_DONE)
+		atomic_sub(dc->queued, &dcc->queued_discard);
+
+	list_del(&dc->list);
+	rb_erase_cached(&dc->rb_node, &dcc->root);
+	dcc->undiscard_blks -= dc->len;
+
+	kmem_cache_free(discard_cmd_slab, dc);
+
+	atomic_dec(&dcc->discard_cmd_cnt);
+}
+*/
+static void __remove_discard_map(struct f2fs_sb_info *sbi, struct dynamic_discard_map *ddm)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+
+	rb_erase_cached(&ddm->rbe.rb_node, &ddmc->root);
+	kmem_cache_free(discard_map_slab, ddm);
+}
+
 static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 							bool check_only)
 {
@@ -1897,11 +1965,16 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 	unsigned long *ckpt_map = (unsigned long *)se->ckpt_valid_map;
 	unsigned long *discard_map = (unsigned long *)se->discard_map;
 	unsigned long *dmap = SIT_I(sbi)->tmp_map;
+	unsigned long *ddmap;
 	unsigned int start = 0, end = -1;
 	bool force = (cpc->reason & CP_DISCARD);
 	struct discard_entry *de = NULL;
 	struct list_head *head = &SM_I(sbi)->dcc_info->entry_list;
 	int i;
+	struct dynamic_discard_map *ddm;
+	bool ddm_blk_exst = true;
+	bool ori_blk_exst = true;
+	unsigned int start_ddm = 0, end_ddm = -1;
 
 	if (se->valid_blocks == max_blocks || !f2fs_hw_support_discard(sbi))
 		return false;
@@ -1913,25 +1986,53 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 			return false;
 	}
 
+	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start);
+	
 	/* SIT_VBLOCK_MAP_SIZE should be multiple of sizeof(unsigned long) */
 	for (i = 0; i < entries; i++)
 		dmap[i] = force ? ~ckpt_map[i] & ~discard_map[i] :
 				(cur_map[i] ^ ckpt_map[i]) & ckpt_map[i];
+
+	/* check existence of discarded block in original version dmap*/
+	start = __find_rev_next_bit(dmap, max_blocks, end + 1);
+	
+	if (start >= max_blocks)
+		ori_blk_exst = false;
+	if (!ddm)
+		ddm_blk_exst = false;
+	else{
+		ddmap = (unsigned long *)ddm->dc_map;
+		start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
+		if (start >= max_blocks)
+			ddm_blk_exst = false;
+	}
+	f2fs_bug_on(sbi, ddm_blk_exst == ori_blk_exst);
+
+		 
+
 
 	while (force || SM_I(sbi)->dcc_info->nr_discards <=
 				SM_I(sbi)->dcc_info->max_discards) {
 		start = __find_rev_next_bit(dmap, max_blocks, end + 1);
 		if (start >= max_blocks)
 			break;
+		start_ddm = __find_rev_next_bit(ddmap, max_blocks, end_ddm + 1);
 
 		end = __find_rev_next_zero_bit(dmap, max_blocks, start + 1);
+		end_ddm = __find_rev_next_zero_bit(ddmap, max_blocks, start_ddm +1);
+
+		if (!force)
+			f2fs_bug_on(sbi, start == start_ddm && end == end_ddm);
+
 		if (force && start && end != max_blocks
 					&& (end - start) < cpc->trim_minlen)
 			continue;
 
-		if (check_only)
+		if (check_only){
+			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 			return true;
-
+		}
 		if (!de) {
 			de = f2fs_kmem_cache_alloc(discard_entry_slab,
 								GFP_F2FS_ZERO);
@@ -1944,6 +2045,8 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 
 		SM_I(sbi)->dcc_info->nr_discards += end - start;
 	}
+	__remove_discard_map(sbi, ddm);
+	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 	return false;
 }
 
@@ -2220,7 +2323,7 @@ static void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int se
 	bool left_most, exist;
 	struct dynamic_discard_map *ddm, *tmpddm;
 
-	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, segno, &left_most);
+	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, (unsigned long long)segno, &left_most);
 	if (del < 0) {
 		if (!*p){
 			/*not exist, so create it*/
@@ -2266,9 +2369,9 @@ static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 			(new_vblocks > f2fs_usable_blks_in_seg(sbi, segno))));
 
 	se->valid_blocks = new_vblocks;
-
+	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);
 	update_dynamic_discard_map(sbi, segno, offset, del);
-
+	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);
 	/* Update valid block bitmap */
 	if (del > 0) {
 		exist = f2fs_test_and_set_bit(offset, se->cur_valid_map);
@@ -5312,9 +5415,11 @@ int __init f2fs_create_segment_manager_caches(void)
 	discard_map_slab = f2fs_kmem_cache_create("f2fs_discard_map",
 			sizeof(struct dynamic_discard_map));
 	if (!discard_map_slab)
-		goto fail;
+		goto destroy_inmem_page_entry;
 	return 0;
 
+destroy_inmem_page_entry:
+	kmem_cache_destroy(inmem_entry_slab);
 destroy_sit_entry_set:
 	kmem_cache_destroy(sit_entry_set_slab);
 destroy_discard_cmd:
@@ -5331,4 +5436,5 @@ void f2fs_destroy_segment_manager_caches(void)
 	kmem_cache_destroy(discard_cmd_slab);
 	kmem_cache_destroy(discard_entry_slab);
 	kmem_cache_destroy(inmem_entry_slab);
+	kmem_cache_destroy(discard_map_slab);
 }
