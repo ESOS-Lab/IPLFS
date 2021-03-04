@@ -29,6 +29,7 @@ static struct kmem_cache *discard_entry_slab;
 static struct kmem_cache *discard_cmd_slab;
 static struct kmem_cache *sit_entry_set_slab;
 static struct kmem_cache *inmem_entry_slab;
+static struct kmem_cache *discard_map_slab;
 
 static unsigned long __reverse_ulong(unsigned char *str)
 {
@@ -2197,6 +2198,54 @@ static void update_segment_mtime(struct f2fs_sb_info *sbi, block_t blkaddr,
 		SIT_I(sbi)->max_mtime = ctime;
 }
 
+
+static struct dynamic_discard_map *__create_discard_map(struct f2fs_sb_info *sbi)
+{
+	struct dynamic_discard_map *ddm;
+
+	ddm = f2fs_kmem_cache_alloc(discard_map_slab, GFP_NOFS);
+	ddm->dc_map = f2fs_kvzalloc(sbi, SIT_VBLOCK_MAP_SIZE, GFP_KERNEL);
+	return ddm;
+}
+
+
+static void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int segno,
+	       					unsigned int offset, int del)
+{
+
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct rb_node **p;
+	struct rb_node *parent = NULL;
+	struct rb_entry *re;
+	bool left_most, exist;
+	struct dynamic_discard_map *ddm, *tmpddm;
+
+	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, segno, &left_most);
+	if (del < 0) {
+		if (!*p){
+			/*not exist, so create it*/
+			ddm = __create_discard_map(sbi);
+			rb_link_node(&ddm->rbe.rb_node, parent, p);
+		}
+		re = rb_entry_safe(*p, struct rb_entry, rb_node);
+		tmpddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);
+		f2fs_bug_on(sbi, tmpddm != ddm);
+		ddm = tmpddm;
+		exist = f2fs_test_and_set_bit(offset, ddm->dc_map);
+		
+	}
+	if (del > 0) {
+		if (!*p){
+			return;	
+		}
+		re = rb_entry_safe(*p, struct rb_entry, rb_node);
+		ddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);
+		exist = f2fs_test_and_clear_bit(offset, ddm->dc_map);
+
+	}
+		
+}
+
 static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 {
 	struct seg_entry *se;
@@ -2217,6 +2266,8 @@ static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 			(new_vblocks > f2fs_usable_blks_in_seg(sbi, segno))));
 
 	se->valid_blocks = new_vblocks;
+
+	update_dynamic_discard_map(sbi, segno, offset, del);
 
 	/* Update valid block bitmap */
 	if (del > 0) {
@@ -5257,6 +5308,11 @@ int __init f2fs_create_segment_manager_caches(void)
 			sizeof(struct inmem_pages));
 	if (!inmem_entry_slab)
 		goto destroy_sit_entry_set;
+	
+	discard_map_slab = f2fs_kmem_cache_create("f2fs_discard_map",
+			sizeof(struct dynamic_discard_map));
+	if (!discard_map_slab)
+		goto fail;
 	return 0;
 
 destroy_sit_entry_set:

@@ -58,6 +58,33 @@ struct rb_entry *f2fs_lookup_rb_tree(struct rb_root_cached *root,
 	return re;
 }
 
+struct rb_node **f2fs_lookup_pos_rb_tree_ext(struct f2fs_sb_info *sbi,
+					struct rb_root_cached *root,
+					struct rb_node **parent,
+					unsigned long long key, bool *leftmost)
+{
+	struct rb_node **p = &root->rb_root.rb_node;
+	struct rb_entry *re;
+	//*exist = false;
+
+	while (*p) {
+		*parent = *p;
+		re = rb_entry(*parent, struct rb_entry, rb_node);
+
+		if (key < re->key) {
+			p = &(*p)->rb_left;
+		} else if (key > re->key) {
+			p = &(*p)->rb_right;
+			*leftmost = false;
+		} else {
+			//*exist = true;
+			break;
+		}
+	}
+
+	return p;
+}
+
 struct rb_node **f2fs_lookup_rb_tree_ext(struct f2fs_sb_info *sbi,
 					struct rb_root_cached *root,
 					struct rb_node **parent,
@@ -80,7 +107,6 @@ struct rb_node **f2fs_lookup_rb_tree_ext(struct f2fs_sb_info *sbi,
 
 	return p;
 }
-
 struct rb_node **f2fs_lookup_rb_tree_for_insert(struct f2fs_sb_info *sbi,
 				struct rb_root_cached *root,
 				struct rb_node **parent,

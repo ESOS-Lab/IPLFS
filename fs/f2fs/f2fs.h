@@ -266,6 +266,7 @@ struct fsync_node_entry {
 	unsigned int seq_id;	/* sequence id */
 };
 
+
 /* for the bitmap indicate blocks to be discarded */
 struct discard_entry {
 	struct list_head list;	/* list head */
@@ -568,6 +569,27 @@ struct extent_tree {
 	atomic_t node_cnt;		/* # of extent node in rb-tree*/
 	bool largest_updated;		/* largest extent updated */
 };
+
+
+
+/*dynamic_discard_map*/
+struct dynamic_discard_map {
+	/* key in rb_entry is segno*/
+	struct rb_entry rbe;
+	unsigned char *dc_map;
+
+};
+
+#define dynamic_discard_map(ptr, type, member) container_of(ptr, type, member)
+
+struct dynamic_discard_map_control {
+	struct rb_root_cached root;		/* root of discard map rb-tree */
+};
+
+
+
+
+
 
 /*
  * This structure is taken from ext4_map_blocks.
@@ -982,6 +1004,9 @@ struct f2fs_sm_info {
 
 	/* for discard command control */
 	struct discard_cmd_control *dcc_info;
+
+	/*for dynamic discard map control*/
+	struct dynamic_discard_map_control *ddmc_info;
 };
 
 /*
@@ -3795,6 +3820,13 @@ void f2fs_leave_shrinker(struct f2fs_sb_info *sbi);
  */
 struct rb_entry *f2fs_lookup_rb_tree(struct rb_root_cached *root,
 				struct rb_entry *cached_re, unsigned int ofs);
+
+
+struct rb_node **f2fs_lookup_pos_rb_tree_ext(struct f2fs_sb_info *sbi,
+					struct rb_root_cached *root,
+					struct rb_node **parent,
+					unsigned long long key, bool *leftmost);
+
 struct rb_node **f2fs_lookup_rb_tree_ext(struct f2fs_sb_info *sbi,
 				struct rb_root_cached *root,
 				struct rb_node **parent,
