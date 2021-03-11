@@ -2180,6 +2180,44 @@ skip:
 	wake_up_discard_thread(sbi, false);
 }
 
+static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
+{
+	dev_t dev = sbi->sb->s_bdev->bd_dev;
+	struct dynamic_discard_map_control *ddmc;
+	int err = 0, i;
+
+	if (SM_I(sbi)->ddmc_info) {
+		ddmc = SM_I(sbi)->ddmc_info;
+		return 0;
+	}
+
+	ddmc = f2fs_kzalloc(sbi, sizeof(struct dynamic_discard_map_control), GFP_KERNEL);
+        if (!ddmc)
+                return -ENOMEM;
+
+        mutex_init(&ddmc->ddm_lock);
+        ddmc->root = RB_ROOT_CACHED;
+        ddmc->rbtree_check = false;
+
+        SM_I(sbi)->ddmc_info = ddmc;
+/*
+init_thread:
+        dcc->f2fs_issue_discard = kthread_run(issue_discard_thread, sbi,
+                                "f2fs_discard-%u:%u", MAJOR(dev), MINOR(dev));
+        if (IS_ERR(dcc->f2fs_issue_discard)) {
+                err = PTR_ERR(dcc->f2fs_issue_discard);
+                kfree(dcc);
+                SM_I(sbi)->dcc_info = NULL;
+                return err;
+        }
+
+        return err;
+*/
+
+
+}
+
+
 static int create_discard_cmd_control(struct f2fs_sb_info *sbi)
 {
 	dev_t dev = sbi->sb->s_bdev->bd_dev;
@@ -2226,6 +2264,29 @@ init_thread:
 
 	return err;
 }
+
+
+static void destroy_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+
+	if (!ddmc)
+		return;
+
+	//f2fs_stop_discard_thread(sbi);
+
+	/*
+	 * Recovery can cache discard commands, so in error path of
+	 * fill_super(), it needs to give a chance to handle them.
+	 */
+	/*if (unlikely(atomic_read(&ddmcc->discard_cmd_cnt)))
+		f2fs_issue_discard_timeout(sbi);
+	*/
+	kfree(ddmc);
+	SM_I(sbi)->ddmc_info = NULL;
+}
+
+
 
 static void destroy_discard_cmd_control(struct f2fs_sb_info *sbi)
 {
@@ -5256,6 +5317,10 @@ int f2fs_build_segment_manager(struct f2fs_sb_info *sbi)
 	if (err)
 		return err;
 
+	err = create_dynamic_discard_map_control(sbi);
+	if (err)
+		return err;
+
 	err = build_sit_info(sbi);
 	if (err)
 		return err;
@@ -5382,6 +5447,7 @@ void f2fs_destroy_segment_manager(struct f2fs_sb_info *sbi)
 		return;
 	f2fs_destroy_flush_cmd_control(sbi, true);
 	destroy_discard_cmd_control(sbi);
+	destroy_dynamic_discard_map_control(sbi);
 	destroy_dirty_segmap(sbi);
 	destroy_curseg(sbi);
 	destroy_free_segmap(sbi);
