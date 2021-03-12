@@ -1976,6 +1976,21 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 	bool ori_blk_exst = true;
 	unsigned int start_ddm = 0, end_ddm = -1;
 
+	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start);
+
+	if (!ddm)
+		ddm_blk_exst = false;
+	else{
+		ddmap = (unsigned long *)ddm->dc_map;
+		start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
+		if (start >= max_blocks){
+			ddm_blk_exst = false;
+			__remove_discard_map(sbi, ddm);
+			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+		}
+	}
+
 	if (se->valid_blocks == max_blocks || !f2fs_hw_support_discard(sbi))
 		return false;
 
@@ -1986,8 +2001,6 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 			return false;
 	}
 
-	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
-	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start);
 	
 	/* SIT_VBLOCK_MAP_SIZE should be multiple of sizeof(unsigned long) */
 	for (i = 0; i < entries; i++)
@@ -1999,17 +2012,13 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 	
 	if (start >= max_blocks)
 		ori_blk_exst = false;
-	if (!ddm)
-		ddm_blk_exst = false;
-	else{
-		ddmap = (unsigned long *)ddm->dc_map;
-		start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
-		if (start >= max_blocks)
-			ddm_blk_exst = false;
-	}
 	f2fs_bug_on(sbi, ddm_blk_exst == ori_blk_exst);
 
-		 
+	if (!(ddm_blk_exst | ori_blk_exst))
+		return false;
+
+
+
 
 
 	while (force || SM_I(sbi)->dcc_info->nr_discards <=
@@ -2387,6 +2396,7 @@ static void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int se
 		if (!*p){
 			/*not exist, so create it*/
 			ddm = __create_discard_map(sbi);
+			ddm->rbe.key = segno;
 			rb_link_node(&ddm->rbe.rb_node, parent, p);
 		}
 		re = rb_entry_safe(*p, struct rb_entry, rb_node);
