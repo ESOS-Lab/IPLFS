@@ -2182,9 +2182,7 @@ skip:
 
 static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 {
-	dev_t dev = sbi->sb->s_bdev->bd_dev;
 	struct dynamic_discard_map_control *ddmc;
-	int err = 0, i;
 
 	if (SM_I(sbi)->ddmc_info) {
 		ddmc = SM_I(sbi)->ddmc_info;
@@ -2197,9 +2195,9 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 
         mutex_init(&ddmc->ddm_lock);
         ddmc->root = RB_ROOT_CACHED;
-        ddmc->rbtree_check = false;
 
         SM_I(sbi)->ddmc_info = ddmc;
+	return 0;
 /*
 init_thread:
         dcc->f2fs_issue_discard = kthread_run(issue_discard_thread, sbi,
@@ -2214,8 +2212,8 @@ init_thread:
         return err;
 */
 
-
 }
+
 
 
 static int create_discard_cmd_control(struct f2fs_sb_info *sbi)

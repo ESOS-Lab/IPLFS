@@ -1,0 +1,303 @@
+ccflags-y += -Og
+./lib/lz4/Makefile
+ccflags-y += -Og
+./lib/zstd/Makefile
+OPTFLAGS = -Og			# Adjust as desired
+./lib/raid6/test/Makefile
+CFL := $(PROFILING) -mcmodel=medlow -fPIC -Og -fasynchronous-unwind-tables -m64 \
+./arch/sparc/vdso/Makefile
+OBJCOPYFLAGS_image.bin := -S -O binary -R .note -R .comment
+./arch/sparc/boot/Makefile
+OBJCOPYFLAGS    := -O binary -R .note -R .comment -S
+./arch/openrisc/Makefile
+KBUILD_CFLAGS_DECOMPRESSOR := $(CLANG_FLAGS) -m64 -Og
+OBJCOPYFLAGS	:= -O binary
+./arch/s390/Makefile
+OBJCOPYFLAGS_syms.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.decompressor.syms
+OBJCOPYFLAGS_info.bin := -O binary --only-section=.vmlinux.info --set-section-flags .vmlinux.info=load
+OBJCOPYFLAGS_info.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.vmlinux.info
+OBJCOPYFLAGS_vmlinux.bin := -O binary --remove-section=.comment --remove-section=.vmlinux.info -S
+OBJCOPYFLAGS_piggy.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.vmlinux.bin.compressed
+./arch/s390/boot/compressed/Makefile
+KBUILD_CFLAGS += -c -MD -Og -m64 -msoft-float -fno-common
+OBJCOPYFLAGS_purgatory.ro := -O elf64-s390
+./arch/s390/purgatory/Makefile
+OBJCOPYFLAGS_vmlinux.bin := -O binary
+./arch/nios2/boot/Makefile
+OBJCOPY_ARGS 	:= -O elf32-xtensa-be
+OBJCOPY_ARGS 	:= -O elf32-xtensa-le
+	$(Q)$(OBJCOPY) -S -O binary $< $@
+./arch/xtensa/boot/boot-redboot/Makefile
+OBJCOPY_ARGS    := -O elf32-xtensa-be
+OBJCOPY_ARGS    := -O elf32-xtensa-le
+./arch/xtensa/boot/boot-elf/Makefile
+OBJCOPYFLAGS = --strip-all -R .comment -R .notes -O binary
+./arch/xtensa/boot/Makefile
+OBJCOPYFLAGS		:=-O binary
+./arch/csky/Makefile
+OBJCOPY_FLAGS =-O binary -R .note -R .comment -S
+./arch/parisc/Makefile
+KBUILD_CFLAGS := -D__KERNEL__ -Og -DBOOTLOADER
+KBUILD_CFLAGS += -fno-PIE -mno-space-regs -mdisable-fpregs -Og
+./arch/parisc/boot/compressed/Makefile
+CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Og $(CC_FLAGS_SCS) $(GCC_PLUGINS_CFLAGS)
+CFLAGS_vgettimeofday.o = -Og -mcmodel=tiny -fasynchronous-unwind-tables
+./arch/arm64/kernel/vdso/Makefile
+VDSO_CFLAGS  += -Og
+VDSO_CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Og
+./arch/arm64/kernel/vdso32/Makefile
+OBJCOPYFLAGS_Image :=-O binary -R .note -R .note.gnu.build-id -R .comment -S
+./arch/arm64/boot/Makefile
+OBJCOPYFLAGS := -R .note -R .comment -R .note.gnu.build-id -O binary
+./arch/microblaze/boot/Makefile
+OBJCOPYFLAGS	:= -O binary -R .note -R .note.gnu.build-id -R .comment -S
+./arch/nds32/Makefile
+OBJCOPYFLAGS_realmode.bin := -O binary
+./arch/x86/realmode/rm/Makefile
+REALMODE_CFLAGS	:= -m16 -g -Og -DDISABLE_BRANCH_PROFILING \
+			$(OBJCOPY) -O elf32-x86-64 "$$TMP" "$$TMPO" && \
+	# GCC ignores '-maccumulate-outgoing-args' when used with '-Og'.
+	# If '-Og' is enabled, disable it and print a warning.
+./arch/x86/Makefile
+CFL := $(PROFILING) -mcmodel=small -fPIC -Og -fasynchronous-unwind-tables -m64 \
+./arch/x86/um/vdso/Makefile
+OBJCOPYFLAGS_vmlinux.bin := -O binary -R .note -R .comment -S
+OBJCOPYFLAGS_setup.bin	:= -O binary
+./arch/x86/boot/Makefile
+KBUILD_CFLAGS := -m$(BITS) -Og
+./arch/x86/boot/compressed/Makefile
+CFL := $(PROFILING) -mcmodel=small -fPIC -Og -fasynchronous-unwind-tables -m64 \
+      cmd_x32 = $(OBJCOPY) -O elf32-x86-64 $< $@
+./arch/x86/entry/vdso/Makefile
+CFLAGS =	-Wall -Og
+./arch/m68k/tools/amiga/Makefile
+OBJCOPYFLAGS_vmlinux.srec := -Ogrec
+OBJCOPYFLAGS_vmlinux.bin  := -Obinary
+OBJCOPYFLAGS_zImage := -O binary -R .note -R .comment -R .stab -R .stabstr -S
+./arch/h8300/boot/Makefile
+OBJCOPYFLAGS := -O binary
+CFLAGS_misc.o = -Og
+./arch/h8300/boot/compressed/Makefile
+OBJCOPYFLAGS= -O binary -R .note -R .note.gnu.build-id -R .comment -S
+./arch/arc/boot/Makefile
+	-Og -g -fPIC -fno-strict-aliasing -fno-common -fno-builtin -G 0 \
+./arch/mips/vdso/Makefile
+AFLAGS_chacha-core.o += -Og # needed to fill branch delay slots
+./arch/mips/crypto/Makefile
+	cmd_32 = $(OBJCOPY) -O $(32bit-bfd) $(OBJCOPYFLAGS) $< $@
+	cmd_64 = $(OBJCOPY) -O $(64bit-bfd) $(OBJCOPYFLAGS) $< $@
+		-m -O $(objtree) $(srctree)/arch/$(ARCH)/configs/generic_defconfig $^ | \
+./arch/mips/Makefile
+      cmd_bin = $(OBJCOPY) -O binary $(strip-flags) $(VMLINUX) $@
+      cmd_srec = $(OBJCOPY) -S -O srec $(strip-flags) $(VMLINUX) $@
+		-D "-I dts -O dtb -p 500 \
+./arch/mips/boot/Makefile
+OBJCOPYFLAGS_vmlinux.bin := $(OBJCOPYFLAGS) -O binary -R .comment -S
+      cmd_32 = $(OBJCOPY) -O $(32bit-bfd) $(OBJCOPYFLAGS) $< $@
+OBJCOPYFLAGS_vmlinuz.bin := $(OBJCOPYFLAGS) -O binary
+OBJCOPYFLAGS_vmlinuz.srec := $(OBJCOPYFLAGS) -S -O srec
+		-D "-I dts -O dtb -p 500 \
+./arch/mips/boot/compressed/Makefile
+# Force -Og to avoid libgcc dependencies
+CFLAGS_REMOVE_vgettimeofday.o = -pg -Og $(GCC_PLUGINS_CFLAGS)
+CFLAGS_vgettimeofday.o = -Og
+CFLAGS_vgettimeofday.o = -Og -include $(c-gettimeofday-y)
+./arch/arm/vdso/Makefile
+OBJCOPYFLAGS	:=-O binary -R .comment -S
+./arch/arm/boot/Makefile
+# string library code (-Og is enforced to keep it much smaller)
+CFLAGS_string.o	:= -Og
+./arch/arm/boot/compressed/Makefile
+udivsi3-y			:= udivsi3_i4i-Og.o
+./arch/sh/lib/Makefile
+# Makefile for I-O DATA DEVICE, INC. "LANDISK Series"
+./arch/sh/boards/mach-landisk/Makefile
+OBJCOPYFLAGS	:= -O binary -R .note -R .note.gnu.build-id -R .comment \
+./arch/sh/Makefile
+OBJCOPYFLAGS_vmlinux.srec := -I binary -O srec
+OBJCOPYFLAGS_uImage.srec := -I binary -O srec
+./arch/sh/boot/Makefile
+OBJCOPYFLAGS    := -O binary
+./arch/riscv/Makefile
+CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Og
+./arch/riscv/kernel/vdso/Makefile
+OBJCOPYFLAGS_Image :=-O binary -R .note -R .note.gnu.build-id -R .comment -S
+./arch/riscv/boot/Makefile
+SPU_CFLAGS	:= -Og -Wall -I$(srctree)/include -D__KERNEL__
+      cmd_spu_objcopy = $(SPU_OBJCOPY) -O binary $< $@
+./arch/powerpc/platforms/cell/spufs/Makefile
+		-m -O $(objtree) $(srctree)/arch/$(ARCH)/configs/$(1) \
+./arch/powerpc/Makefile
+		 -fno-strict-aliasing -Og -msoft-float -mno-altivec -mno-vsx \
+./arch/powerpc/boot/Makefile
+OBJCOPYFLAGS_vmlinux.bin := -O binary
+./arch/c6x/boot/Makefile
+ccflags-y := -Og
+./drivers/net/wireguard/Makefile
+KBUILD_CFLAGS			:= $(cflags-y) -Og -DDISABLE_BRANCH_PROFILING \
+./drivers/firmware/efi/libstub/Makefile
+ccflags-$(GCOV) += -Og
+./drivers/scsi/lpfc/Makefile
+ccflags-y			:= -Og -D_LINUX -DBUILDING_ACPICA
+./drivers/acpi/acpica/Makefile
+CFLAGS = -g -Og
+./f2fs-tools/fsck/Makefile
+CFLAGS = -g -Og
+./f2fs-tools/mkfs/Makefile
+CFLAGS = -g -Og
+./f2fs-tools/lib/Makefile
+CFLAGS = -g -Og
+./f2fs-tools/Makefile
+CFLAGS = -g -Og
+./f2fs-tools/tools/Makefile
+CFLAGS = -g -Og
+./f2fs-tools/man/Makefile
+TPROGS_CFLAGS += -Wall -Og
+			  $(CLANG) -target bpf -Og -g -c -x c - -o ./llvm_btf_verify.o; \
+		-Og -emit-llvm -Xclang -disable-llvm-passes -c $< -o - | \
+		$(OPT) -Og -mtriple=bpf-pc-linux | $(LLVM_DIS) | \
+./samples/bpf/Makefile
+CFLAGS_jitterentropy.o = -Og
+./crypto/Makefile
+			      -Og -fomit-frame-pointer -std=gnu89
+KBUILD_HOSTCXXFLAGS := -Wall -Og $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
+KBUILD_CFLAGS += -Og
+KBUILD_CFLAGS += -Og
+KBUILD_CFLAGS += -Og
+./Makefile
+	$(Q)$(CLANG) -g -Og -target bpf $(INCLUDES)			      \
+./kernel/bpf/preload/iterators/Makefile
+nosy-dump : CFLAGS = -Wall -Og -g
+./tools/firewire/Makefile
+CFLAGS += -Og -Wall -g -D_GNU_SOURCE -I$(OUTPUT)include
+./tools/spi/Makefile
+	$(BUILD) -fstack-protector-all -Og -D_FORTIFY_SOURCE=2 -ldw -lelf -lnuma -lelf -I/usr/include/slang -lslang $(FLAGS_PERL_EMBED) $(FLAGS_PYTHON_EMBED) -DPACKAGE='"perf"' -lbfd -ldl -lz -llzma -lzstd -lcap
+	$(BUILD) -Og -D_FORTIFY_SOURCE=2
+./tools/build/feature/Makefile
+override CFLAGS+= $(call cc-option,-Og,-Og) ${WARNFLAGS}
+./tools/thermal/tmon/Makefile
+CFLAGS += -g -Og -Werror -Wall -I. -I../include/ -I ../../usr/include/ -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -include ../../include/linux/kconfig.h
+./tools/virtio/Makefile
+CFLAGS = -Og -Wall -pthread
+./tools/virtio/virtio-trace/Makefile
+CFLAGS += -pthread -Og -ggdb -flto -fwhole-program
+LDFLAGS += -pthread -Og -ggdb -flto -fwhole-program
+./tools/virtio/ringtest/Makefile
+override CFLAGS += -Og -Wall -Wextra -g -D_GNU_SOURCE -I$(OUTPUT)include -I$(srctree)/tools/include
+./tools/usb/Makefile
+	@objcopy -Obinary $^ $@
+	@objcopy -Obinary $^ $@
+	@objcopy -Oihex $^ $@
+./tools/edid/Makefile
+override CFLAGS += -Og -Wall -g -D_GNU_SOURCE -I$(OUTPUT)include
+./tools/iio/Makefile
+# use '-Og' optimization if available, else use -Og
+OPTIMIZATION := $(call cc-supports,-Og,-Og)
+	override CFLAGS += -Og -g -DDEBUG
+./tools/power/cpupower/Makefile
+override CFLAGS +=	-Og -Wall -I../../../include
+./tools/power/x86/x86_energy_perf_policy/Makefile
+override CFLAGS += -Og -Wall -g -D_GNU_SOURCE -I$(OUTPUT)include
+./tools/power/x86/intel-speed-select/Makefile
+override CFLAGS +=	-Og -Wall -I../../../include
+./tools/power/x86/turbostat/Makefile
+override CFLAGS += -Og -Wall -g -D_GNU_SOURCE -I$(OUTPUT)include
+./tools/gpio/Makefile
+override CFLAGS += -Og -Wall -g -D_GNU_SOURCE -I$(OUTPUT)include
+./tools/hv/Makefile
+CFLAGS += -Wall -Og
+./tools/bpf/Makefile
+	$(QUIET_GEN)$(CLANG) -g -Og -target bpf $(INCLUDES)		      \
+./tools/bpf/runqslower/Makefile
+CFLAGS += -Og
+		-g -Og -target bpf -c $< -o $@ && $(LLVM_STRIP) -g $@
+./tools/bpf/bpftool/Makefile
+CFLAGS += -g -Og -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
+./tools/testing/vsock/Makefile
+CFLAGS += -I. -I../../include -g -Og -Wall -fsanitize=address
+./tools/testing/scatterlist/Makefile
+CFLAGS += -Wall -Og
+./tools/testing/selftests/tmpfs/Makefile
+		 -Og -target bpf -emit-llvm -c $< -o - |      \
+./tools/testing/selftests/tc-testing/Makefile
+CFLAGS += -Og -g -std=gnu99 -Wall
+./tools/testing/selftests/capabilities/Makefile
+CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -Og -g -std=gnu99 \
+./tools/testing/selftests/kvm/Makefile
+CFLAGS += -Wall -Og -I$(APIDIR)
+./tools/testing/selftests/ir/Makefile
+CFLAGS += -Og -g -std=gnu99 -Wall -I../../../../usr/include/ $(VAR_CFLAGS)
+./tools/testing/selftests/gpio/Makefile
+CFLAGS += -Og -Wall -g -I./ -I../../../../usr/include/ -L$(OUTPUT) -Wl,-rpath=./ \
+./tools/testing/selftests/rseq/Makefile
+CFLAGS += -g -rdynamic -Wall -Og $(GENFLAGS) $(SAN_CFLAGS)		\
+	$(Q)$(CLANG) $3 -Og -target bpf -c $1 -o $2 -mcpu=v3
+	$(Q)$(CLANG) $3 -Og -target bpf -c $1 -o $2 -mcpu=v2
+	$(Q)$(BPF_GCC) $3 -Og -c $1 -o $2
+	$$(call msg,TEST-OBJ,$(TRUNNER_BINARY),$$@)
+	$$(call msg,EXT-OBJ,$(TRUNNER_BINARY),$$@)
+./tools/testing/selftests/bpf/Makefile
+CFLAGS += -Og -Wl,-no-as-needed -Wall
+./tools/testing/selftests/timers/Makefile
+CFLAGS =  -Wall -Wl,--no-as-needed -Og -g  -I$(top_srcdir)/usr/include
+./tools/testing/selftests/net/mptcp/Makefile
+CFLAGS =  -Wall -Wl,--no-as-needed -Og -g
+./tools/testing/selftests/net/Makefile
+CFLAGS += -Og -Wl,-no-as-needed -Wall
+./tools/testing/selftests/rtc/Makefile
+CFLAGS := -Wall -Og -g
+./tools/testing/selftests/arm64/Makefile
+CFLAGS := -Og -g -std=gnu99 -pthread -Wall
+./tools/testing/selftests/x86/Makefile
+CFLAGS := $(CFLAGS) $(INCLUDEDIR) -Wall -Og -g
+./tools/testing/selftests/sparc64/drivers/Makefile
+CFLAGS += -Wall -Og -g -fsanitize=address -fsanitize=undefined
+./tools/testing/selftests/openat2/Makefile
+         -Og
+./tools/testing/selftests/mount/Makefile
+CFLAGS := $(CFLAGS) -g -Og -Wall -D_GNU_SOURCE -pthread $(INCLUDES)
+./tools/testing/selftests/futex/functional/Makefile
+         -Og
+./tools/testing/selftests/firmware/Makefile
+CFLAGS += -Wall -Og -Wno-unused-function
+./tools/testing/selftests/proc/Makefile
+CFLAGS += -Og -g -std=gnu89 -pthread -Wall -Wextra
+./tools/testing/selftests/sync/Makefile
+CFLAGS = -Wall -Og
+./tools/testing/selftests/safesetid/Makefile
+$(TEST_GEN_PROGS): CFLAGS += -Og -g -pthread -m64 -maltivec
+./tools/testing/selftests/powerpc/math/Makefile
+CFLAGS = -Og -m64 -I./include
+./tools/testing/selftests/powerpc/nx-gzip/Makefile
+ASFLAGS += -Og -Wall -g -nostdlib -m64
+	$(CROSS_COMPILE)objcopy -j .text --reverse-bytes=4 -O binary $< $@
+./tools/testing/selftests/powerpc/switch_endian/Makefile
+$(OUTPUT)/tm-unavailable: CFLAGS += -Og -pthread -m64 -Wno-error=uninitialized -mvsx
+$(OUTPUT)/tm-trap: CFLAGS += -Og -pthread -m64
+./tools/testing/selftests/powerpc/tm/Makefile
+CFLAGS := -std=gnu99 -Og -Wall -Werror -DGIT_VERSION='"$(GIT_VERSION)"' -I$(CURDIR)/include $(CFLAGS)
+./tools/testing/selftests/powerpc/Makefile
+CFLAGS += -Og
+./tools/testing/selftests/powerpc/benchmarks/Makefile
+CFLAGS += -static -Og -Wl,-no-as-needed -Wall -I../../../../usr/include
+./tools/testing/selftests/dmabuf-heaps/Makefile
+CFLAGS += -Og
+./tools/testing/selftests/mqueue/Makefile
+	flock -x $$@.lock -c '[ -f $$@ ] && exit 0; wget -O $$@.tmp $(MIRROR)$(1) || wget -O $$@.tmp $(2)$(1) || rm -f $$@.tmp; [ -f $$@.tmp ] || exit 1; if echo "$(3)  $$@.tmp" | sha256sum -c -; then mv $$@.tmp $$@; else rm -f $$@.tmp; exit 71; fi'
+export CFLAGS ?= -Og -pipe
+./tools/testing/selftests/wireguard/qemu/Makefile
+CFLAGS += -I. -I../../include -g -Og -Wall -D_LGPL_SOURCE -fsanitize=address \
+./tools/testing/radix-tree/Makefile
+  CFLAGS += -Og
+  CFLAGS += -Og
+./tools/lib/api/Makefile
+  CFLAGS += -Og
+  CFLAGS += -Og
+  CFLAGS += -Og
+./tools/lib/subcmd/Makefile
+  CFLAGS := -g -Og
+./tools/lib/bpf/Makefile
+CFLAGS ?= -g -DCONFIG_LOCKDEP -DCONFIG_STACKTRACE -DCONFIG_PROVE_LOCKING -DBITS_PER_LONG=__WORDSIZE -DLIBLOCKDEP_VERSION='"$(LIBLOCKDEP_VERSION)"' -rdynamic -Og -g
+./tools/lib/lockdep/Makefile
+CFLAGS += -Og -Wall -g -D_GNU_SOURCE -I$(OUTPUT)include
+./tools/pci/Makefile
