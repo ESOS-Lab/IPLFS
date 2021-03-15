@@ -1976,7 +1976,7 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 	bool ori_blk_exst = true;
 	unsigned int start_ddm = 0, end_ddm = -1;
 
-	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	//mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start);
 
 	if (!ddm)
@@ -1987,18 +1987,30 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 		if (start >= max_blocks){
 			ddm_blk_exst = false;
 			__remove_discard_map(sbi, ddm);
-			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+			//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 		}
 	}
 
-	if (se->valid_blocks == max_blocks || !f2fs_hw_support_discard(sbi))
-		return false;
+	if (se->valid_blocks == max_blocks || !f2fs_hw_support_discard(sbi)){
+		if (ddm_blk_exst){
+			__remove_discard_map(sbi, ddm);
+			//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+			
+		}
 
+		return false;
+	} 
 	if (!force) {
 		if (!f2fs_realtime_discard_enable(sbi) || !se->valid_blocks ||
 			SM_I(sbi)->dcc_info->nr_discards >=
-				SM_I(sbi)->dcc_info->max_discards)
+				SM_I(sbi)->dcc_info->max_discards){
+
+			if (ddm_blk_exst){
+				__remove_discard_map(sbi, ddm);
+				//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+			}
 			return false;
+		}
 	}
 
 	
@@ -2012,7 +2024,10 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 	
 	if (start >= max_blocks)
 		ori_blk_exst = false;
-	f2fs_bug_on(sbi, ddm_blk_exst == ori_blk_exst);
+	if (ddm_blk_exst != ori_blk_exst)
+		panic("add discard addrs: exst not match\n");
+		//printk("add discard addrs: exst not match\n");
+	//f2fs_bug_on(sbi, ddm_blk_exst != ori_blk_exst);
 
 	if (!(ddm_blk_exst | ori_blk_exst))
 		return false;
@@ -2031,15 +2046,19 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 		end = __find_rev_next_zero_bit(dmap, max_blocks, start + 1);
 		end_ddm = __find_rev_next_zero_bit(ddmap, max_blocks, start_ddm +1);
 
-		if (!force)
-			f2fs_bug_on(sbi, start == start_ddm && end == end_ddm);
-
+		if (!force){
+			if (start != start_ddm || end != end_ddm)
+				panic("start end not match in add_discard_addrs");
+				//printk("start end not match in add_discard_addrs");
+			//f2fs_bug_on(sbi, start != start_ddm || end != end_ddm);
+		}
 		if (force && start && end != max_blocks
 					&& (end - start) < cpc->trim_minlen)
 			continue;
 
 		if (check_only){
-			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+			//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock)
+			__remove_discard_map(sbi, ddm);
 			return true;
 		}
 		if (!de) {
@@ -2055,7 +2074,7 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 		SM_I(sbi)->dcc_info->nr_discards += end - start;
 	}
 	__remove_discard_map(sbi, ddm);
-	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 	return false;
 }
 
@@ -2388,23 +2407,56 @@ static void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int se
 	struct rb_node **p;
 	struct rb_node *parent = NULL;
 	struct rb_entry *re;
-	bool left_most, exist;
-	struct dynamic_discard_map *ddm, *tmpddm;
-
-	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, (unsigned long long)segno, &left_most);
+	bool leftmost, exist;
+	struct dynamic_discard_map *ddm;
+	bool new = false;
+	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, (unsigned long long)segno, &leftmost);
 	if (del < 0) {
 		if (!*p){
+			new = true;
 			/*not exist, so create it*/
 			ddm = __create_discard_map(sbi);
+			if (ddm == 0)
+				panic("__create_discard_map failed");
 			ddm->rbe.key = segno;
+			f2fs_test_and_set_bit(offset, ddm->dc_map);
 			rb_link_node(&ddm->rbe.rb_node, parent, p);
+			if (*p == 0)
+				panic("pstar is zero");
+			rb_insert_color_cached(&ddm->rbe.rb_node, &ddmc->root, leftmost);
+			return;
 		}
+		else{
+			re = rb_entry_safe(*p, struct rb_entry, rb_node);
+			if (re == 0)
+				panic("re is zero");
+			ddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);
+			if (ddm == 0)
+				panic("tmpddm is zero 1st");
+			f2fs_test_and_set_bit(offset, ddm->dc_map);
+		}
+		/*
+		if (*p == 0)
+			panic("pstar is zero aft");
 		re = rb_entry_safe(*p, struct rb_entry, rb_node);
+		if (re == 0)
+			panic("re is zero");
 		tmpddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);
-		f2fs_bug_on(sbi, tmpddm != ddm);
+		if (tmpddm == 0)
+			panic("tmpddm is zero 1st");
+		//f2fs_bug_on(sbi, tmpddm != ddm);
+		if (new && tmpddm != ddm){
+			if (ddm == 0)
+				panic("ddm is zero");
+			if (tmpddm == 0)
+				panic("tmpddm is zero");
+			printk("tmp key is %lld and ddm key is %lld\n", tmpddm->rbe.key, ddm->rbe.key);
+			panic("dynamic_discard_map doesn't work in update_dynamic_discard_map!!!!\n");
+			//printk("dynamic_discard_map doesn't work in update_dynamic_discard_map!!!!\n");
+		}
 		ddm = tmpddm;
 		exist = f2fs_test_and_set_bit(offset, ddm->dc_map);
-		
+		*/
 	}
 	if (del > 0) {
 		if (!*p){
@@ -3181,10 +3233,14 @@ bool f2fs_exist_trim_candidates(struct f2fs_sb_info *sbi,
 
 	down_write(&SIT_I(sbi)->sentry_lock);
 	for (; cpc->trim_start <= cpc->trim_end; cpc->trim_start++) {
+		
+		mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 		if (add_discard_addrs(sbi, cpc, true)) {
+			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 			has_candidate = true;
 			break;
 		}
+		mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 	}
 	up_write(&SIT_I(sbi)->sentry_lock);
 
@@ -4381,7 +4437,9 @@ void f2fs_flush_sit_entries(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 			/* add discard candidates */
 			if (!(cpc->reason & CP_DISCARD)) {
 				cpc->trim_start = segno;
+				mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 				add_discard_addrs(sbi, cpc, false);
+				mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 			}
 
 			if (to_journal) {
@@ -4422,8 +4480,11 @@ out:
 	if (cpc->reason & CP_DISCARD) {
 		__u64 trim_start = cpc->trim_start;
 
-		for (; cpc->trim_start <= cpc->trim_end; cpc->trim_start++)
+		for (; cpc->trim_start <= cpc->trim_end; cpc->trim_start++){
+			mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 			add_discard_addrs(sbi, cpc, false);
+			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+		}
 
 		cpc->trim_start = trim_start;
 	}

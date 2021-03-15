@@ -1,0 +1,194 @@
+[1mdiff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c[m
+[1mindex 2b874e521..aa8b1d73e 100644[m
+[1m--- a/fs/f2fs/segment.c[m
+[1m+++ b/fs/f2fs/segment.c[m
+[36m@@ -1976,7 +1976,7 @@[m [mstatic bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,[m
+ 	bool ori_blk_exst = true;[m
+ 	unsigned int start_ddm = 0, end_ddm = -1;[m
+ [m
+[31m-	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	[m
+[32m+[m	[32m//mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start);[m
+ [m
+ 	if (!ddm)[m
+[36m@@ -1987,18 +1987,30 @@[m [mstatic bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,[m
+ 		if (start >= max_blocks){[m
+ 			ddm_blk_exst = false;[m
+ 			__remove_discard_map(sbi, ddm);[m
+[31m-			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	[m
+[32m+[m			[32m//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 		}[m
+ 	}[m
+ [m
+[31m-	if (se->valid_blocks == max_blocks || !f2fs_hw_support_discard(sbi))[m
+[31m-		return false;[m
+[32m+[m	[32mif (se->valid_blocks == max_blocks || !f2fs_hw_support_discard(sbi)){[m
+[32m+[m		[32mif (ddm_blk_exst){[m
+[32m+[m			[32m__remove_discard_map(sbi, ddm);[m
+[32m+[m			[32m//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+[32m+[m[41m			[m
+[32m+[m		[32m}[m
+ [m
+[32m+[m		[32mreturn false;[m
+[32m+[m	[32m}[m[41m [m
+ 	if (!force) {[m
+ 		if (!f2fs_realtime_discard_enable(sbi) || !se->valid_blocks ||[m
+ 			SM_I(sbi)->dcc_info->nr_discards >=[m
+[31m-				SM_I(sbi)->dcc_info->max_discards)[m
+[32m+[m				[32mSM_I(sbi)->dcc_info->max_discards){[m
+[32m+[m
+[32m+[m			[32mif (ddm_blk_exst){[m
+[32m+[m				[32m__remove_discard_map(sbi, ddm);[m
+[32m+[m				[32m//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+[32m+[m			[32m}[m
+ 			return false;[m
+[32m+[m		[32m}[m
+ 	}[m
+ [m
+ 	[m
+[36m@@ -2012,7 +2024,10 @@[m [mstatic bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,[m
+ 	[m
+ 	if (start >= max_blocks)[m
+ 		ori_blk_exst = false;[m
+[31m-	f2fs_bug_on(sbi, ddm_blk_exst == ori_blk_exst);[m
+[32m+[m	[32mif (ddm_blk_exst != ori_blk_exst)[m
+[32m+[m		[32mpanic("add discard addrs: exst not match\n");[m
+[32m+[m		[32m//printk("add discard addrs: exst not match\n");[m
+[32m+[m	[32m//f2fs_bug_on(sbi, ddm_blk_exst != ori_blk_exst);[m
+ [m
+ 	if (!(ddm_blk_exst | ori_blk_exst))[m
+ 		return false;[m
+[36m@@ -2031,15 +2046,19 @@[m [mstatic bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,[m
+ 		end = __find_rev_next_zero_bit(dmap, max_blocks, start + 1);[m
+ 		end_ddm = __find_rev_next_zero_bit(ddmap, max_blocks, start_ddm +1);[m
+ [m
+[31m-		if (!force)[m
+[31m-			f2fs_bug_on(sbi, start == start_ddm && end == end_ddm);[m
+[31m-[m
+[32m+[m		[32mif (!force){[m
+[32m+[m			[32mif (start != start_ddm || end != end_ddm)[m
+[32m+[m				[32mpanic("start end not match in add_discard_addrs");[m
+[32m+[m				[32m//printk("start end not match in add_discard_addrs");[m
+[32m+[m			[32m//f2fs_bug_on(sbi, start != start_ddm || end != end_ddm);[m
+[32m+[m		[32m}[m
+ 		if (force && start && end != max_blocks[m
+ 					&& (end - start) < cpc->trim_minlen)[m
+ 			continue;[m
+ [m
+ 		if (check_only){[m
+[31m-			mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	[m
+[32m+[m			[32m//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock)[m
+[32m+[m			[32m__remove_discard_map(sbi, ddm);[m
+ 			return true;[m
+ 		}[m
+ 		if (!de) {[m
+[36m@@ -2055,7 +2074,7 @@[m [mstatic bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,[m
+ 		SM_I(sbi)->dcc_info->nr_discards += end - start;[m
+ 	}[m
+ 	__remove_discard_map(sbi, ddm);[m
+[31m-	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	[m
+[32m+[m	[32m//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 	return false;[m
+ }[m
+ [m
+[36m@@ -2388,23 +2407,56 @@[m [mstatic void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int se[m
+ 	struct rb_node **p;[m
+ 	struct rb_node *parent = NULL;[m
+ 	struct rb_entry *re;[m
+[31m-	bool left_most, exist;[m
+[31m-	struct dynamic_discard_map *ddm, *tmpddm;[m
+[31m-[m
+[31m-	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, (unsigned long long)segno, &left_most);[m
+[32m+[m	[32mbool leftmost, exist;[m
+[32m+[m	[32mstruct dynamic_discard_map *ddm;[m
+[32m+[m	[32mbool new = false;[m
+[32m+[m	[32mp = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, (unsigned long long)segno, &leftmost);[m
+ 	if (del < 0) {[m
+ 		if (!*p){[m
+[32m+[m			[32mnew = true;[m
+ 			/*not exist, so create it*/[m
+ 			ddm = __create_discard_map(sbi);[m
+[32m+[m			[32mif (ddm == 0)[m
+[32m+[m				[32mpanic("__create_discard_map failed");[m
+ 			ddm->rbe.key = segno;[m
+[32m+[m			[32mf2fs_test_and_set_bit(offset, ddm->dc_map);[m
+ 			rb_link_node(&ddm->rbe.rb_node, parent, p);[m
+[32m+[m			[32mif (*p == 0)[m
+[32m+[m				[32mpanic("pstar is zero");[m
+[32m+[m			[32mrb_insert_color_cached(&ddm->rbe.rb_node, &ddmc->root, leftmost);[m
+[32m+[m			[32mreturn;[m
+ 		}[m
+[32m+[m		[32melse{[m
+[32m+[m			[32mre = rb_entry_safe(*p, struct rb_entry, rb_node);[m
+[32m+[m			[32mif (re == 0)[m
+[32m+[m				[32mpanic("re is zero");[m
+[32m+[m			[32mddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);[m
+[32m+[m			[32mif (ddm == 0)[m
+[32m+[m				[32mpanic("tmpddm is zero 1st");[m
+[32m+[m			[32mf2fs_test_and_set_bit(offset, ddm->dc_map);[m
+[32m+[m		[32m}[m
+[32m+[m		[32m/*[m
+[32m+[m		[32mif (*p == 0)[m
+[32m+[m			[32mpanic("pstar is zero aft");[m
+ 		re = rb_entry_safe(*p, struct rb_entry, rb_node);[m
+[32m+[m		[32mif (re == 0)[m
+[32m+[m			[32mpanic("re is zero");[m
+ 		tmpddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);[m
+[31m-		f2fs_bug_on(sbi, tmpddm != ddm);[m
+[32m+[m		[32mif (tmpddm == 0)[m
+[32m+[m			[32mpanic("tmpddm is zero 1st");[m
+[32m+[m		[32m//f2fs_bug_on(sbi, tmpddm != ddm);[m
+[32m+[m		[32mif (new && tmpddm != ddm){[m
+[32m+[m			[32mif (ddm == 0)[m
+[32m+[m				[32mpanic("ddm is zero");[m
+[32m+[m			[32mif (tmpddm == 0)[m
+[32m+[m				[32mpanic("tmpddm is zero");[m
+[32m+[m			[32mprintk("tmp key is %lld and ddm key is %lld\n", tmpddm->rbe.key, ddm->rbe.key);[m
+[32m+[m			[32mpanic("dynamic_discard_map doesn't work in update_dynamic_discard_map!!!!\n");[m
+[32m+[m			[32m//printk("dynamic_discard_map doesn't work in update_dynamic_discard_map!!!!\n");[m
+[32m+[m		[32m}[m
+ 		ddm = tmpddm;[m
+ 		exist = f2fs_test_and_set_bit(offset, ddm->dc_map);[m
+[31m-		[m
+[32m+[m		[32m*/[m
+ 	}[m
+ 	if (del > 0) {[m
+ 		if (!*p){[m
+[36m@@ -3181,10 +3233,14 @@[m [mbool f2fs_exist_trim_candidates(struct f2fs_sb_info *sbi,[m
+ [m
+ 	down_write(&SIT_I(sbi)->sentry_lock);[m
+ 	for (; cpc->trim_start <= cpc->trim_end; cpc->trim_start++) {[m
+[32m+[m[41m		[m
+[32m+[m		[32mmutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 		if (add_discard_addrs(sbi, cpc, true)) {[m
+[32m+[m			[32mmutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 			has_candidate = true;[m
+ 			break;[m
+ 		}[m
+[32m+[m		[32mmutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 	}[m
+ 	up_write(&SIT_I(sbi)->sentry_lock);[m
+ [m
+[36m@@ -4381,7 +4437,9 @@[m [mvoid f2fs_flush_sit_entries(struct f2fs_sb_info *sbi, struct cp_control *cpc)[m
+ 			/* add discard candidates */[m
+ 			if (!(cpc->reason & CP_DISCARD)) {[m
+ 				cpc->trim_start = segno;[m
+[32m+[m				[32mmutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 				add_discard_addrs(sbi, cpc, false);[m
+[32m+[m				[32mmutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 			}[m
+ [m
+ 			if (to_journal) {[m
+[36m@@ -4422,8 +4480,11 @@[m [mvoid f2fs_flush_sit_entries(struct f2fs_sb_info *sbi, struct cp_control *cpc)[m
+ 	if (cpc->reason & CP_DISCARD) {[m
+ 		__u64 trim_start = cpc->trim_start;[m
+ [m
+[31m-		for (; cpc->trim_start <= cpc->trim_end; cpc->trim_start++)[m
+[32m+[m		[32mfor (; cpc->trim_start <= cpc->trim_end; cpc->trim_start++){[m
+[32m+[m			[32mmutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+ 			add_discard_addrs(sbi, cpc, false);[m
+[32m+[m			[32mmutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);[m[41m	[m
+[32m+[m		[32m}[m
+ [m
+ 		cpc->trim_start = trim_start;[m
+ 	}[m
