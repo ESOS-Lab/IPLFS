@@ -1958,13 +1958,13 @@ static void __remove_discard_map(struct f2fs_sb_info *sbi, struct dynamic_discar
 static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 							bool check_only)
 {
-	int entries = SIT_VBLOCK_MAP_SIZE / sizeof(unsigned long);
+	//int entries = SIT_VBLOCK_MAP_SIZE / sizeof(unsigned long);
 	int max_blocks = sbi->blocks_per_seg;
 	struct seg_entry *se = get_seg_entry(sbi, cpc->trim_start);
-	unsigned long *cur_map = (unsigned long *)se->cur_valid_map;
-	unsigned long *ckpt_map = (unsigned long *)se->ckpt_valid_map;
-	unsigned long *discard_map = (unsigned long *)se->discard_map;
-	unsigned long *dmap = SIT_I(sbi)->tmp_map;
+	//unsigned long *cur_map = (unsigned long *)se->cur_valid_map;
+	//unsigned long *ckpt_map = (unsigned long *)se->ckpt_valid_map;
+	//unsigned long *discard_map = (unsigned long *)se->discard_map;
+	//unsigned long *dmap = SIT_I(sbi)->tmp_map;
 	unsigned long *ddmap;
 	unsigned int start = 0, end = -1;
 	bool force = (cpc->reason & CP_DISCARD);
@@ -1973,10 +1973,14 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 	int i;
 	struct dynamic_discard_map *ddm;
 	bool ddm_blk_exst = true;
-	bool ori_blk_exst = true;
+	//bool ori_blk_exst = true;
 	unsigned int start_ddm = 0, end_ddm = -1;
 
-	//mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	//panic("Just Panic\n");
+
+	if (force)
+		panic("FITRIM occurs!!!\n");
+
 	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start);
 
 	if (!ddm)
@@ -1986,79 +1990,76 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 		start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
 		if (start >= max_blocks){
 			ddm_blk_exst = false;
-			__remove_discard_map(sbi, ddm);
-			//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+			//__remove_discard_map(sbi, ddm);
 		}
 	}
 
 	if (se->valid_blocks == max_blocks || !f2fs_hw_support_discard(sbi)){
 		if (ddm_blk_exst){
 			__remove_discard_map(sbi, ddm);
-			//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 			
 		}
-
+		
 		return false;
 	} 
 	if (!force) {
 		if (!f2fs_realtime_discard_enable(sbi) || !se->valid_blocks ||
 			SM_I(sbi)->dcc_info->nr_discards >=
 				SM_I(sbi)->dcc_info->max_discards){
-
+			//The condition !se->valid_blocks must be commented later. 
+			//My code should handle case empty segments. 
+			//Cuz I'll erase prefree segments issuing in clear_prefree_segments function. 
 			if (ddm_blk_exst){
 				__remove_discard_map(sbi, ddm);
-				//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 			}
+			
 			return false;
 		}
 	}
 
 	
 	/* SIT_VBLOCK_MAP_SIZE should be multiple of sizeof(unsigned long) */
-	for (i = 0; i < entries; i++)
+	/*for (i = 0; i < entries; i++)
 		dmap[i] = force ? ~ckpt_map[i] & ~discard_map[i] :
 				(cur_map[i] ^ ckpt_map[i]) & ckpt_map[i];
-
+	*/
 	/* check existence of discarded block in original version dmap*/
-	start = __find_rev_next_bit(dmap, max_blocks, end + 1);
+	//start = __find_rev_next_bit(dmap, max_blocks, end + 1);
 	
-	if (start >= max_blocks)
-		ori_blk_exst = false;
-	if (ddm_blk_exst != ori_blk_exst)
-		panic("add discard addrs: exst not match\n");
+	//if (start >= max_blocks)
+	//	ori_blk_exst = false;
+	//ori_blk_exst = !(start >= max_blocks);
+	//if (ddm_blk_exst != ori_blk_exst)
+	//	panic("add discard addrs: exst not match\n");
 		//printk("add discard addrs: exst not match\n");
 	//f2fs_bug_on(sbi, ddm_blk_exst != ori_blk_exst);
 
-	if (!(ddm_blk_exst | ori_blk_exst))
+	//if (!(ddm_blk_exst | ori_blk_exst))
+	if (!ddm_blk_exst)
 		return false;
-
-
-
-
 
 	while (force || SM_I(sbi)->dcc_info->nr_discards <=
 				SM_I(sbi)->dcc_info->max_discards) {
-		start = __find_rev_next_bit(dmap, max_blocks, end + 1);
+		//start = __find_rev_next_bit(dmap, max_blocks, end + 1);
 		if (start >= max_blocks)
 			break;
-		start_ddm = __find_rev_next_bit(ddmap, max_blocks, end_ddm + 1);
+		start = __find_rev_next_bit(ddmap, max_blocks, end_ddm + 1);
 
-		end = __find_rev_next_zero_bit(dmap, max_blocks, start + 1);
-		end_ddm = __find_rev_next_zero_bit(ddmap, max_blocks, start_ddm +1);
+		//end = __find_rev_next_zero_bit(dmap, max_blocks, start + 1);
+		end = __find_rev_next_zero_bit(ddmap, max_blocks, start_ddm +1);
 
-		if (!force){
+		/*if (!force){
 			if (start != start_ddm || end != end_ddm)
 				panic("start end not match in add_discard_addrs");
 				//printk("start end not match in add_discard_addrs");
 			//f2fs_bug_on(sbi, start != start_ddm || end != end_ddm);
-		}
+		}*/
 		if (force && start && end != max_blocks
 					&& (end - start) < cpc->trim_minlen)
 			continue;
 
 		if (check_only){
-			//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock)
-			__remove_discard_map(sbi, ddm);
+			//__remove_discard_map(sbi, ddm);
 			return true;
 		}
 		if (!de) {
@@ -2074,7 +2075,6 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 		SM_I(sbi)->dcc_info->nr_discards += end - start;
 	}
 	__remove_discard_map(sbi, ddm);
-	//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 	return false;
 }
 
