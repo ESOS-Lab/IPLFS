@@ -1889,7 +1889,7 @@ static int f2fs_issue_discard(struct f2fs_sb_info *sbi,
 
 
 static struct dynamic_discard_map* get_dynamic_discard_map(struct f2fs_sb_info *sbi,
-	       						unsigned long long segno)
+	       						unsigned long long segno, int* height)
 {
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	struct rb_node **p, *parent = NULL;
@@ -1897,7 +1897,7 @@ static struct dynamic_discard_map* get_dynamic_discard_map(struct f2fs_sb_info *
 	bool left_most;
 	struct dynamic_discard_map* ddm;
 
-	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, segno, &left_most);
+	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, segno, &left_most, height);
 	
 	re = rb_entry_safe(*p, struct rb_entry, rb_node);
 	ddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);
@@ -1950,7 +1950,7 @@ static void __detach_discard_cmd(struct discard_cmd_control *dcc,
 static void __remove_discard_map(struct f2fs_sb_info *sbi, struct dynamic_discard_map *ddm)
 {
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
-
+	atomic_dec(&ddmc->node_cnt);
 	rb_erase_cached(&ddm->rbe.rb_node, &ddmc->root);
 	kmem_cache_free(discard_map_slab, ddm);
 }
@@ -1975,22 +1975,22 @@ static bool add_discard_addrs(struct f2fs_sb_info *sbi, struct cp_control *cpc,
 	bool ddm_blk_exst = true;
 	//bool ori_blk_exst = true;
 	unsigned int start_ddm = 0, end_ddm = -1;
-
+	int height = 0;
 	//panic("Just Panic\n");
 
 	if (force)
 		panic("FITRIM occurs!!!\n");
 
-	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start);
-
+	ddm = get_dynamic_discard_map(sbi, (unsigned long long) cpc->trim_start, &height);
 	if (!ddm)
 		ddm_blk_exst = false;
 	else{
+		printk("add_discard_addrs: DDM Height is %d for segno %d\n", height, cpc->trim_start);
 		ddmap = (unsigned long *)ddm->dc_map;
 		start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
 		if (start >= max_blocks){
 			ddm_blk_exst = false;
-			//__remove_discard_map(sbi, ddm);
+			__remove_discard_map(sbi, ddm);
 		}
 	}
 
@@ -2410,7 +2410,8 @@ static void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int se
 	bool leftmost, exist;
 	struct dynamic_discard_map *ddm;
 	bool new = false;
-	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, (unsigned long long)segno, &leftmost);
+	int height = 0;
+	p = f2fs_lookup_pos_rb_tree_ext(sbi, &ddmc->root, &parent, (unsigned long long)segno, &leftmost, &height);
 	if (del < 0) {
 		if (!*p){
 			new = true;
@@ -2420,6 +2421,7 @@ static void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int se
 				panic("__create_discard_map failed");
 			ddm->rbe.key = segno;
 			f2fs_test_and_set_bit(offset, ddm->dc_map);
+			atomic_inc(&ddmc->node_cnt);
 			rb_link_node(&ddm->rbe.rb_node, parent, p);
 			if (*p == 0)
 				panic("pstar is zero");

@@ -585,6 +585,7 @@ struct dynamic_discard_map {
 struct dynamic_discard_map_control {
 	struct rb_root_cached root;		/* root of discard map rb-tree */
 	struct mutex ddm_lock;
+	atomic_t node_cnt;
 	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
 };
 
@@ -3827,7 +3828,7 @@ struct rb_entry *f2fs_lookup_rb_tree(struct rb_root_cached *root,
 struct rb_node **f2fs_lookup_pos_rb_tree_ext(struct f2fs_sb_info *sbi,
 					struct rb_root_cached *root,
 					struct rb_node **parent,
-					unsigned long long key, bool *leftmost);
+					unsigned long long key, bool *leftmost, int *height);
 
 struct rb_node **f2fs_lookup_rb_tree_ext(struct f2fs_sb_info *sbi,
 				struct rb_root_cached *root,
