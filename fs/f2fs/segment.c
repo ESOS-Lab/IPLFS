@@ -2223,7 +2223,7 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 
         mutex_init(&ddmc->ddm_lock);
         ddmc->root = RB_ROOT_CACHED;
-	ddmc->segs_per_node = 100;
+	ddmc->segs_per_node = 300;
 	atomic_set(&ddmc->node_cnt, 0);
 	INIT_LIST_HEAD(&ddmc->head);
 
@@ -4459,7 +4459,7 @@ static void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_contr
 	struct list_head *head_ddm = &ddmc->head;
 	struct list_head *p;
 	bool force = (cpc->reason & CP_DISCARD);
-	while(list_empty(head_ddm)){
+	while(!list_empty(head_ddm)){
 		p = head_ddm->next;
 		list_del(p);
 		ddm = dynamic_discard_map(p, struct dynamic_discard_map, list);
