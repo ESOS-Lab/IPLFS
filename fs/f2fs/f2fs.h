@@ -577,6 +577,7 @@ struct dynamic_discard_map {
 	/* key in rb_entry is segno*/
 	struct rb_entry rbe;
 	unsigned char *dc_map;
+	struct list_head list;
 
 };
 
@@ -586,6 +587,8 @@ struct dynamic_discard_map_control {
 	struct rb_root_cached root;		/* root of discard map rb-tree */
 	struct mutex ddm_lock;
 	atomic_t node_cnt;
+	unsigned int segs_per_node;		/*number of segments each node manages*/
+	struct list_head head;
 	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
 };
 
