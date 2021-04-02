@@ -1583,7 +1583,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 
 	mutex_lock(&ddmc->ddm_lock);	
-	printk("f2fs CP start!! ddmc node cnt: %d\n", ddmc->node_cnt);
+	//printk("f2fs CP start!! ddmc node cnt: %d\n", ddmc->node_cnt);
 	mutex_unlock(&ddmc->ddm_lock);	
 	if (f2fs_readonly(sbi->sb) || f2fs_hw_is_readonly(sbi))
 		return -EROFS;
@@ -1647,7 +1647,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	f2fs_flush_sit_entries(sbi, cpc);
 	mutex_lock(&ddmc->ddm_lock);	
-	printk("f2fs flush end!! ddmc node cnt: %d\n", ddmc->node_cnt);
+	//printk("f2fs flush end!! ddmc node cnt: %d\n", ddmc->node_cnt);
 	mutex_unlock(&ddmc->ddm_lock);	
 	/* save inmem log status */
 	f2fs_save_inmem_curseg(sbi);

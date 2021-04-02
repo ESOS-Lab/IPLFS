@@ -4463,8 +4463,8 @@ static void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_contr
 		p = head_ddm->next;
 		list_del(p);
 		ddm = dynamic_discard_map(p, struct dynamic_discard_map, list);
-                printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", 
-				ddmc->node_cnt);
+                //printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", 
+		//		ddmc->node_cnt);
 		if (force){
 			panic("flush_dynamic_discard_maps: not expected!!");
         		__remove_discard_map(sbi, ddm);
