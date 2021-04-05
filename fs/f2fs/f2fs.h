@@ -574,7 +574,12 @@ struct extent_tree {
 
 /*dynamic_discard_map*/
 struct dynamic_discard_map {
-	/* key in rb_entry is segno*/
+
+	/*hash*/
+	struct hlist_node hnode;
+	unsigned long long key;
+
+	/* key in rb_entry is segno*/	
 	struct rb_entry rbe;
 	unsigned char *dc_map;
 	struct list_head list;
@@ -584,8 +589,15 @@ struct dynamic_discard_map {
 #define dynamic_discard_map(ptr, type, member) container_of(ptr, type, member)
 
 struct dynamic_discard_map_control {
+	/*hash table version*/
+	struct hlist_head *ht;
+	unsigned int hbits;
+	//struct mutex *per_entry_lck_list;
+
+	/*rb tree version*/
 	struct rb_root_cached root;		/* root of discard map rb-tree */
 	struct mutex ddm_lock;
+	
 	atomic_t node_cnt;
 	unsigned int segs_per_node;		/*number of segments each node manages*/
 	struct list_head head;

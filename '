@@ -1952,7 +1952,6 @@ static void __remove_dynamic_discard_map(struct f2fs_sb_info *sbi, struct dynami
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	atomic_dec(&ddmc->node_cnt);
 	rb_erase_cached(&ddm->rbe.rb_node, &ddmc->root);
-	hash_del(&ddm->hnode);
 	kmem_cache_free(discard_map_slab, ddm);
 }
 
@@ -4590,10 +4589,6 @@ static void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_contr
                 	flush_one_ddm(sbi, ddmc, ddm);
 		}
 	}
-	if (!hash_empty(ht)){
-		panic("hash must be emptry after flushing all");
-	}
-
 }
 
 /*
