@@ -3843,7 +3843,8 @@ struct rb_entry *f2fs_lookup_rb_tree(struct rb_root_cached *root,
 struct rb_node **f2fs_lookup_pos_rb_tree_ext(struct f2fs_sb_info *sbi,
 					struct rb_root_cached *root,
 					struct rb_node **parent,
-					unsigned long long key, bool *leftmost, int *height);
+					unsigned long long key, bool *leftmost, int *height,
+					bool *exist);
 
 struct rb_node **f2fs_lookup_rb_tree_ext(struct f2fs_sb_info *sbi,
 				struct rb_root_cached *root,
