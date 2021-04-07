@@ -2453,7 +2453,6 @@ void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int segno,
 static struct dynamic_discard_map *f2fs_lookup_hash(struct f2fs_sb_info *sbi,  
 					unsigned long long key)
 {
-	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	struct hlist_head *head = &ht[hash_min(key, HASH_BITS(ht))];
 	struct dynamic_discard_map *ddm;
 
@@ -2490,11 +2489,11 @@ static void update_ddm_hash(struct f2fs_sb_info *sbi, unsigned int segno,
 			ddm->key = ddmkey;
 			//hash_add(ddmc->ht, &ddm->hnode, ddmkey);
 			hash_add(ht, &ddm->hnode, ddmkey);
+			list_add_tail(&ddm->list, head);
+			atomic_inc(&ddmc->node_cnt);
 			
 		}
 		f2fs_test_and_set_bit(offset_in_ddm, ddm->dc_map);
-		atomic_inc(&ddmc->node_cnt);
-		list_add_tail(&ddm->list, head);
 			
 		return;
 	}
@@ -2513,7 +2512,7 @@ static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 	unsigned int segno, offset;
 	long int new_vblocks;
 	bool exist;
-	bool ddmhash = false;
+	//bool ddmhash = false;
 #ifdef CONFIG_F2FS_CHECK_FS
 	bool mir_exist;
 #endif
@@ -2531,9 +2530,9 @@ static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 
 	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);
 	//if (ddmhash)
-	//	update_ddm_hash(sbi, segno, offset, del);
+	update_ddm_hash(sbi, segno, offset, del);
 	//else {
-	update_dynamic_discard_map(sbi, segno, offset, del);
+	//update_dynamic_discard_map(sbi, segno, offset, del);
 	//}
 	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);
 
@@ -4424,7 +4423,6 @@ static void recover_info_from_ddm(struct f2fs_sb_info *sbi, unsigned long long d
 static unsigned long *get_seg_dmap(struct f2fs_sb_info *sbi, unsigned int p_segno){
 	unsigned long *cur_map;
 	unsigned long *ckpt_map;
-	unsigned long *discard_map;
 	unsigned long *dmap;
 	struct seg_entry *se;
 	int entries = SIT_VBLOCK_MAP_SIZE / sizeof(unsigned long);
@@ -4458,11 +4456,6 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 	unsigned int last_target_segno;
 	unsigned int p_segno;
 	unsigned int start_in_seg, end_in_seg;
-	//struct list_head *tmphead;
-	//INIT_LIST_HEAD(tmphead);
-	unsigned long *dmap;
-	int dmap_max_blocks = sbi->blocks_per_seg;
-	unsigned int dmap_start = 0, dmap_end = -1;
 
         if (!f2fs_hw_support_discard(sbi)){
 		panic("Why HW not support discard!!");
@@ -4500,20 +4493,6 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 			} else {
 				end_in_seg = end_offset;
 			}
-			//sanity check
-			//dmap = get_seg_dmap(sbi, p_segno);
-			//dmap_start = __find_rev_next_bit(dmap, dmap_max_blocks, start_in_seg);
-			/*
-			if (dmap_start != start_in_seg){
-				printk("dmap_start: %d, start_in_seg:%d\n", dmap_start, start_in_seg);
-				panic("flush_one_ddm: start! extended dmap is not same with dmap %d, %d", dmap_start, start_in_seg);
-			}
-			dmap_end = __find_rev_next_zero_bit(dmap, dmap_max_blocks, dmap_start + 1);
-			if (dmap_end != end_in_seg){
-				printk("dmap_end: %d, end_in_seg:%d\n", dmap_end, end_in_seg);
-				panic("flush_one_ddm: end! extended dmap is not same with dmap");
-			}
-			*/
                 	for (i = start_in_seg; i < end_in_seg; i++)
                        		__set_bit_le(i, (void *)de->discard_map);
 			last_target_segno = p_segno;
@@ -4540,8 +4519,8 @@ static void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_contr
 		p = head_ddm->next;
 		list_del(p);
 		ddm = dynamic_discard_map(p, struct dynamic_discard_map, list);
-                //printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", 
-		//		ddmc->node_cnt);
+                printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", 
+				ddmc->node_cnt);
 		if (force){
 			panic("flush_dynamic_discard_maps: not expected!!");
         		__remove_dynamic_discard_map(sbi, ddm);
@@ -4562,7 +4541,6 @@ static unsigned long *get_one_seg_bitmap_from_extended_ddm(struct f2fs_sb_info *
 {
         int entries = SIT_VBLOCK_MAP_SIZE / sizeof(unsigned long);
 	unsigned int segs_per_ddm = SM_I(sbi)->ddmc_info->segs_per_node;
-        unsigned int blocks_per_seg = sbi->blocks_per_seg;
         unsigned int start_segno = ddmkey * segs_per_ddm;
         unsigned int delta_segno = segno - start_segno;
 	unsigned long *dc_map = (unsigned long *) ddm->dc_map;
@@ -4574,22 +4552,40 @@ static unsigned long *get_one_seg_bitmap_from_extended_ddm(struct f2fs_sb_info *
 
 }
 
-static unsigned long *get_ddmap_from_extended_ddm(struct f2fs_sb_info *sbi, 
+
+static unsigned long *get_ddmap_from_extended_ddm_hash(struct f2fs_sb_info *sbi, 
 							unsigned long long segno)
 {
+	struct dynamic_discard_map *ddm;
+	unsigned long long ex_ddmkey, recovered_segno;
+	unsigned int ex_ddm_offset, recovered_offset;
+	unsigned long *dc_map;
+	
+	/*get extended ddm from segno*/
+	get_ddm_info(sbi, segno, 0, &ex_ddmkey, &ex_ddm_offset);
+        ddm = f2fs_lookup_hash(sbi, ex_ddmkey);
+	if (ddm == NULL)
+		return NULL;
+	
+	/*recovery check*/
+	recover_info_from_ddm(sbi, ex_ddmkey, ex_ddm_offset, &recovered_segno, &recovered_offset);
+	if (recovered_segno != segno || recovered_offset != 0){
+		panic("get_ddmap_from_extended_ddm_hash: recover failed! ex vs recov : key %lld != %lld or offset %d != %d", ex_ddmkey, recovered_segno, ex_ddm_offset, recovered_offset);
+	}
+	dc_map = get_one_seg_bitmap_from_extended_ddm(sbi, ddm, ex_ddmkey, segno);
+	return dc_map;
 
-        int entries = SIT_VBLOCK_MAP_SIZE / sizeof(unsigned long);
-	unsigned int segs_per_ddm = SM_I(sbi)->ddmc_info->segs_per_node;
-        unsigned int blocks_per_seg = sbi->blocks_per_seg;
-        unsigned int start_segno;
-        unsigned int delta_segno;
+}
 
 
+
+static unsigned long *get_ddmap_from_extended_ddm_rb(struct f2fs_sb_info *sbi, 
+							unsigned long long segno)
+{
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	struct rb_node **p, *parent = NULL;
 	struct rb_entry *re;
 	bool leftmost, exist;
-	unsigned int offset_in_ddm;
 	struct dynamic_discard_map *ddm;
 	int height=0;
 	unsigned long long ex_ddmkey, recovered_segno;
@@ -4604,13 +4600,11 @@ static unsigned long *get_ddmap_from_extended_ddm(struct f2fs_sb_info *sbi,
 	printk("%d", height);
 	re = rb_entry_safe(*p, struct rb_entry, rb_node);
         ddm = dynamic_discard_map(re, struct dynamic_discard_map, rbe);
-	if (dc_map == 0x20)
-		panic("get_ddmap_from_extended_ddm: 0x20!!");
 	
 	/*recovery check*/
 	recover_info_from_ddm(sbi, ex_ddmkey, ex_ddm_offset, &recovered_segno, &recovered_offset);
 	if (recovered_segno != segno || recovered_offset != 0){
-		panic("get_ddmap_from_extended_ddm: recover failed! ex vs recov : key %lld != %lld or offset %d != %d", ex_ddmkey, recovered_segno, ex_ddm_offset, recovered_offset);
+		panic("get_ddmap_from_extended_ddm_rb: recover failed! ex vs recov : key %lld != %lld or offset %d != %d", ex_ddmkey, recovered_segno, ex_ddm_offset, recovered_offset);
 	}
 	dc_map = get_one_seg_bitmap_from_extended_ddm(sbi, ddm, ex_ddmkey, segno);
 	return dc_map;
@@ -4631,15 +4625,9 @@ static bool check_ddm_sanity(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	unsigned int start = 0, end = -1, start_ddm = 0, end_ddm = -1;
 	bool force = (cpc->reason & CP_DISCARD);
-	struct discard_entry *de = NULL;
-	struct list_head *head = &SM_I(sbi)->dcc_info->entry_list;
 	int i;
 	unsigned long *ddmap;
-
-	ddmap = get_ddmap_from_extended_ddm(sbi, segno);
-	if (ddmap == NULL){
-		return false;
-	}
+	bool ori_blk_exst = true;
 
 	if (force)
 		panic("FITRIM occurs!!!\n");
@@ -4662,6 +4650,18 @@ static bool check_ddm_sanity(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	for (i = 0; i < entries; i++)
 		dmap[i] = force ? ~ckpt_map[i] & ~discard_map[i] :
 				(cur_map[i] ^ ckpt_map[i]) & ckpt_map[i];
+	
+	start = __find_rev_next_bit(dmap, max_blocks, end+1);
+	if (start >= max_blocks)
+		ori_blk_exst = false;
+
+	ddmap = get_ddmap_from_extended_ddm_hash(sbi, segno);
+	if (ddmap == NULL){
+		if (ori_blk_exst){
+			panic("check_ddm_sanity: no ddmap but ori_blk_exst");
+		}
+		return false;
+	}
 	
 	/* check existence of discarded block in original version dmap*/
 	while (SM_I(sbi)->dcc_info->nr_discards <=
