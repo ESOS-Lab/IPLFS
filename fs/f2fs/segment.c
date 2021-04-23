@@ -1908,7 +1908,7 @@ static void __remove_dynamic_discard_map(struct f2fs_sb_info *sbi, struct dynami
 {
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	atomic_dec(&ddmc->node_cnt);
-	rb_erase_cached(&ddm->rbe.rb_node, &ddmc->root);
+	//rb_erase_cached(&ddm->rbe.rb_node, &ddmc->root);
 	hash_del(&ddm->hnode);
 	kmem_cache_free(discard_map_slab, ddm);
 }
@@ -2451,12 +2451,14 @@ void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int segno,
 //EXPORT_SYMBOL(update_dynamic_discard_map);
 
 static struct dynamic_discard_map *f2fs_lookup_hash(struct f2fs_sb_info *sbi,  
-					unsigned long long key)
+					unsigned long long key, unsigned int *height)
 {
 	struct hlist_head *head = &ht[hash_min(key, HASH_BITS(ht))];
 	struct dynamic_discard_map *ddm;
+	*height = 0;
 
 	hlist_for_each_entry(ddm, head, hnode){
+		*height += 1;
 		if (ddm->key == key)
 			return ddm;
 
@@ -2472,14 +2474,16 @@ static void update_ddm_hash(struct f2fs_sb_info *sbi, unsigned int segno,
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	//struct hlist_head *ht = ddmc->ht;
 	struct dynamic_discard_map *ddm;
-	//int height = 0;
 	unsigned long long ddmkey;
 	unsigned int offset_in_ddm;
+	unsigned int height;
 	struct list_head *head = &ddmc->head;
-	get_ddm_info(sbi, segno, offset, &ddmkey, &offset_in_ddm);
 
-	ddm = f2fs_lookup_hash(sbi, ddmkey);
+	get_ddm_info(sbi, segno, offset, &ddmkey, &offset_in_ddm);
 	
+	ddm = f2fs_lookup_hash(sbi, ddmkey, &height);
+	
+	//printk("update_ddm_hash: height is %d\n", height);
 	if (del < 0) {
 		if (!ddm){
 			/*not exist, so create it*/
@@ -2529,9 +2533,7 @@ static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 	se->valid_blocks = new_vblocks;
 
 	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);
-	//if (ddmhash)
 	update_ddm_hash(sbi, segno, offset, del);
-	//else {
 	//update_dynamic_discard_map(sbi, segno, offset, del);
 	//}
 	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);
@@ -4528,9 +4530,9 @@ static void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_contr
                 	flush_one_ddm(sbi, ddmc, ddm);
 		}
 	}
-	if (!hash_empty(ht)){
-		panic("hash must be emptry after flushing all");
-	}
+	//if (!hash_empty(ht)){
+	//	panic("hash must be emptry after flushing all");
+	//}
 
 }
 
@@ -4560,10 +4562,11 @@ static unsigned long *get_ddmap_from_extended_ddm_hash(struct f2fs_sb_info *sbi,
 	unsigned long long ex_ddmkey, recovered_segno;
 	unsigned int ex_ddm_offset, recovered_offset;
 	unsigned long *dc_map;
+	unsigned int height;
 	
 	/*get extended ddm from segno*/
 	get_ddm_info(sbi, segno, 0, &ex_ddmkey, &ex_ddm_offset);
-        ddm = f2fs_lookup_hash(sbi, ex_ddmkey);
+        ddm = f2fs_lookup_hash(sbi, ex_ddmkey, &height);
 	if (ddm == NULL)
 		return NULL;
 	
@@ -4755,13 +4758,13 @@ void f2fs_flush_sit_entries(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 #endif
 
 			/* add discard candidates */
-			if (!(cpc->reason & CP_DISCARD)) {
+			/*if (!(cpc->reason & CP_DISCARD)) {
 				cpc->trim_start = segno;
-				mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+				//mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 				//add_discard_addrs(sbi, cpc, false);
-				check_ddm_sanity(sbi, cpc);
-				mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
-			}
+				//check_ddm_sanity(sbi, cpc);
+				//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+			}*/
 
 			if (to_journal) {
 				offset = f2fs_lookup_journal_in_cursum(journal,
