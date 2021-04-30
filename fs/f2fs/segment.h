@@ -587,10 +587,22 @@ static inline bool has_curseg_enough_space(struct f2fs_sb_info *sbi)
 	return true;
 }
 
+
+static inline unsigned int free_physical_sections(struct f2fs_sb_info *sbi)
+{
+	unsigned int pages_per_sec = sbi->segs_per_sec * sbi->blocks_per_seg;
+	unsigned int valid_segs = (sbi->total_valid_block_count + pages_per_sec - 1) >>
+						sbi->log_blocks_per_seg;
+	unsigned int valid_secs = segs / sbi->segs_per_sec;
+
+	return sbi->total_sections - valid_secs;
+}
+
+
 static inline bool has_not_enough_free_secs(struct f2fs_sb_info *sbi,
 					int freed, int needed)
 {
-	int node_secs = get_blocktype_secs(sbi, F2FS_DIRTY_NODES);
+	/*int node_secs = get_blocktype_secs(sbi, F2FS_DIRTY_NODES);
 	int dent_secs = get_blocktype_secs(sbi, F2FS_DIRTY_DENTS);
 	int imeta_secs = get_blocktype_secs(sbi, F2FS_DIRTY_IMETA);
 
@@ -601,6 +613,42 @@ static inline bool has_not_enough_free_secs(struct f2fs_sb_info *sbi,
 			has_curseg_enough_space(sbi))
 		return false;
 	return (free_sections(sbi) + freed) <=
+		(node_secs + 2 * dent_secs + imeta_secs +
+		reserved_sections(sbi) + needed);
+	*/
+
+	int node_secs = get_blocktype_secs(sbi, F2FS_DIRTY_NODES);
+	int dent_secs = get_blocktype_secs(sbi, F2FS_DIRTY_DENTS);
+	int imeta_secs = get_blocktype_secs(sbi, F2FS_DIRTY_IMETA);
+
+	if (unlikely(is_sbi_flag_set(sbi, SBI_POR_DOING)))
+		return false;
+
+	if (free_physical_sections(sbi) + freed == reserved_sections(sbi) + needed &&
+			has_curseg_enough_space(sbi))
+		return false;
+	
+	return (free_physical_sections(sbi) + freed) <=
+		(node_secs + 2 * dent_secs + imeta_secs +
+		reserved_sections(sbi) + needed);
+}
+
+
+static inline bool has_not_enough_free_physical_secs(struct f2fs_sb_info *sbi,
+					int freed, int needed)
+{
+	int node_secs = get_blocktype_secs(sbi, F2FS_DIRTY_NODES);
+	int dent_secs = get_blocktype_secs(sbi, F2FS_DIRTY_DENTS);
+	int imeta_secs = get_blocktype_secs(sbi, F2FS_DIRTY_IMETA);
+
+	if (unlikely(is_sbi_flag_set(sbi, SBI_POR_DOING)))
+		return false;
+
+	/*if (free_sections(sbi) + freed == reserved_sections(sbi) + needed &&
+			has_curseg_enough_space(sbi))
+		return false;
+	*/
+	return (free_physical_sections(sbi) + freed) <=
 		(node_secs + 2 * dent_secs + imeta_secs +
 		reserved_sections(sbi) + needed);
 }

@@ -2830,10 +2830,17 @@ write:
 
 		goto done;
 	}
+	/*if (!wbc->for_reclaim)
+		need_balance_fs = true;
+	else if (has_not_enough_free_secs(sbi, 0, 0))
+		goto redirty_out;
+	else
+		set_inode_flag(inode, FI_HOT_DATA);
+	*/
 
 	if (!wbc->for_reclaim)
 		need_balance_fs = true;
-	else if (has_not_enough_free_secs(sbi, 0, 0))
+	else if (has_not_enough_free_physical_secs(sbi, 0, 0))
 		goto redirty_out;
 	else
 		set_inode_flag(inode, FI_HOT_DATA);

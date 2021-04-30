@@ -1636,8 +1636,12 @@ static int expand_inode_data(struct inode *inode, loff_t offset,
 
 		map.m_len = sbi->blocks_per_seg;
 next_alloc:
-		if (has_not_enough_free_secs(sbi, 0,
+		//if (has_not_enough_free_secs(sbi, 0,
+		//	GET_SEC_FROM_SEG(sbi, overprovision_segments(sbi)))) {
+	        if (has_not_enough_free_physical_secs(sbi, 0,
 			GET_SEC_FROM_SEG(sbi, overprovision_segments(sbi)))) {
+			//IF_LBA gc remove
+			panic("expand_inode_data: gc not expected!!");
 			down_write(&sbi->gc_lock);
 			err = f2fs_gc(sbi, true, false, NULL_SEGNO);
 			if (err && err != -ENODATA && err != -EAGAIN)
@@ -2469,7 +2473,8 @@ static int f2fs_ioc_gc(struct file *filp, unsigned long arg)
 	} else {
 		down_write(&sbi->gc_lock);
 	}
-
+	//IF_LBA
+	panic("f2fs_ioc_gc: not expected!!")
 	ret = f2fs_gc(sbi, sync, true, NULL_SEGNO);
 out:
 	mnt_drop_write_file(filp);
@@ -2506,6 +2511,7 @@ do_more:
 		down_write(&sbi->gc_lock);
 	}
 
+	panic("__f2fs_ioc_gc_range: not expected!!")
 	ret = f2fs_gc(sbi, range->sync, true, GET_SEGNO(sbi, range->start));
 	if (ret) {
 		if (ret == -EBUSY)
@@ -2959,6 +2965,7 @@ static int f2fs_ioc_flush_device(struct file *filp, unsigned long arg)
 		sm->last_victim[GC_CB] = end_segno + 1;
 		sm->last_victim[GC_GREEDY] = end_segno + 1;
 		sm->last_victim[ALLOC_NEXT] = end_segno + 1;
+		panic("f2fs_ioc_flush_device: not expected!!")
 		ret = f2fs_gc(sbi, true, true, start_segno);
 		if (ret == -EAGAIN)
 			ret = 0;

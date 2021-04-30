@@ -1753,7 +1753,7 @@ static int f2fs_disable_checkpoint(struct f2fs_sb_info *sbi)
 
 	f2fs_update_time(sbi, DISABLE_TIME);
 
-	while (!f2fs_time_over(sbi, DISABLE_TIME)) {
+	/*while (!f2fs_time_over(sbi, DISABLE_TIME)) {
 		down_write(&sbi->gc_lock);
 		err = f2fs_gc(sbi, true, false, NULL_SEGNO);
 		if (err == -ENODATA) {
@@ -1762,7 +1762,7 @@ static int f2fs_disable_checkpoint(struct f2fs_sb_info *sbi)
 		}
 		if (err && err != -EAGAIN)
 			break;
-	}
+	}*/
 
 	ret = sync_filesystem(sbi->sb);
 	if (ret || err) {

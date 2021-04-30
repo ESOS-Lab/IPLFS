@@ -506,7 +506,9 @@ void f2fs_balance_fs(struct f2fs_sb_info *sbi, bool need)
 	 * We should do GC or end up with checkpoint, if there are so many dirty
 	 * dir/node pages without enough free segments.
 	 */
-	if (has_not_enough_free_secs(sbi, 0, 0)) {
+	//if (has_not_enough_free_secs(sbi, 0, 0)) {
+	if (has_not_enough_free_physical_secs(sbi, 0, 0)) {
+		panic("f2fs_balance_fs: gc not expected!");
 		down_write(&sbi->gc_lock);
 		f2fs_gc(sbi, false, false, NULL_SEGNO);
 	}
