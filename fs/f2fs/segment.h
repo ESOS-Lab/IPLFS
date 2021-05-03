@@ -593,7 +593,7 @@ static inline unsigned int free_physical_sections(struct f2fs_sb_info *sbi)
 	unsigned int pages_per_sec = sbi->segs_per_sec * sbi->blocks_per_seg;
 	unsigned int valid_segs = (sbi->total_valid_block_count + pages_per_sec - 1) >>
 						sbi->log_blocks_per_seg;
-	unsigned int valid_secs = segs / sbi->segs_per_sec;
+	unsigned int valid_secs = valid_segs / sbi->segs_per_sec;
 
 	return sbi->total_sections - valid_secs;
 }

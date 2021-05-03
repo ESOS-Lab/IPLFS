@@ -2474,7 +2474,7 @@ static int f2fs_ioc_gc(struct file *filp, unsigned long arg)
 		down_write(&sbi->gc_lock);
 	}
 	//IF_LBA
-	panic("f2fs_ioc_gc: not expected!!")
+	panic("f2fs_ioc_gc: not expected!!");
 	ret = f2fs_gc(sbi, sync, true, NULL_SEGNO);
 out:
 	mnt_drop_write_file(filp);
@@ -2511,7 +2511,7 @@ do_more:
 		down_write(&sbi->gc_lock);
 	}
 
-	panic("__f2fs_ioc_gc_range: not expected!!")
+	panic("__f2fs_ioc_gc_range: not expected!!");
 	ret = f2fs_gc(sbi, range->sync, true, GET_SEGNO(sbi, range->start));
 	if (ret) {
 		if (ret == -EBUSY)
@@ -2965,7 +2965,7 @@ static int f2fs_ioc_flush_device(struct file *filp, unsigned long arg)
 		sm->last_victim[GC_CB] = end_segno + 1;
 		sm->last_victim[GC_GREEDY] = end_segno + 1;
 		sm->last_victim[ALLOC_NEXT] = end_segno + 1;
-		panic("f2fs_ioc_flush_device: not expected!!")
+		panic("f2fs_ioc_flush_device: not expected!!");
 		ret = f2fs_gc(sbi, true, true, start_segno);
 		if (ret == -EAGAIN)
 			ret = 0;

@@ -2927,9 +2927,10 @@ static void new_curseg(struct f2fs_sb_info *sbi, int type, bool new_sec)
 	unsigned int segno = curseg->segno;
 	int dir = ALLOC_LEFT;
 
-	if (curseg->inited)
+	/*if (curseg->inited)
 		write_sum_page(sbi, curseg->sum_blk,
 				GET_SUM_BLOCK(sbi, segno));
+	*/
 	if (seg_type == CURSEG_WARM_DATA || seg_type == CURSEG_COLD_DATA)
 		dir = ALLOC_RIGHT;
 
@@ -2987,9 +2988,9 @@ static void change_curseg(struct f2fs_sb_info *sbi, int type, bool flush)
 	struct f2fs_summary_block *sum_node;
 	struct page *sum_page;
 
-	if (flush)
+	/*if (flush)
 		write_sum_page(sbi, curseg->sum_blk,
-					GET_SUM_BLOCK(sbi, curseg->segno));
+					GET_SUM_BLOCK(sbi, curseg->segno));*/
 
 	__set_test_and_inuse(sbi, new_segno);
 
@@ -3002,15 +3003,16 @@ static void change_curseg(struct f2fs_sb_info *sbi, int type, bool flush)
 	curseg->alloc_type = SSR;
 	__next_free_blkoff(sbi, curseg, 0);
 
-	sum_page = f2fs_get_sum_page(sbi, new_segno);
-	if (IS_ERR(sum_page)) {
+	//sum_page = f2fs_get_sum_page(sbi, new_segno);
+	//if (IS_ERR(sum_page)) {
 		/* GC won't be able to use stale summary pages by cp_error */
-		memset(curseg->sum_blk, 0, SUM_ENTRY_SIZE);
-		return;
-	}
-	sum_node = (struct f2fs_summary_block *)page_address(sum_page);
+	//	memset(curseg->sum_blk, 0, SUM_ENTRY_SIZE);
+	//	return;
+	//}
+	/*sum_node = (struct f2fs_summary_block *)page_address(sum_page);
 	memcpy(curseg->sum_blk, sum_node, SUM_ENTRY_SIZE);
 	f2fs_put_page(sum_page, 1);
+	*/
 }
 
 static int get_ssr_segment(struct f2fs_sb_info *sbi, int type,
@@ -3070,10 +3072,11 @@ static void __f2fs_save_inmem_curseg(struct f2fs_sb_info *sbi, int type)
 	if (!curseg->inited)
 		goto out;
 
-	if (get_valid_blocks(sbi, curseg->segno, false)) {
-		write_sum_page(sbi, curseg->sum_blk,
-				GET_SUM_BLOCK(sbi, curseg->segno));
-	} else {
+	//if (get_valid_blocks(sbi, curseg->segno, false)) {
+		/*write_sum_page(sbi, curseg->sum_blk,
+				GET_SUM_BLOCK(sbi, curseg->segno));*/
+	//} else {
+	if (!get_valid_blocks(sbi, curseg->segno, false)) {
 		mutex_lock(&DIRTY_I(sbi)->seglist_lock);
 		__set_test_and_free(sbi, curseg->segno, true);
 		mutex_unlock(&DIRTY_I(sbi)->seglist_lock);
@@ -4111,13 +4114,14 @@ static int read_normal_summaries(struct f2fs_sb_info *sbi, int type)
 							type - CURSEG_HOT_NODE);
 		else
 			blk_addr = GET_SUM_BLOCK(sbi, segno);
+		//GET_SUM_BLOCK part must be modified. I disabled updating summary block so getting sum block form SSA part would cause trash SUM block. But it's okay since The content of SSA is actually not used. Thus, holding trash sum block for node type as curseg doesn't really matter. 
 	}
 
 	new = f2fs_get_meta_page(sbi, blk_addr);
 	if (IS_ERR(new))
 		return PTR_ERR(new);
 	sum = (struct f2fs_summary_block *)page_address(new);
-
+	/*
 	if (IS_NODESEG(type)) {
 		if (__exist_node_summaries(sbi)) {
 			struct f2fs_summary *ns = &sum->entries[0];
@@ -4132,6 +4136,7 @@ static int read_normal_summaries(struct f2fs_sb_info *sbi, int type)
 				goto out;
 		}
 	}
+	*/
 
 	/* set uncompleted segment to curseg */
 	curseg = CURSEG_I(sbi, type);
@@ -4141,9 +4146,10 @@ static int read_normal_summaries(struct f2fs_sb_info *sbi, int type)
 	down_write(&curseg->journal_rwsem);
 	memcpy(curseg->journal, &sum->journal, SUM_JOURNAL_SIZE);
 	up_write(&curseg->journal_rwsem);
-
+	
 	memcpy(curseg->sum_blk->entries, sum->entries, SUM_ENTRY_SIZE);
 	memcpy(&curseg->sum_blk->footer, &sum->footer, SUM_FOOTER_SIZE);
+	
 	curseg->next_segno = segno;
 	reset_curseg(sbi, type, 0);
 	curseg->alloc_type = ckpt->alloc_type[type];
@@ -4758,15 +4764,6 @@ void f2fs_flush_sit_entries(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 						SIT_VBLOCK_MAP_SIZE))
 				f2fs_bug_on(sbi, 1);
 #endif
-
-			/* add discard candidates */
-			/*if (!(cpc->reason & CP_DISCARD)) {
-				cpc->trim_start = segno;
-				//mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
-				//add_discard_addrs(sbi, cpc, false);
-				//check_ddm_sanity(sbi, cpc);
-				//mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
-			}*/
 
 			if (to_journal) {
 				offset = f2fs_lookup_journal_in_cursum(journal,
