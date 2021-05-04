@@ -2774,10 +2774,14 @@ static unsigned int get_free_zone(struct f2fs_sb_info *sbi)
 {
 	int i;
 	unsigned int zone = 0;
+	unsigned int total_zones = MAIN_SECS(sbi) / sbi->secs_per_zone;
+
 	down_read(&SM_I(sbi)->curseg_zone_lock);
 	for (i = 0; i < NR_CURSEG_TYPE; i++)
 		zone = max(zone, CURSEG_I(sbi, i)->zone);
 	up_read(&SM_I(sbi)->curseg_zone_lock);
+	if (zone + 1 > total_zones)
+		panic("get_free_zone: out of 64 bit LBA");
 	return zone + 1;
 }
 
@@ -2785,15 +2789,12 @@ static void get_new_segment_IFLBA(struct f2fs_sb_info *sbi,
 			unsigned int *newseg, bool new_sec, int type)
 {
 	unsigned int segno, secno, zoneno;
-	unsigned int total_zones = MAIN_SECS(sbi) / sbi->secs_per_zone;
 	unsigned int old_secno = GET_SEC_FROM_SEG(sbi, *newseg);
-	unsigned int old_zoneno = GET_ZONE_FROM_SEG(sbi, *newseg);
 
-	spin_lock(&free_i->segmap_lock);
 	//find next free segment in section
 	if (!new_sec && ((*newseg + 1) % sbi->segs_per_sec)) {
 		segno = *newseg + 1;
-		if (segno < GET_SEG_FROM_SEC(sbi, hint + 1))
+		if (segno < GET_SEG_FROM_SEC(sbi, old_secno + 1))
 			panic("get_new_segment_IFLBA: must not be here\n");
 		goto got_it;
 	}
@@ -2804,9 +2805,9 @@ static void get_new_segment_IFLBA(struct f2fs_sb_info *sbi,
 		goto got_it;
 	}
 	//find next free zone
-	zoneno = get_free_zone();
-	secno = zoneno * sbi->secs_per_zone
-	segno = secno * sbo->segs_per_sec;
+	zoneno = get_free_zone(sbi);
+	secno = zoneno * sbi->secs_per_zone;
+	segno = secno * sbi->segs_per_sec;
 
 got_it:
 	/* set it as dirty segment in free segmap */
@@ -2995,7 +2996,7 @@ static void new_curseg(struct f2fs_sb_info *sbi, int type, bool new_sec)
 static void new_curseg_IFLBA(struct f2fs_sb_info *sbi, int type, bool new_sec)
 {
 	struct curseg_info *curseg = CURSEG_I(sbi, type);
-	unsigned short seg_type = curseg->seg_type;
+	//unsigned short seg_type = curseg->seg_type;
 	unsigned int segno = curseg->segno;
 
 	//segno = __get_next_segno(sbi, type);
@@ -3046,8 +3047,8 @@ static void change_curseg(struct f2fs_sb_info *sbi, int type, bool flush)
 	struct dirty_seglist_info *dirty_i = DIRTY_I(sbi);
 	struct curseg_info *curseg = CURSEG_I(sbi, type);
 	unsigned int new_segno = curseg->next_segno;
-	struct f2fs_summary_block *sum_node;
-	struct page *sum_page;
+	//struct f2fs_summary_block *sum_node;
+	//struct page *sum_page;
 
 	/*if (flush)
 		write_sum_page(sbi, curseg->sum_blk,
@@ -3263,6 +3264,20 @@ static void allocate_segment_by_default(struct f2fs_sb_info *sbi,
 	stat_inc_seg_type(sbi, curseg);
 }
 
+
+static void append_only_allocate_segment(struct f2fs_sb_info *sbi,
+						int type, bool force)
+{
+	struct curseg_info *curseg = CURSEG_I(sbi, type);
+
+	if (force)
+		new_curseg_IFLBA(sbi, type, true);
+	else
+		new_curseg_IFLBA(sbi, type, false);
+
+	stat_inc_seg_type(sbi, curseg);
+}
+
 void f2fs_allocate_segment_for_resize(struct f2fs_sb_info *sbi, int type,
 					unsigned int start, unsigned int end)
 {
@@ -3334,6 +3349,10 @@ void f2fs_allocate_new_segments(struct f2fs_sb_info *sbi)
 
 static const struct segment_allocation default_salloc_ops = {
 	.allocate_segment = allocate_segment_by_default,
+};
+
+static const struct segment_allocation IFLBA_salloc_ops = {
+	.allocate_segment = append_only_allocate_segment,
 };
 
 bool f2fs_exist_trim_candidates(struct f2fs_sb_info *sbi,
@@ -4216,7 +4235,7 @@ static int read_normal_summaries(struct f2fs_sb_info *sbi, int type)
 	curseg->alloc_type = ckpt->alloc_type[type];
 	curseg->next_blkoff = blk_off;
 	mutex_unlock(&curseg->curseg_mutex);
-out:
+//out:
 	f2fs_put_page(new, 1);
 	return err;
 }
@@ -4973,7 +4992,8 @@ static int build_sit_info(struct f2fs_sb_info *sbi)
 #endif
 
 	/* init SIT information */
-	sit_i->s_ops = &default_salloc_ops;
+	//sit_i->s_ops = &default_salloc_ops;
+	sit_i->s_ops = &IFLBA_salloc_ops;
 
 	sit_i->sit_base_addr = le32_to_cpu(raw_super->sit_blkaddr);
 	sit_i->sit_blocks = sit_segs << sbi->log_blocks_per_seg;
