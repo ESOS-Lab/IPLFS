@@ -993,6 +993,7 @@ struct f2fs_sm_info {
 
 	struct rw_semaphore curseg_lock;	/* for preventing curseg change */
 
+	struct rw_semaphore curseg_zone_lock;
 	block_t seg0_blkaddr;		/* block address of 0'th segment */
 	block_t main_blkaddr;		/* start block address of main area */
 	block_t ssa_blkaddr;		/* start block address of SSA area */
