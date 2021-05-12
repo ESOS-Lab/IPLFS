@@ -189,7 +189,8 @@ bool f2fs_is_valid_blkaddr(struct f2fs_sb_info *sbi,
 			WARN_ON(1);
 			return false;
 		} else {
-			return __is_bitmap_valid(sbi, blkaddr, type);
+			return true;
+			//return __is_bitmap_valid(sbi, blkaddr, type);
 		}
 		break;
 	case META_GENERIC:
@@ -1424,7 +1425,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	/* start to update checkpoint, cp ver is already updated previously */
 	ckpt->elapsed_time = cpu_to_le64(get_mtime(sbi, true));
-	ckpt->free_segment_count = cpu_to_le32(free_segments(sbi));
+	//ckpt->free_segment_count = cpu_to_le32(free_segments(sbi));
 	for (i = 0; i < NR_CURSEG_NODE_TYPE; i++) {
 		ckpt->cur_node_segno[i] =
 			cpu_to_le32(curseg_segno(sbi, i + CURSEG_HOT_NODE));
@@ -1617,6 +1618,8 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	/* this is the case of multiple fstrims without any changes */
 	if (cpc->reason & CP_DISCARD) {
+		panic("f2fs_write_checkpoint: not prepared to CP_DISCARD\n");
+		/*
 		if (!f2fs_exist_trim_candidates(sbi, cpc)) {
 			unblock_operations(sbi);
 			goto out;
@@ -1629,7 +1632,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 			f2fs_clear_prefree_segments(sbi, cpc);
 			unblock_operations(sbi);
 			goto out;
-		}
+		}*/
 	}
 
 	/*
@@ -1645,12 +1648,14 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	if (err)
 		goto stop;
 
-	f2fs_flush_sit_entries(sbi, cpc);
-	mutex_lock(&ddmc->ddm_lock);	
+	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	flush_dynamic_discard_maps(sbi, cpc);
+	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	
+	//f2fs_flush_sit_entries(sbi, cpc);
 	//printk("f2fs flush end!! ddmc node cnt: %d\n", ddmc->node_cnt);
-	mutex_unlock(&ddmc->ddm_lock);	
 	/* save inmem log status */
-	f2fs_save_inmem_curseg(sbi);
+	//f2fs_save_inmem_curseg(sbi);
 
 	err = do_checkpoint(sbi, cpc);
 	if (err)
@@ -1658,7 +1663,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	else
 		f2fs_clear_prefree_segments(sbi, cpc);
 
-	f2fs_restore_inmem_curseg(sbi);
+	//f2fs_restore_inmem_curseg(sbi);
 stop:
 	unblock_operations(sbi);
 	stat_inc_cp_count(sbi->stat_info);

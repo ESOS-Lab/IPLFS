@@ -2580,16 +2580,21 @@ static inline bool check_inplace_update_policy(struct inode *inode,
 
 bool f2fs_should_update_inplace(struct inode *inode, struct f2fs_io_info *fio)
 {
-	if (f2fs_is_pinned_file(inode))
+	if (f2fs_is_pinned_file(inode)){
+		panic("f2fs_should_update_inplace: f2fs_is_pinned_file true, not expected");
 		return true;
-
+	}
 	/* if this is cold file, we should overwrite to avoid fragmentation */
-	if (file_is_cold(inode))
+	if (file_is_cold(inode)){
+		panic("f2fs_should_update_inplace: f2fs_is_cold true, not expected");
 		return true;
-
-	return check_inplace_update_policy(inode, fio);
+	}
+	if (check_inplace_update_policy(inode, fio)){
+		panic("f2fs_should_update_inplace: check_inplace_update_policy true, not expected");
+		return true;
+	}
+	return false;
 }
-
 bool f2fs_should_update_outplace(struct inode *inode, struct f2fs_io_info *fio)
 {
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
@@ -2617,7 +2622,6 @@ bool f2fs_should_update_outplace(struct inode *inode, struct f2fs_io_info *fio)
 static inline bool need_inplace_update(struct f2fs_io_info *fio)
 {
 	struct inode *inode = fio->page->mapping->host;
-
 	if (f2fs_should_update_outplace(inode, fio))
 		return false;
 

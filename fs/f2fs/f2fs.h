@@ -599,6 +599,7 @@ struct dynamic_discard_map_control {
 	struct mutex ddm_lock;
 	
 	atomic_t node_cnt;
+	atomic_t blk_cnt;
 	unsigned int segs_per_node;		/*number of segments each node manages*/
 	struct list_head head;
 	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
@@ -997,6 +998,7 @@ struct f2fs_sm_info {
 	block_t seg0_blkaddr;		/* block address of 0'th segment */
 	block_t main_blkaddr;		/* start block address of main area */
 	block_t ssa_blkaddr;		/* start block address of SSA area */
+	block_t start_segno;		/*IFLBA: moved from free_i to here*/
 
 	unsigned int segment_count;	/* total # of segments */
 	unsigned int main_segments;	/* # of segments in main area */
@@ -2895,6 +2897,8 @@ static inline int f2fs_is_mmap_file(struct inode *inode)
 
 static inline bool f2fs_is_pinned_file(struct inode *inode)
 {
+	if (is_inode_flag_set(inode, FI_PIN_FILE))
+		panic("f2fs_is_pinned_file: this is pinned file. not expected");
 	return is_inode_flag_set(inode, FI_PIN_FILE);
 }
 
@@ -3422,6 +3426,9 @@ unsigned int f2fs_usable_segs_in_sec(struct f2fs_sb_info *sbi,
 			unsigned int segno);
 unsigned int f2fs_usable_blks_in_seg(struct f2fs_sb_info *sbi,
 			unsigned int segno);
+
+void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, 
+			struct cp_control *cpc);
 
 /*
  * checkpoint.c

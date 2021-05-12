@@ -1780,6 +1780,8 @@ static void init_atgc_management(struct f2fs_sb_info *sbi)
 		SIT_I(sbi)->elapsed_time >= DEF_GC_THREAD_AGE_THRESHOLD)
 		am->atgc_enabled = true;
 
+	am->atgc_enabled = false;//for IFLBA
+
 	am->root = RB_ROOT_CACHED;
 	INIT_LIST_HEAD(&am->victim_list);
 	am->victim_count = 0;
@@ -1800,7 +1802,7 @@ void f2fs_build_gc_manager(struct f2fs_sb_info *sbi)
 		SIT_I(sbi)->last_victim[ALLOC_NEXT] =
 				GET_SEGNO(sbi, FDEV(0).end_blk) + 1;
 
-	init_atgc_management(sbi);
+	//init_atgc_management(sbi);
 }
 
 static int free_segment_range(struct f2fs_sb_info *sbi,

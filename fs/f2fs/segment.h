@@ -19,8 +19,10 @@
 #define F2FS_MIN_META_SEGMENTS	8 /* SB + 2 (CP + SIT + NAT) + SSA */
 
 /* L: Logical segment # in volume, R: Relative segment # in main area */
-#define GET_L2R_SEGNO(free_i, segno)	((segno) - (free_i)->start_segno)
-#define GET_R2L_SEGNO(free_i, segno)	((segno) + (free_i)->start_segno)
+//#define GET_L2R_SEGNO(free_i, segno)	((segno) - (free_i)->start_segno)
+//#define GET_R2L_SEGNO(free_i, segno)	((segno) + (free_i)->start_segno)
+#define GET_L2R_SEGNO(sm_i, segno)	((segno) - (sm_i)->start_segno)
+#define GET_R2L_SEGNO(sm_i, segno)	((segno) + (sm_i)->start_segno)
 
 #define IS_DATASEG(t)	((t) <= CURSEG_COLD_DATA)
 #define IS_NODESEG(t)	((t) >= CURSEG_HOT_NODE && (t) <= CURSEG_COLD_NODE)
@@ -83,8 +85,11 @@ static inline void sanity_check_seg_type(struct f2fs_sb_info *sbi,
 					(sbi)->log_blocks_per_seg))
 
 #define START_BLOCK(sbi, segno)	(SEG0_BLKADDR(sbi) +			\
-	 (GET_R2L_SEGNO(FREE_I(sbi), segno) << (sbi)->log_blocks_per_seg))
+	 (GET_R2L_SEGNO(SM_I(sbi), segno) << (sbi)->log_blocks_per_seg))
 
+/*#define START_BLOCK(sbi, segno)	(SEG0_BLKADDR(sbi) +			\
+	 (GET_R2L_SEGNO(FREE_I(sbi), segno) << (sbi)->log_blocks_per_seg))
+*/
 #define NEXT_FREE_BLKADDR(sbi, curseg)					\
 	(START_BLOCK(sbi, (curseg)->segno) + (curseg)->next_blkoff)
 
@@ -96,8 +101,13 @@ static inline void sanity_check_seg_type(struct f2fs_sb_info *sbi,
 
 #define GET_SEGNO(sbi, blk_addr)					\
 	((!__is_valid_data_blkaddr(blk_addr)) ?			\
+	NULL_SEGNO : GET_L2R_SEGNO(SM_I(sbi),			\
+		GET_SEGNO_FROM_SEG0(sbi, blk_addr)))
+/*#define GET_SEGNO(sbi, blk_addr)					\
+	((!__is_valid_data_blkaddr(blk_addr)) ?			\
 	NULL_SEGNO : GET_L2R_SEGNO(FREE_I(sbi),			\
 		GET_SEGNO_FROM_SEG0(sbi, blk_addr)))
+*/
 #define BLKS_PER_SEC(sbi)					\
 	((sbi)->segs_per_sec * (sbi)->blocks_per_seg)
 #define GET_SEC_FROM_SEG(sbi, segno)				\
@@ -571,8 +581,10 @@ static inline bool has_curseg_enough_space(struct f2fs_sb_info *sbi)
 	/* check current node segment */
 	for (i = CURSEG_HOT_NODE; i <= CURSEG_COLD_NODE; i++) {
 		segno = CURSEG_I(sbi, i)->segno;
+		//left_blocks = f2fs_usable_blks_in_seg(sbi, segno) -
+		//		get_seg_entry(sbi, segno)->ckpt_valid_blocks;
 		left_blocks = f2fs_usable_blks_in_seg(sbi, segno) -
-				get_seg_entry(sbi, segno)->ckpt_valid_blocks;
+				CURSEG_I(sbi, i)->next_blkoff;
 
 		if (node_blocks > left_blocks)
 			return false;
@@ -580,8 +592,10 @@ static inline bool has_curseg_enough_space(struct f2fs_sb_info *sbi)
 
 	/* check current data segment */
 	segno = CURSEG_I(sbi, CURSEG_HOT_DATA)->segno;
+	//left_blocks = f2fs_usable_blks_in_seg(sbi, segno) -
+	//		get_seg_entry(sbi, segno)->ckpt_valid_blocks;
 	left_blocks = f2fs_usable_blks_in_seg(sbi, segno) -
-			get_seg_entry(sbi, segno)->ckpt_valid_blocks;
+			CURSEG_I(sbi, CURSEG_HOT_DATA)->next_blkoff;
 	if (dent_blocks > left_blocks)
 		return false;
 	return true;
@@ -664,7 +678,10 @@ static inline bool f2fs_is_checkpoint_ready(struct f2fs_sb_info *sbi)
 
 static inline bool excess_prefree_segs(struct f2fs_sb_info *sbi)
 {
-	return prefree_segments(sbi) > SM_I(sbi)->rec_prefree_segments;
+	
+	//return prefree_segments(sbi) > SM_I(sbi)->rec_prefree_segments;
+	return atomic_read(&SM_I(sbi)->ddmc_info->blk_cnt) / sbi->blocks_per_seg \
+		> SM_I(sbi)->rec_prefree_segments;
 }
 
 static inline int utilization(struct f2fs_sb_info *sbi)

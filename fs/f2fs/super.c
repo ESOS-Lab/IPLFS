@@ -1797,7 +1797,7 @@ restore_flag:
 static void f2fs_enable_checkpoint(struct f2fs_sb_info *sbi)
 {
 	down_write(&sbi->gc_lock);
-	f2fs_dirty_to_prefree(sbi);
+	//f2fs_dirty_to_prefree(sbi);
 
 	clear_sbi_flag(sbi, SBI_CP_DISABLED);
 	set_sbi_flag(sbi, SBI_IS_DIRTY);
@@ -3831,7 +3831,7 @@ try_onemore:
 	}
 
 reset_checkpoint:
-	f2fs_init_inmem_curseg(sbi);
+	//f2fs_init_inmem_curseg(sbi);
 
 	/* f2fs_recover_fsync_data() cleared this already */
 	clear_sbi_flag(sbi, SBI_POR_DOING);
