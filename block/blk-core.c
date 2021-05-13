@@ -732,8 +732,10 @@ static inline int bio_check_eod(struct bio *bio, sector_t maxsector)
 	if (nr_sectors && maxsector &&
 	    (nr_sectors > maxsector ||
 	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
-		handle_bad_sector(bio, maxsector);
-		return -EIO;
+		printk("[JW DBG] (%s) bio->bi_iter.bi_sector: %lld, maxsector-nr_sectors: %lld\n", __func__, bio->bi_iter.bi_sector  , maxsector - nr_sectors);
+		//handle_bad_sector(bio, maxsector);
+		//return -EIO;
+		return 0;
 	}
 	return 0;
 }

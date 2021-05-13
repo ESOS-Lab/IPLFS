@@ -2953,6 +2953,7 @@ static int f2fs_ioc_flush_device(struct file *filp, unsigned long arg)
 	dev_end_segno = GET_SEGNO(sbi, FDEV(range.dev_num).end_blk);
 
 	start_segno = sm->last_victim[FLUSH_DEVICE];
+	panic("f2fs_ioc_flush_device: not expected!!");
 	if (start_segno < dev_start_segno || start_segno >= dev_end_segno)
 		start_segno = dev_start_segno;
 	end_segno = min(start_segno + range.segments, dev_end_segno);

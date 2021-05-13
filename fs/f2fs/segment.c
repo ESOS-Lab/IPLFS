@@ -2793,7 +2793,7 @@ static unsigned int get_free_zone(struct f2fs_sb_info *sbi)
 		zone = max(zone, CURSEG_I(sbi, i)->zone);
 	up_read(&SM_I(sbi)->curseg_zone_lock);
 	if (zone + 1 > total_zones)
-		panic("get_free_zone: out of 64 bit LBA");
+		printk("get_free_zone: new zone %d is out of total zone %d",zone + 1, total_zones );
 	return zone + 1;
 }
 
@@ -4627,8 +4627,8 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 		p = head_ddm->next;
 		list_del(p);
 		ddm = dynamic_discard_map(p, struct dynamic_discard_map, list);
-                printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", 
-				ddmc->node_cnt);
+                //printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", 
+		//		ddmc->node_cnt);
 		if (force){
 			panic("flush_dynamic_discard_maps: not expected!!");
         		__remove_dynamic_discard_map(sbi, ddm);

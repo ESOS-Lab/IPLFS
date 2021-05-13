@@ -175,19 +175,25 @@ bool f2fs_is_valid_blkaddr(struct f2fs_sb_info *sbi,
 		break;
 	case META_POR:
 		if (unlikely(blkaddr >= MAX_BLKADDR(sbi) ||
-			blkaddr < MAIN_BLKADDR(sbi)))
-			return false;
+			blkaddr < MAIN_BLKADDR(sbi))){
+			printk("{[JW DBG] (%s) %d out of range %d", __func__, blkaddr, MAX_BLKADDR(sbi) );
+			return true;
+			//return false;
+		}
 		break;
 	case DATA_GENERIC:
 	case DATA_GENERIC_ENHANCE:
 	case DATA_GENERIC_ENHANCE_READ:
 		if (unlikely(blkaddr >= MAX_BLKADDR(sbi) ||
 				blkaddr < MAIN_BLKADDR(sbi))) {
-			f2fs_warn(sbi, "access invalid blkaddr:%u",
+			printk("{[JW DBG] (%s) %d out of range %d", __func__, blkaddr, MAX_BLKADDR(sbi) );
+			return true;
+			/*f2fs_warn(sbi, "access invalid blkaddr:%u",
 				  blkaddr);
 			set_sbi_flag(sbi, SBI_NEED_FSCK);
 			WARN_ON(1);
 			return false;
+			*/
 		} else {
 			return true;
 			//return __is_bitmap_valid(sbi, blkaddr, type);

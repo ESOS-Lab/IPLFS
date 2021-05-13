@@ -3724,7 +3724,7 @@ try_onemore:
 		sbi->kbytes_written =
 			le64_to_cpu(seg_i->journal->info.kbytes_written);
 
-	f2fs_build_gc_manager(sbi);
+	//f2fs_build_gc_manager(sbi);
 
 	err = f2fs_build_stats(sbi);
 	if (err)
