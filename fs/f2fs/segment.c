@@ -2792,8 +2792,8 @@ static unsigned int get_free_zone(struct f2fs_sb_info *sbi)
 	for (i = 0; i < NR_CURSEG_TYPE; i++)
 		zone = max(zone, CURSEG_I(sbi, i)->zone);
 	up_read(&SM_I(sbi)->curseg_zone_lock);
-	if (zone + 1 > total_zones)
-		printk("get_free_zone: new zone %d is out of total zone %d",zone + 1, total_zones );
+	//if (zone + 1 > total_zones)
+	//	printk("get_free_zone: new zone %d is out of total zone %d",zone + 1, total_zones );
 	return zone + 1;
 }
 

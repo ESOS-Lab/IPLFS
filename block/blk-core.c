@@ -728,6 +728,39 @@ ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
 static inline int bio_check_eod(struct bio *bio, sector_t maxsector)
 {
 	unsigned int nr_sectors = bio_sectors(bio);
+	static int ite = 0;
+	if (nr_sectors && maxsector &&
+	    (nr_sectors > maxsector ||
+	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
+		if (ite < 100){
+			printk("[JW DBG] (%s) bio->bi_iter.bi_sector: %lld, maxsector-nr_sectors: %lld\n", __func__, bio->bi_iter.bi_sector  , maxsector - nr_sectors);
+			ite += 1;
+		}
+		//handle_bad_sector(bio, maxsector);
+		//return -EIO;
+		return 0;
+	}
+	return 0;
+}
+static inline int juwon_out_of_sector(struct bio *bio, char* message)
+{
+	unsigned int nr_sectors = bio_sectors(bio);
+	sector_t maxsector = get_capacity(bio->bi_disk);
+
+	if (nr_sectors && maxsector &&
+	    (nr_sectors > maxsector ||
+	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
+		printk("[JW DBG] (%s) bio->bi_iter.bi_sector: %lld, maxsector-nr_sectors: %lld\n", message, bio->bi_iter.bi_sector  , maxsector - nr_sectors);
+		//handle_bad_sector(bio, maxsector);
+		//return -EIO;
+		return 0;
+	}
+	return 0;
+}
+
+static inline int juwon_chk_bio_check_eod_fail_submit_bio_noacct(struct bio *bio, sector_t maxsector)
+{
+	unsigned int nr_sectors = bio_sectors(bio);
 
 	if (nr_sectors && maxsector &&
 	    (nr_sectors > maxsector ||
@@ -739,7 +772,34 @@ static inline int bio_check_eod(struct bio *bio, sector_t maxsector)
 	}
 	return 0;
 }
+static inline int juwon_chk_bef_driver_submit_bio(struct bio *bio, sector_t maxsector)
+{
+	unsigned int nr_sectors = bio_sectors(bio);
 
+	if (nr_sectors && maxsector &&
+	    (nr_sectors > maxsector ||
+	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
+		printk("[JW DBG] (%s) bio->bi_iter.bi_sector: %lld, maxsector-nr_sectors: %lld\n", __func__, bio->bi_iter.bi_sector  , maxsector - nr_sectors);
+		//handle_bad_sector(bio, maxsector);
+		//return -EIO;
+		return 0;
+	}
+	return 0;
+}
+static inline int juwon_chk_bef_blk_mq_submit_bio(struct bio *bio, sector_t maxsector)
+{
+	unsigned int nr_sectors = bio_sectors(bio);
+
+	if (nr_sectors && maxsector &&
+	    (nr_sectors > maxsector ||
+	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
+		printk("[JW DBG] (%s) bio->bi_iter.bi_sector: %lld, maxsector-nr_sectors: %lld\n", __func__, bio->bi_iter.bi_sector  , maxsector - nr_sectors);
+		//handle_bad_sector(bio, maxsector);
+		//return -EIO;
+		return 0;
+	}
+	return 0;
+}
 /*
  * Remap block n of partition p to block n+start(p) of the disk.
  */
@@ -760,6 +820,7 @@ static inline int blk_partition_remap(struct bio *bio)
 	if (bio_sectors(bio)) {
 		if (bio_check_eod(bio, bdev_nr_sectors(p)))
 			goto out;
+		//juwon_out_of_sector(bio, "blk_partition_remap");
 		bio->bi_iter.bi_sector += p->bd_start_sect;
 		trace_block_bio_remap(bio, p->bd_dev,
 				      bio->bi_iter.bi_sector -
@@ -837,6 +898,7 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
 			goto end_io;
 		if (unlikely(bio_check_eod(bio, get_capacity(bio->bi_disk))))
 			goto end_io;
+		//juwon_out_of_sector(bio, "recheck aft blk_partition_remap");
 	}
 
 	/*
@@ -932,8 +994,11 @@ static blk_qc_t __submit_bio(struct bio *bio)
 	blk_qc_t ret = BLK_QC_T_NONE;
 
 	if (blk_crypto_bio_prep(&bio)) {
-		if (!disk->fops->submit_bio)
+		if (!disk->fops->submit_bio){
+			//juwon_chk_bef_blk_mq_submit_bio(bio, get_capacity(bio->bi_disk));
 			return blk_mq_submit_bio(bio);
+		}
+		//juwon_chk_bef_driver_submit_bio(bio, get_capacity(bio->bi_disk));
 		ret = disk->fops->submit_bio(bio);
 	}
 	blk_queue_exit(disk->queue);
@@ -1045,8 +1110,12 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
  */
 blk_qc_t submit_bio_noacct(struct bio *bio)
 {
-	if (!submit_bio_checks(bio))
+	//juwon_out_of_sector(bio, "start of submit_bio_noacct");
+	if (!submit_bio_checks(bio)){
+		//juwon_chk_bio_check_eod_fail_submit_bio_noacct(bio, get_capacity(bio->bi_disk));
 		return BLK_QC_T_NONE;
+	}
+	//juwon_out_of_sector(bio, "end of submit_bio_noacct");
 
 	/*
 	 * We only want one ->submit_bio to be active at a time, else stack

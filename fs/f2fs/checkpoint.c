@@ -176,7 +176,7 @@ bool f2fs_is_valid_blkaddr(struct f2fs_sb_info *sbi,
 	case META_POR:
 		if (unlikely(blkaddr >= MAX_BLKADDR(sbi) ||
 			blkaddr < MAIN_BLKADDR(sbi))){
-			printk("{[JW DBG] (%s) %d out of range %d", __func__, blkaddr, MAX_BLKADDR(sbi) );
+			//printk("{[JW DBG] (%s) %d out of range %d", __func__, blkaddr, MAX_BLKADDR(sbi) );
 			return true;
 			//return false;
 		}
@@ -186,7 +186,7 @@ bool f2fs_is_valid_blkaddr(struct f2fs_sb_info *sbi,
 	case DATA_GENERIC_ENHANCE_READ:
 		if (unlikely(blkaddr >= MAX_BLKADDR(sbi) ||
 				blkaddr < MAIN_BLKADDR(sbi))) {
-			printk("{[JW DBG] (%s) %d out of range %d", __func__, blkaddr, MAX_BLKADDR(sbi) );
+			//printk("{[JW DBG] (%s) %d out of range %d", __func__, blkaddr, MAX_BLKADDR(sbi) );
 			return true;
 			/*f2fs_warn(sbi, "access invalid blkaddr:%u",
 				  blkaddr);
