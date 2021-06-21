@@ -728,20 +728,22 @@ ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
 static inline int bio_check_eod(struct bio *bio, sector_t maxsector)
 {
 	unsigned int nr_sectors = bio_sectors(bio);
-	static int ite = 0;
+	//static int ite = 0;
 	if (nr_sectors && maxsector &&
 	    (nr_sectors > maxsector ||
 	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
+		/*
 		if (ite < 100){
 			printk("[JW DBG] (%s) bio->bi_iter.bi_sector: %lld, maxsector-nr_sectors: %lld\n", __func__, bio->bi_iter.bi_sector  , maxsector - nr_sectors);
 			ite += 1;
-		}
+		}*/
 		//handle_bad_sector(bio, maxsector);
 		//return -EIO;
 		return 0;
 	}
 	return 0;
 }
+/*
 static inline int juwon_out_of_sector(struct bio *bio, char* message)
 {
 	unsigned int nr_sectors = bio_sectors(bio);
@@ -757,7 +759,8 @@ static inline int juwon_out_of_sector(struct bio *bio, char* message)
 	}
 	return 0;
 }
-
+*/
+/*
 static inline int juwon_chk_bio_check_eod_fail_submit_bio_noacct(struct bio *bio, sector_t maxsector)
 {
 	unsigned int nr_sectors = bio_sectors(bio);
@@ -772,6 +775,9 @@ static inline int juwon_chk_bio_check_eod_fail_submit_bio_noacct(struct bio *bio
 	}
 	return 0;
 }
+*/
+
+/*
 static inline int juwon_chk_bef_driver_submit_bio(struct bio *bio, sector_t maxsector)
 {
 	unsigned int nr_sectors = bio_sectors(bio);
@@ -786,6 +792,9 @@ static inline int juwon_chk_bef_driver_submit_bio(struct bio *bio, sector_t maxs
 	}
 	return 0;
 }
+
+*/
+/*
 static inline int juwon_chk_bef_blk_mq_submit_bio(struct bio *bio, sector_t maxsector)
 {
 	unsigned int nr_sectors = bio_sectors(bio);
@@ -800,6 +809,7 @@ static inline int juwon_chk_bef_blk_mq_submit_bio(struct bio *bio, sector_t maxs
 	}
 	return 0;
 }
+*/
 /*
  * Remap block n of partition p to block n+start(p) of the disk.
  */
