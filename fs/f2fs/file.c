@@ -256,6 +256,9 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
 	};
 	unsigned int seq_id = 0;
 
+	if (datasync)
+		panic("%s: datasync is 1, not expected\n", __func__);
+
 	if (unlikely(f2fs_readonly(inode->i_sb) ||
 				is_sbi_flag_set(sbi, SBI_CP_DISABLED)))
 		return 0;
@@ -266,10 +269,10 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
 		goto go_write;
 
 	/* if fdatasync is triggered, let's do in-place-update */
-	if (datasync || get_dirty_pages(inode) <= SM_I(sbi)->min_fsync_blocks)
-		set_inode_flag(inode, FI_NEED_IPU);
+	//if (datasync || get_dirty_pages(inode) <= SM_I(sbi)->min_fsync_blocks)
+	//	set_inode_flag(inode, FI_NEED_IPU);
 	ret = file_write_and_wait_range(file, start, end);
-	clear_inode_flag(inode, FI_NEED_IPU);
+	//clear_inode_flag(inode, FI_NEED_IPU);
 
 	if (ret) {
 		trace_f2fs_sync_file_exit(inode, cp_reason, datasync, ret);
