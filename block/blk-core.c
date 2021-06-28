@@ -728,15 +728,15 @@ ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
 static inline int bio_check_eod(struct bio *bio, sector_t maxsector)
 {
 	unsigned int nr_sectors = bio_sectors(bio);
-	//static int ite = 0;
+	static int ite = 0;
 	if (nr_sectors && maxsector &&
 	    (nr_sectors > maxsector ||
 	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
-		/*
-		if (ite < 100){
+		
+		if (ite % 100==0){
 			printk("[JW DBG] (%s) bio->bi_iter.bi_sector: %lld, maxsector-nr_sectors: %lld\n", __func__, bio->bi_iter.bi_sector  , maxsector - nr_sectors);
 			ite += 1;
-		}*/
+		}
 		//handle_bad_sector(bio, maxsector);
 		//return -EIO;
 		return 0;

@@ -1549,7 +1549,8 @@ next_dnode:
 
 	/* When reading holes, we need its node page */
 	set_new_dnode(&dn, inode, NULL, NULL, 0);
-	err = f2fs_get_dnode_of_data(&dn, pgofs, mode);
+	//err = f2fs_get_dnode_of_data(&dn, pgofs, mode);
+	err = f2fs_get_dnode_of_data_jw(&dn, pgofs, mode);
 	if (err) {
 		if (flag == F2FS_GET_BLOCK_BMAP)
 			map->m_pblk = 0;

@@ -714,6 +714,117 @@ got:
 	return level;
 }
 
+int f2fs_get_dnode_of_data_jw(struct dnode_of_data *dn, pgoff_t index, int mode)
+{
+	struct f2fs_sb_info *sbi = F2FS_I_SB(dn->inode);
+	struct page *npage[4];
+	struct page *parent = NULL;
+	int offset[4];
+	unsigned int noffset[4];
+	nid_t nids[4];
+	int level, i = 0;
+	int err = 0;
+
+	level = get_node_path(dn->inode, index, offset, noffset);
+	if (level < 0)
+		return level;
+
+	nids[0] = dn->inode->i_ino;
+	npage[0] = dn->inode_page;
+
+	if (!npage[0]) {
+		//printk("[JW DBG] %s: 1st: nid: %u", __func__, nids[0]);
+		npage[0] = f2fs_get_node_page(sbi, nids[0]);
+		if (IS_ERR(npage[0]))
+			return PTR_ERR(npage[0]);
+	}
+
+	/* if inline_data is set, should not report any block indices */
+	if (f2fs_has_inline_data(dn->inode) && index) {
+		err = -ENOENT;
+		f2fs_put_page(npage[0], 1);
+		goto release_out;
+	}
+
+	parent = npage[0];
+	if (level != 0)
+		nids[1] = get_nid(parent, offset[0], true);
+	dn->inode_page = npage[0];
+	dn->inode_page_locked = true;
+	
+	/* get indirect or direct nodes */
+	for (i = 1; i <= level; i++) {
+		bool done = false;
+
+		if (!nids[i] && mode == ALLOC_NODE) {
+			/* alloc new node */
+			if (!f2fs_alloc_nid(sbi, &(nids[i]))) {
+				err = -ENOSPC;
+				goto release_pages;
+			}
+
+			dn->nid = nids[i];
+			npage[i] = f2fs_new_node_page(dn, noffset[i]);
+			if (IS_ERR(npage[i])) {
+				f2fs_alloc_nid_failed(sbi, nids[i]);
+				err = PTR_ERR(npage[i]);
+				goto release_pages;
+			}
+
+			set_nid(parent, offset[i - 1], nids[i], i == 1);
+			f2fs_alloc_nid_done(sbi, nids[i]);
+			done = true;
+		} else if (mode == LOOKUP_NODE_RA && i == level && level > 1) {
+			npage[i] = f2fs_get_node_page_ra(parent, offset[i - 1]);
+			if (IS_ERR(npage[i])) {
+				err = PTR_ERR(npage[i]);
+				goto release_pages;
+			}
+			done = true;
+		}
+		if (i == 1) {
+			dn->inode_page_locked = false;
+			unlock_page(parent);
+		} else {
+			f2fs_put_page(parent, 1);
+		}
+
+		if (!done) {
+			//printk("[JW DBG] %s: 2st: level %d:  nid: %u", __func__, i, nids[i]);
+			npage[i] = f2fs_get_node_page(sbi, nids[i]);
+			//printk("[JW DBG] %s: 2st DONE : level %d:  nid: %u", __func__, i, nids[i]);
+			if (IS_ERR(npage[i])) {
+				err = PTR_ERR(npage[i]);
+				f2fs_put_page(npage[0], 0);
+				goto release_out;
+			}
+		}
+		if (i < level) {
+			parent = npage[i];
+			nids[i + 1] = get_nid(parent, offset[i], false);
+		}
+	}
+	dn->nid = nids[level];
+	dn->ofs_in_node = offset[level];
+	dn->node_page = npage[level];
+	dn->data_blkaddr = f2fs_data_blkaddr(dn);
+	return 0;
+
+release_pages:
+	f2fs_put_page(parent, 1);
+	if (i > 1)
+		f2fs_put_page(npage[0], 0);
+release_out:
+	dn->inode_page = NULL;
+	dn->node_page = NULL;
+	if (err == -ENOENT) {
+		dn->cur_level = i;
+		dn->max_level = level;
+		dn->ofs_in_node = offset[level];
+	}
+	return err;
+}
+
 /*
  * Caller should call f2fs_put_dnode(dn).
  * Also, it should grab and release a rwsem by calling f2fs_lock_op() and
@@ -755,7 +866,7 @@ int f2fs_get_dnode_of_data(struct dnode_of_data *dn, pgoff_t index, int mode)
 		nids[1] = get_nid(parent, offset[0], true);
 	dn->inode_page = npage[0];
 	dn->inode_page_locked = true;
-
+	
 	/* get indirect or direct nodes */
 	for (i = 1; i <= level; i++) {
 		bool done = false;
@@ -1389,6 +1500,7 @@ page_hit:
 			  nid, nid_of_node(page), ino_of_node(page),
 			  ofs_of_node(page), cpver_of_node(page),
 			  next_blkaddr_of_node(page));
+		//panic("%s: inconsistent node block panic\n", __func__);
 		err = -EINVAL;
 out_err:
 		ClearPageUptodate(page);
@@ -1657,6 +1769,10 @@ release_page:
 static int f2fs_write_node_page(struct page *page,
 				struct writeback_control *wbc)
 {
+	nid_t nid;
+	nid = nid_of_node(page);
+	if (nid == 7)
+		printk("[JW DBG] %s: nid 7 bef __write_node_page\n", __func__);
 	return __write_node_page(page, false, NULL, wbc, false,
 						FS_NODE_IO, NULL);
 }
@@ -1673,6 +1789,7 @@ int f2fs_fsync_node_pages(struct f2fs_sb_info *sbi, struct inode *inode,
 	nid_t ino = inode->i_ino;
 	int nr_pages;
 	int nwritten = 0;
+	nid_t nid;
 
 	if (atomic) {
 		last_page = last_fsync_dnode(sbi, ino);
@@ -1740,6 +1857,10 @@ continue_unlock:
 			if (!clear_page_dirty_for_io(page))
 				goto continue_unlock;
 
+			
+			nid = nid_of_node(page);
+			if (nid == 7)
+				printk("[JW DBG] %s: nid 7 bef __write_node_page\n", __func__);
 			ret = __write_node_page(page, atomic &&
 						page == last_page,
 						&submitted, wbc, true,
@@ -1867,7 +1988,7 @@ continue_unlock:
 
 int f2fs_sync_node_pages(struct f2fs_sb_info *sbi,
 				struct writeback_control *wbc,
-				bool do_balance, enum iostat_type io_type)
+				bool do_balance, enum iostat_type io_type, int* nid7_synced)
 {
 	pgoff_t index;
 	struct pagevec pvec;
@@ -1875,7 +1996,7 @@ int f2fs_sync_node_pages(struct f2fs_sb_info *sbi,
 	int nwritten = 0;
 	int ret = 0;
 	int nr_pages, done = 0;
-
+	nid_t nid;
 	pagevec_init(&pvec);
 
 next_step:
@@ -1955,6 +2076,11 @@ write_node:
 			set_fsync_mark(page, 0);
 			set_dentry_mark(page, 0);
 
+			nid = nid_of_node(page);
+			if (nid == 7){
+				printk("[JW DBG] %s: nid 7 bef __write_node_page\n", __func__);
+				*nid7_synced = 1;
+			}
 			ret = __write_node_page(page, false, &submitted,
 						wbc, do_balance, io_type, NULL);
 			if (ret)
@@ -2039,7 +2165,7 @@ static int f2fs_write_node_pages(struct address_space *mapping,
 	struct f2fs_sb_info *sbi = F2FS_M_SB(mapping);
 	struct blk_plug plug;
 	long diff;
-
+	int tmpint = 0;
 	if (unlikely(is_sbi_flag_set(sbi, SBI_POR_DOING)))
 		goto skip_write;
 
@@ -2061,7 +2187,8 @@ static int f2fs_write_node_pages(struct address_space *mapping,
 
 	diff = nr_pages_to_write(sbi, NODE, wbc);
 	blk_start_plug(&plug);
-	f2fs_sync_node_pages(sbi, wbc, true, FS_NODE_IO);
+	printk("[JW DBG] %s: AM I?\n", __func__);
+	f2fs_sync_node_pages(sbi, wbc, true, FS_NODE_IO, &tmpint);
 	blk_finish_plug(&plug);
 	wbc->nr_to_write = max((long)0, wbc->nr_to_write - diff);
 
