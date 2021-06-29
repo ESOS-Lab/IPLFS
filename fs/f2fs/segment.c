@@ -2500,17 +2500,17 @@ static void update_ddm_hash(struct f2fs_sb_info *sbi, unsigned int segno,
 	
 	//printk("update_ddm_hash: height is %d\n", height);
 	if (del < 0) {
-		if (segno == GET_SEGNO(sbi, 37120) && offset == (GET_BLKOFF_FROM_SEG0(sbi, 37120)))
-			printk("[JW DBG] %s: 37120 is added to ddm!!\n", __func__);
+		//if (segno == GET_SEGNO(sbi, 37120) && offset == (GET_BLKOFF_FROM_SEG0(sbi, 37120)))
+		//	printk("[JW DBG] %s: 37120 is added to ddm!!\n", __func__);
 		if (!ddm){
 			/*not exist, so create it*/
 			ddm = __create_discard_map(sbi);
 			if (ddm == 0)
 				panic("__create_discard_map failed");
 			ddm->key = ddmkey;
-			if (ddmkey == 0){
-				printk("[JW DBG] %s: ddm node with ddmkey 0 created by segno: %u, offset: %u!!\n", __func__, segno, offset);
-			}
+			//if (ddmkey == 0){
+				//printk("[JW DBG] %s: ddm node with ddmkey 0 created by segno: %u, offset: %u!!\n", __func__, segno, offset);
+			//}
 			//hash_add(ddmc->ht, &ddm->hnode, ddmkey);
 			hash_add(ht, &ddm->hnode, ddmkey);
 			list_add_tail(&ddm->list, head);
@@ -2523,8 +2523,8 @@ static void update_ddm_hash(struct f2fs_sb_info *sbi, unsigned int segno,
 		return;
 	}
 	if (del > 0) {
-		if (segno == GET_SEGNO(sbi, 37120) && offset == (GET_BLKOFF_FROM_SEG0(sbi, 37120)))
-			printk("[JW DBG] %s: 37120 is deleted in ddm!!\n", __func__);
+		//if (segno == GET_SEGNO(sbi, 37120) && offset == (GET_BLKOFF_FROM_SEG0(sbi, 37120)))
+		//	printk("[JW DBG] %s: 37120 is deleted in ddm!!\n", __func__);
 		if (!ddm){
 			return;	
 		}
@@ -2833,12 +2833,10 @@ static void get_new_segment_IFLBA(struct f2fs_sb_info *sbi,
 	zoneno = get_free_zone(sbi);
 	secno = zoneno * sbi->secs_per_zone;
 	segno = secno * sbi->segs_per_sec;
-	//printk();
 
 got_it:
 	/* set it as dirty segment in free segmap */
 	*newseg = segno;
-	//printk("");
 
 }
 
@@ -3865,14 +3863,15 @@ static void update_device_state(struct f2fs_io_info *fio)
 
 static void do_write_page(struct f2fs_summary *sum, struct f2fs_io_info *fio)
 {
-	static block_t nid7_addr = 0;
+	/*static block_t nid7_addr = 0;
 	static int data_wrtcnt = 0;
 	static int node_wrtcnt = 0;
 	static int wrtcnt = 0;
+	*/
 	int type = __get_segment_type(fio);
 	bool keep_order = (f2fs_lfs_mode(fio->sbi) && type == CURSEG_COLD_DATA);
 
-	struct node_info ni;
+	//struct node_info ni;
 	struct f2fs_sb_info *sbi = F2FS_P_SB(fio->page);	
 
 	if (keep_order)
@@ -3891,15 +3890,15 @@ reallocate:
 		goto reallocate;
 	}
 	//
-	f2fs_get_node_info(sbi, nid_of_node(fio->page), &ni);
-	if ((fio->new_blkaddr == nid7_addr) || (fio->old_blkaddr == nid7_addr) && nid7_addr != 0){
+	//f2fs_get_node_info(sbi, nid_of_node(fio->page), &ni);
+	/*if ((fio->new_blkaddr == nid7_addr) || (fio->old_blkaddr == nid7_addr) && nid7_addr != 0){
 		printk("[JW DBG] %s: other detected!! fio type is NODE %d, ino: %u, oldblkaddr: %u, newblkaddr: %u,  \n",
 				 __func__, fio->type == NODE, fio->ino, fio->old_blkaddr , fio->new_blkaddr);
 	}
 	if (nid_of_node(fio->page) == 7){
 		printk("[JW DBG] %s: fio type is NODE %d, ino: %u, oldblkaddr: %u, newblkaddr: %u,  \n",
 				 __func__, fio->type == NODE, fio->ino, fio->old_blkaddr , fio->new_blkaddr);
-		if (fio->type == NODE)
+		if (fio->type == NODE){
 			printk("\t nodefooter[nid:%u,ino%u,ofs:%u,cpver:%llu,blkaddr:%u]", 
 			  nid_of_node(fio->page), ino_of_node(fio->page),
 			  ofs_of_node(fio->page), cpver_of_node(fio->page),
@@ -3908,7 +3907,8 @@ reallocate:
 			//printk("[JW DBG] %s: Intended Bug\n", __func__);
 			nid7_addr = fio->new_blkaddr;
 			//f2fs_bug_on(sbi, 1);
-	}
+		}
+	}*/
 	/*
 	wrtcnt += 1;
 	if (fio->type == NODE){
@@ -4613,15 +4613,18 @@ static void check_discarded_addr(block_t start_baddr, int offs, block_t target_a
 		printk("[JW DBG] %s: target addr %u is discarded!!\n",__func__, target_addr);
 }
 
+
+
+//Notice!! This function always frees DDM. This can cause problem when number of blocks to be discarded is more than max_discards. The while loop stops when numblks to be discarded exceeds max_disacrds. This means DDM is freed while some of blks are not disacrded. This can cause orphan blocks. So this must be fixed. 
 static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_control *ddmc,
-					struct dynamic_discard_map *ddm)
+					struct dynamic_discard_map *ddm, int lpcnt)
 {
 
         int max_blocks = sbi->blocks_per_seg * ddmc->segs_per_node;
 	unsigned int start = 0, end = -1;
         struct discard_entry *de = NULL;
 	unsigned long *ddmap = (unsigned long *)ddm->dc_map;
-	unsigned long long ddmkey = ddm->rbe.key;
+	unsigned long long ddmkey = ddm->key;
 	unsigned long long start_segno, end_segno; 
 	unsigned int start_offset, end_offset;
         struct list_head *head = &SM_I(sbi)->dcc_info->entry_list;
@@ -4630,6 +4633,7 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 	unsigned int last_target_segno;
 	unsigned int p_segno;
 	unsigned int start_in_seg, end_in_seg;
+	int localcnt = 0;
 
         if (!f2fs_hw_support_discard(sbi)){
 		panic("Why HW not support discard!!");
@@ -4650,9 +4654,10 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
                 end = __find_rev_next_zero_bit(ddmap, max_blocks, start + 1);
 		recover_info_from_ddm(sbi, ddmkey, start, &start_segno, &start_offset);
 		recover_info_from_ddm(sbi, ddmkey, end, &end_segno, &end_offset);
-		if (start_segno == 2 || end_segno == 2){
-			printk("[JW DBG] %s: start segno: %lld, off: %u, end segno: %lld, off: %u || 37120's segno: %u, off: %u, ddmkey: %lld, start: %u, end: %u\n", __func__, start_segno, start_offset, end_segno, end_offset, GET_SEGNO(sbi, 37120), GET_BLKOFF_FROM_SEG0(sbi, 37120), ddmkey, start, end );
-		}
+		localcnt += 1;
+		//if (start_segno == 2 || end_segno == 2){
+		//	printk("[JW DBG] %s: %d's loop: localcnt: %d : start segno: %lld, off: %u, end segno: %lld, off: %u , max_blocks: %d || 37120's segno: %u, off: %u, ddmkey: %lld, start: %u, end: %u\n", __func__, lpcnt, localcnt, start_segno, start_offset, end_segno, end_offset, max_blocks, GET_SEGNO(sbi, 37120), GET_BLKOFF_FROM_SEG0(sbi, 37120), ddmkey, start, end );
+		//}
 		/*set bitmap for each segment*/
 		start_in_seg = start_offset;
 		for (p_segno = start_segno; p_segno <= end_segno; p_segno++){
@@ -4670,8 +4675,8 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 				end_in_seg = end_offset;
 			}
                 	for (i = start_in_seg; i < end_in_seg; i++){
-				check_discarded_addr(de->start_blkaddr, i, 37120);
-				check_discarded_addr(de->start_blkaddr, i, 37121);
+				//check_discarded_addr(de->start_blkaddr, i, 37120);
+				//check_discarded_addr(de->start_blkaddr, i, 37121);
                        		__set_bit_le(i, (void *)de->discard_map);
 
 			}
@@ -4683,6 +4688,7 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
                 SM_I(sbi)->dcc_info->nr_discards += end - start;
 		first = false;
         }
+
         __remove_dynamic_discard_map(sbi, ddm);
         return false;
 
@@ -4696,20 +4702,21 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	struct list_head *head_ddm = &ddmc->head;
 	struct list_head *p;
 	bool force = (cpc->reason & CP_DISCARD);
+	int lpcnt = 0;
 	while(!list_empty(head_ddm)){
 		p = head_ddm->next;
 		list_del(p);
 		ddm = dynamic_discard_map(p, struct dynamic_discard_map, list);
-                //printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", 
-		//		ddmc->node_cnt);
+                //printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", ddmc->node_cnt);
 		if (force){
 			panic("flush_dynamic_discard_maps: not expected!!");
         		__remove_dynamic_discard_map(sbi, ddm);
 		} else {
-                	flush_one_ddm(sbi, ddmc, ddm);
+                	flush_one_ddm(sbi, ddmc, ddm, lpcnt);
 		}
+		lpcnt += 1;
 	}
-	atomic_xchg(&ddmc->blk_cnt, 0);
+	atomic_xchg(&ddmc->blk_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
 	if (atomic_read(&ddmc->blk_cnt) != 0)
 		panic("flush_dynamic_discard_maps(): blk_cnt not set to zero!\n");
 	//if (!hash_empty(ht)){

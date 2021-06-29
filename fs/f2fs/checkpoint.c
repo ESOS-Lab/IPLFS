@@ -1172,7 +1172,7 @@ static bool __need_flush_quota(struct f2fs_sb_info *sbi)
 /*
  * Freeze all the FS-operations for checkpoint.
  */
-static int block_operations(struct f2fs_sb_info *sbi, int* nid7_syn)
+static int block_operations(struct f2fs_sb_info *sbi)//, int* nid7_syn)
 {
 	struct writeback_control wbc = {
 		.sync_mode = WB_SYNC_ALL,
@@ -1180,7 +1180,7 @@ static int block_operations(struct f2fs_sb_info *sbi, int* nid7_syn)
 		.for_reclaim = 0,
 	};
 	int err = 0, cnt = 0;
-	int nid7_was_synced = 0;
+	//int nid7_was_synced = 0;
 	/*
 	 * Let's flush inline_data in dirty node pages.
 	 */
@@ -1240,8 +1240,8 @@ retry_flush_nodes:
 	if (get_pages(sbi, F2FS_DIRTY_NODES)) {
 		up_write(&sbi->node_write);
 		atomic_inc(&sbi->wb_sync_req[NODE]);
-		printk("[JW DBG] %s: Bef f2fs_sync_node_pages()\n", __func__);
-		err = f2fs_sync_node_pages(sbi, &wbc, false, FS_CP_NODE_IO, &nid7_was_synced);
+		//printk("[JW DBG] %s: Bef f2fs_sync_node_pages()\n", __func__);
+		err = f2fs_sync_node_pages(sbi, &wbc, false, FS_CP_NODE_IO);//, &nid7_was_synced);
 		atomic_dec(&sbi->wb_sync_req[NODE]);
 		if (err) {
 			up_write(&sbi->node_change);
@@ -1251,12 +1251,13 @@ retry_flush_nodes:
 		cond_resched();
 		goto retry_flush_nodes;
 	}
+	/*
 	if (nid7_was_synced){
-		printk("[JW DBG] %s: nid7_was_synced = 1\n", __func__);
+		//printk("[JW DBG] %s: nid7_was_synced = 1\n", __func__);
 		*nid7_syn = 1;
 		nid7_was_synced = 0;
 		//f2fs_bug_on(sbi, 1);	
-	}
+	}*/
 
 	/*
 	 * sbi->node_change is used only for AIO write_begin path which produces
@@ -1595,8 +1596,8 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	unsigned long long ckpt_ver;
 	int err = 0;
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
-	int nid7_syn = 0;
-	static int jw_cp_cnt = 0;
+	//int nid7_syn = 0;
+	//static int jw_cp_cnt = 0;
 	mutex_lock(&ddmc->ddm_lock);	
 	//printk("f2fs CP start!! ddmc node cnt: %d\n", ddmc->node_cnt);
 	mutex_unlock(&ddmc->ddm_lock);	
@@ -1623,7 +1624,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	trace_f2fs_write_checkpoint(sbi->sb, cpc->reason, "start block_ops");
 
 	//err = block_operations(sbi);
-	err = block_operations(sbi, &nid7_syn);
+	err = block_operations(sbi);//, &nid7_syn);
 
 
 	if (err)
