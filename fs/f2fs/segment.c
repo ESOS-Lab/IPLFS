@@ -2560,7 +2560,6 @@ static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);
 	update_ddm_hash(sbi, segno, offset, del);
 	//update_dynamic_discard_map(sbi, segno, offset, del);
-	//}
 	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);
 	
 

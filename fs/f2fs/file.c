@@ -256,9 +256,9 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
 	};
 	unsigned int seq_id = 0;
 
-	if (datasync)
-		panic("%s: datasync is 1, not expected\n", __func__);
-
+	//if (datasync)
+	//	panic("%s: datasync is 1, not expected\n", __func__);
+	//printk("[JW DBG]: %s: sync!!\n", __func__);
 	if (unlikely(f2fs_readonly(inode->i_sb) ||
 				is_sbi_flag_set(sbi, SBI_CP_DISABLED)))
 		return 0;

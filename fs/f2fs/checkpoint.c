@@ -1669,6 +1669,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 	flush_dynamic_discard_maps(sbi, cpc);
 	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	
+	
 
 	//f2fs_flush_sit_entries(sbi, cpc);
 	//printk("f2fs flush end!! ddmc node cnt: %d\n", ddmc->node_cnt);
