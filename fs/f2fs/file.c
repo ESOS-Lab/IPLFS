@@ -2469,12 +2469,15 @@ static int f2fs_ioc_gc(struct file *filp, unsigned long arg)
 		return ret;
 
 	if (!sync) {
+		printk("%s: bef down write trylock gc lock!!!!\n", __func__);
 		if (!down_write_trylock(&sbi->gc_lock)) {
 			ret = -EBUSY;
 			goto out;
 		}
 	} else {
+		printk("%s: bef down write gc lock!!!!\n", __func__);
 		down_write(&sbi->gc_lock);
+		printk("%s: aft down write gc lock!!!!\n", __func__);
 	}
 	//IF_LBA
 	panic("f2fs_ioc_gc: not expected!!");
@@ -2506,6 +2509,7 @@ static int __f2fs_ioc_gc_range(struct file *filp, struct f2fs_gc_range *range)
 
 do_more:
 	if (!range->sync) {
+		printk("%s: bef down write try gc lock!!!!\n", __func__);
 		if (!down_write_trylock(&sbi->gc_lock)) {
 			ret = -EBUSY;
 			goto out;

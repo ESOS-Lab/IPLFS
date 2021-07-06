@@ -114,6 +114,7 @@ do_gc:
 		/* if return value is not zero, no victim was selected */
 		//if (f2fs_gc(sbi, sync_mode, true, NULL_SEGNO))
 		//	wait_ms = gc_th->no_gc_sleep_time;
+		up_write(&sbi->gc_lock);
 
 		trace_f2fs_background_gc(sbi->sb, wait_ms,
 				prefree_segments(sbi), free_segments(sbi));
@@ -1651,7 +1652,7 @@ int f2fs_gc(struct f2fs_sb_info *sbi, bool sync,
 	unsigned long long last_skipped = sbi->skipped_atomic_files[FG_GC];
 	unsigned long long first_skipped;
 	unsigned int skipped_round = 0, round = 0;
-
+	//panic("[JW DBG] %s: this should not be called\n ", __func__ );
 	trace_f2fs_gc_begin(sbi->sb, sync, background,
 				get_pages(sbi, F2FS_DIRTY_NODES),
 				get_pages(sbi, F2FS_DIRTY_DENTS),
