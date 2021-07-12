@@ -1623,7 +1623,6 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	trace_f2fs_write_checkpoint(sbi->sb, cpc->reason, "start block_ops");
 
-	//err = block_operations(sbi);
 	err = block_operations(sbi);//, &nid7_syn);
 
 
@@ -1677,8 +1676,10 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	//f2fs_save_inmem_curseg(sbi);
 
 	err = do_checkpoint(sbi, cpc);
-	if (err)
+	if (err){
 		f2fs_release_discard_addrs(sbi);
+		printk("[JW DBG] %s: do_checkpoint returns error, not expected!, also modify f2fs_release_discard_addrs\n", __func__);
+	}
 	else
 		f2fs_clear_prefree_segments(sbi, cpc);
 
