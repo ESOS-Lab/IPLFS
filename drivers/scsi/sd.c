@@ -1237,8 +1237,8 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
 	}
 
 	if (blk_rq_pos(rq) + blk_rq_sectors(rq) > get_capacity(rq->rq_disk)) {
-		scmd_printk(KERN_ERR, cmd, "access beyond end of device\n");
-		goto fail;
+		scmd_printk(KERN_ERR, cmd, "[JW DBG] %s: access beyond end of device\n", __func__);
+		//goto fail;
 	}
 
 	if ((blk_rq_pos(rq) & mask) || (blk_rq_sectors(rq) & mask)) {
