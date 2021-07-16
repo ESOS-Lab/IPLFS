@@ -1552,11 +1552,11 @@ retry:
 				f2fs_time_over(sbi, UMOUNT_DISCARD_TIMEOUT))
 				break;
 
-			if (dpolicy->io_aware && i < dpolicy->io_aware_gran &&
+			/*if (dpolicy->io_aware && i < dpolicy->io_aware_gran &&
 						!is_idle(sbi, DISCARD_TIME)) {
 				io_interrupted = true;
 				break;
-			}
+			}*/
 
 			__submit_discard_cmd(sbi, dpolicy, dc, &issued);
 
@@ -2174,7 +2174,8 @@ skip:
 		dcc->nr_discards -= total_len;
 	}
 
-	wake_up_discard_thread(sbi, false);
+	//wake_up_discard_thread(sbi, false);
+	wake_up_discard_thread(sbi, true);
 }
 
 
