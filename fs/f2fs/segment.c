@@ -2208,6 +2208,7 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 	
 	atomic_set(&ddmc->node_cnt, 0);
 	atomic_set(&ddmc->blk_cnt, 0);
+	atomic_set(&ddmc->seg_cnt, 0);
 	INIT_LIST_HEAD(&ddmc->head);
 
         SM_I(sbi)->ddmc_info = ddmc;
@@ -4446,6 +4447,65 @@ void f2fs_write_node_summaries(struct f2fs_sb_info *sbi, block_t start_blk)
 	write_normal_summaries(sbi, start_blk, CURSEG_HOT_NODE);
 }
 
+block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi, 
+					block_t start_blk, block_t journal_limit_addr,
+					unsigned int dbgcnt)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
+	struct list_head *head = &dcc->entry_list;
+	struct discard_entry *entry, *this;
+	struct discard_journal_block *dst_dj_blk = NULL;
+	struct discard_journal *dst_dj = NULL;
+	unsigned int discard_segcnt = (unsigned int) atomic_read(&ddmc->seg_cnt);
+	struct page *page = NULL;
+	unsigned int didx = 0;
+	block_t tmp_dblkcnt = 0;
+	block_t dblkcnt = (discard_segcnt % ENTRIES_IN_DJ_BLOCK)? 
+			discard_segcnt / ENTRIES_IN_DJ_BLOCK + 1 : 
+			discard_segcnt / ENTRIES_IN_DJ_BLOCK;
+	block_t blk = start_blk;
+
+	if (start_blk + dblkcnt >= journal_limit_addr)
+		panic("[JW DBG] %s: discard seg exceeded cp pack capacity\n", __func__);
+		
+	if (is_set_ckpt_flags(sbi, CP_COMPACT_SUM_FLAG))
+		panic("[JW DBG] %s: must not be compact ckpt", __func__);
+	
+	list_for_each_entry_safe(entry, this, head, list) {
+		if (!page) {
+			page = f2fs_grab_meta_page(sbi, blk++);
+			dst_dj_blk = (struct discard_journal_block *)page_address(page);
+			memset(dst_dj_blk, 0, sizeof(*dst_dj_blk));
+			didx = 0;
+			tmp_dblkcnt++;
+		}
+		dst_dj = &dst_dj_blk->entries[didx++];
+		dst_dj->start_blkaddr = cpu_to_le32(entry->start_blkaddr);
+		memcpy(dst_dj->discard_map, entry->discard_map, DISCARD_BLOCK_MAP_SIZE);
+
+		if (didx == ENTRIES_IN_DJ_BLOCK){
+			dst_dj_blk->entry_cnt = cpu_to_le32(didx);
+			set_page_dirty(page);
+			f2fs_put_page(page, 1);
+			didx = 0;
+			page = NULL;
+		}
+	}
+	if (didx > 0){
+		dst_dj_blk->entry_cnt = cpu_to_le32(didx);
+		set_page_dirty(page);
+		f2fs_put_page(page, 1);
+	}
+	atomic_xchg(&ddmc->seg_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
+
+	//printk("[JW DBG] %s: discard journal blk cnt: %u, real dblkcnt: %u, remaind entry cnt: %u\n", __func__, dblkcnt, tmp_dblkcnt, didx);	
+	return blk;
+
+}
+
+
+
 int f2fs_lookup_journal_in_cursum(struct f2fs_journal *journal, int type,
 					unsigned int val, int alloc)
 {
@@ -4633,7 +4693,8 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 	unsigned int last_target_segno;
 	unsigned int p_segno;
 	unsigned int start_in_seg, end_in_seg;
-	int localcnt = 0;
+	unsigned int segcnt = 0;
+	//int localcnt = 0;
 
         if (!f2fs_hw_support_discard(sbi)){
 		panic("Why HW not support discard!!");
@@ -4654,7 +4715,7 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
                 end = __find_rev_next_zero_bit(ddmap, max_blocks, start + 1);
 		recover_info_from_ddm(sbi, ddmkey, start, &start_segno, &start_offset);
 		recover_info_from_ddm(sbi, ddmkey, end, &end_segno, &end_offset);
-		localcnt += 1;
+		//localcnt += 1;
 		//if (start_segno == 2 || end_segno == 2){
 		//	printk("[JW DBG] %s: %d's loop: localcnt: %d : start segno: %lld, off: %u, end segno: %lld, off: %u , max_blocks: %d || 37120's segno: %u, off: %u, ddmkey: %lld, start: %u, end: %u\n", __func__, lpcnt, localcnt, start_segno, start_offset, end_segno, end_offset, max_blocks, GET_SEGNO(sbi, 37120), GET_BLKOFF_FROM_SEG0(sbi, 37120), ddmkey, start, end );
 		//}
@@ -4668,6 +4729,10 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
                                                         GFP_F2FS_ZERO);
                			de->start_blkaddr = START_BLOCK(sbi, p_segno);
                 		list_add_tail(&de->list, head);
+				//printk("\n[JW DBG] %s: segno: %u\n", __func__, p_segno);
+				segcnt += 1;
+				atomic_inc(&ddmc->seg_cnt);
+				
 			}
 			if (end_segno - p_segno){
 				end_in_seg = sbi->blocks_per_seg-1;
@@ -4678,8 +4743,8 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 				//check_discarded_addr(de->start_blkaddr, i, 37120);
 				//check_discarded_addr(de->start_blkaddr, i, 37121);
                        		__set_bit_le(i, (void *)de->discard_map);
-
 			}
+			//printk("%u ~ %u+%u  ", start_in_seg, start_in_seg, end_in_seg-start_in_seg);
 			last_target_segno = p_segno;
 			start_in_seg = 0;
 
@@ -4690,6 +4755,8 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
         }
 
         __remove_dynamic_discard_map(sbi, ddm);
+	//printk("[JW DBG] %s: seg cnt: %u\n", __func__, segcnt);
+
         return false;
 
 
@@ -4703,6 +4770,9 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	struct list_head *p;
 	bool force = (cpc->reason & CP_DISCARD);
 	int lpcnt = 0;
+	if (atomic_read(&ddmc->seg_cnt) != 0)
+		panic("flush_dynamic_discard_maps(): seg_cnt not set to zero!\n");
+
 	while(!list_empty(head_ddm)){
 		p = head_ddm->next;
 		list_del(p);
@@ -4714,14 +4784,15 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 		} else {
                 	flush_one_ddm(sbi, ddmc, ddm, lpcnt);
 		}
-		lpcnt += 1;
+		//lpcnt += 1;
 	}
 	atomic_xchg(&ddmc->blk_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
-	if (atomic_read(&ddmc->blk_cnt) != 0)
-		panic("flush_dynamic_discard_maps(): blk_cnt not set to zero!\n");
-	//if (!hash_empty(ht)){
-	//	panic("hash must be emptry after flushing all");
-	//}
+	//if (atomic_read(&ddmc->blk_cnt) != 0)
+	//	panic("flush_dynamic_discard_maps(): blk_cnt not set to zero!\n");
+	if (!hash_empty(ht))
+		panic("hash must be emptry after flushing all");
+	if (atomic_read(&ddmc->node_cnt) != 0)
+		panic("flush_dynamic_discard_maps(): node_cnt not set to zero!\n");
 
 }
 

@@ -1433,6 +1433,8 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	struct curseg_info *seg_i = CURSEG_I(sbi, CURSEG_HOT_NODE);
 	u64 kbytes_written;
 	int err;
+	static unsigned int dbgcnt = 0;
+	dbgcnt += 1;
 
 	/* Flush all the NAT/SIT pages */
 	f2fs_sync_meta_pages(sbi, META, LONG_MAX, FS_CP_META_IO);
@@ -1460,10 +1462,10 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	/* 2 cp + n data seg summary + orphan inode blocks */
 	data_sum_blocks = f2fs_npages_for_summary_flush(sbi, false);
 	spin_lock_irqsave(&sbi->cp_lock, flags);
-	if (data_sum_blocks < NR_CURSEG_DATA_TYPE)
-		__set_ckpt_flags(ckpt, CP_COMPACT_SUM_FLAG);
-	else
-		__clear_ckpt_flags(ckpt, CP_COMPACT_SUM_FLAG);
+	//if (data_sum_blocks < NR_CURSEG_DATA_TYPE)
+	//	__set_ckpt_flags(ckpt, CP_COMPACT_SUM_FLAG);
+	//else
+	__clear_ckpt_flags(ckpt, CP_COMPACT_SUM_FLAG);
 	spin_unlock_irqrestore(&sbi->cp_lock, flags);
 
 	orphan_blocks = GET_ORPHAN_BLOCKS(orphan_num);
@@ -1492,7 +1494,11 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 				= cpu_to_le32(crc32);
 
 	start_blk = __start_cp_next_addr(sbi);
-
+	
+	block_t end_of_discard_journal = 0;
+	/*end_of_disard_journal is boundary that limits discard journaling in ckpt*/
+	/*the reason for -1 is consideration of 2nd ckpt pack*/
+	end_of_discard_journal = start_blk + sbi->blocks_per_seg - 1;
 	/* write nat bits */
 	if (enabled_nat_bits(sbi, cpc)) {
 		__u64 cp_ver = cur_cp_version(ckpt);
@@ -1502,6 +1508,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 		*(__le64 *)nm_i->nat_bits = cpu_to_le64(cp_ver);
 
 		blk = start_blk + sbi->blocks_per_seg - nm_i->nat_bits_blocks;
+		end_of_discard_journal = blk - 1;
 		for (i = 0; i < nm_i->nat_bits_blocks; i++)
 			f2fs_update_meta_page(sbi, nm_i->nat_bits +
 					(i << F2FS_BLKSIZE_BITS), blk + i);
@@ -1522,6 +1529,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	f2fs_write_data_summaries(sbi, start_blk);
 	start_blk += data_sum_blocks;
 
+
 	/* Record write statistics in the hot node summary */
 	kbytes_written = sbi->kbytes_written;
 	kbytes_written += (f2fs_get_sectors_written(sbi) -
@@ -1532,6 +1540,8 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 		f2fs_write_node_summaries(sbi, start_blk);
 		start_blk += NR_CURSEG_NODE_TYPE;
 	}
+	//printk("[JW DBG] %s: start_blk: %u\n", __func__, start_blk);
+	start_blk = f2fs_write_discard_journals(sbi, start_blk, end_of_discard_journal, dbgcnt);
 
 	/* update user_block_counts */
 	sbi->last_valid_block_count = sbi->total_valid_block_count;
@@ -1586,6 +1596,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 		set_sbi_flag(sbi, SBI_IS_DIRTY);
 
 	f2fs_bug_on(sbi, get_pages(sbi, F2FS_DIRTY_DENTS));
+
 
 	return unlikely(f2fs_cp_error(sbi)) ? -EIO : 0;
 }
@@ -1665,6 +1676,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	if (err)
 		goto stop;
 
+	//printk("[JW DBG] %s: CP START!!\n", __func__);
 	mutex_lock(&SM_I(sbi)->ddmc_info->ddm_lock);	
 	flush_dynamic_discard_maps(sbi, cpc);
 	mutex_unlock(&SM_I(sbi)->ddmc_info->ddm_lock);	

@@ -482,6 +482,23 @@ struct f2fs_summary_block {
 	struct summary_footer footer;
 } __packed;
 
+/*discard journal for IFLBA F2FS*/
+#define DISCARD_BLOCK_MAP_SIZE 64
+#define ENTRIES_IN_DJ_BLOCK 60  
+
+/*discard journal size: 68 byte*/
+struct discard_journal{
+	__le32 start_blkaddr;
+	unsigned char discard_map[DISCARD_BLOCK_MAP_SIZE];
+} __packed;
+
+/*16 byte left. 4 bytes for entry_cnt. 12 bytes unused*/
+struct discard_journal_block{
+	__le32 entry_cnt;	
+	struct discard_journal entries[ENTRIES_IN_DJ_BLOCK];
+} __packed;
+
+
 /*
  * For directory operations
  */

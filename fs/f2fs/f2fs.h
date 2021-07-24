@@ -600,6 +600,7 @@ struct dynamic_discard_map_control {
 	
 	atomic_t node_cnt;
 	atomic_t blk_cnt;
+	atomic_t seg_cnt;
 	unsigned int segs_per_node;		/*number of segments each node manages*/
 	struct list_head head;
 	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
@@ -3430,6 +3431,9 @@ unsigned int f2fs_usable_blks_in_seg(struct f2fs_sb_info *sbi,
 void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, 
 			struct cp_control *cpc);
 
+block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
+	       		block_t start_blk, block_t journal_limit_addr,
+			unsigned int dbgcnt);
 /*
  * checkpoint.c
  */

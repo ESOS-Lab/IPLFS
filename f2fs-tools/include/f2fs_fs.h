@@ -902,6 +902,22 @@ struct f2fs_summary_block {
 	struct summary_footer footer;
 } __attribute__((packed));
 
+/*discard journal for IFLBA F2FS*/
+#define DISCARD_BLOCK_MAP_SIZE 64
+#define ENTRIES_IN_DJ_BLOCK 60  
+struct discard_journal{
+	__le32 start_blkaddr;
+	unsigned char discard_map[DISCARD_BLOCK_MAP_SIZE];
+} __attribute__((packed));
+
+
+struct discard_journal_block{
+	__le32 entry_cnt;	
+	struct discard_journal entries[ENTRIES_IN_DJ_BLOCK];
+} __attribute__((packed));
+
+
+
 /*
  * For directory operations
  */

@@ -2486,7 +2486,7 @@ fi
 $as_echo "$ac_cv_file__git" >&6; }
 if test "x$ac_cv_file__git" = xyes; then :
 
-$as_echo "#define F2FS_TOOLS_DATE \"2017-09-21\"" >>confdefs.h
+$as_echo "#define F2FS_TOOLS_DATE \"2021-07-16\"" >>confdefs.h
 
 else
 
