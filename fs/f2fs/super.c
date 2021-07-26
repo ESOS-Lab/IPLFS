@@ -3778,6 +3778,9 @@ try_onemore:
 	if (unlikely(is_set_ckpt_flags(sbi, CP_DISABLED_FLAG)))
 		goto reset_checkpoint;
 
+	/*discard discard journal*/
+	f2fs_flush_discard_journals(sbi);
+
 	/* recover fsynced data */
 	if (!test_opt(sbi, DISABLE_ROLL_FORWARD) &&
 			!test_opt(sbi, NORECOVERY)) {

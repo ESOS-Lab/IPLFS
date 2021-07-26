@@ -236,6 +236,7 @@ void print_ckpt_info(struct f2fs_sb_info *sbi)
 
 	DISP_u32(cp, ckpt_flags);
 	DISP_u32(cp, cp_pack_total_block_count);
+	DISP_u32(cp, discard_journal_block_count);
 	DISP_u32(cp, cp_pack_start_sum);
 	DISP_u32(cp, valid_node_count);
 	DISP_u32(cp, valid_inode_count);

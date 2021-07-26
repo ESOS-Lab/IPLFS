@@ -674,6 +674,7 @@ err_out:
 	return err;
 }
 
+
 int f2fs_recover_orphan_inodes(struct f2fs_sb_info *sbi)
 {
 	block_t start_blk, orphan_blocks, i, j;
@@ -865,10 +866,12 @@ static struct page *validate_checkpoint(struct f2fs_sb_info *sbi,
 	if (err)
 		return NULL;
 
-	if (le32_to_cpu(cp_block->cp_pack_total_block_count) >
+	if (le32_to_cpu(cp_block->cp_pack_total_block_count) 
+			+ le32_to_cpu(cp_block->discard_journal_block_count) >
 					sbi->blocks_per_seg) {
 		f2fs_warn(sbi, "invalid cp_pack_total_block_count:%u",
-			  le32_to_cpu(cp_block->cp_pack_total_block_count));
+			  le32_to_cpu(cp_block->cp_pack_total_block_count)
+			  + le32_to_cpu(cp_block->discard_journal_block_count));
 		goto invalid_cp;
 	}
 	pre_version = *version;
@@ -1306,7 +1309,8 @@ static void update_ckpt_flags(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	spin_lock_irqsave(&sbi->cp_lock, flags);
 
 	if ((cpc->reason & CP_UMOUNT) &&
-			le32_to_cpu(ckpt->cp_pack_total_block_count) >
+			le32_to_cpu(ckpt->cp_pack_total_block_count) 
+			+ le32_to_cpu(ckpt->discard_journal_block_count) >
 			sbi->blocks_per_seg - NM_I(sbi)->nat_bits_blocks)
 		disable_nat_bits(sbi, false);
 
@@ -1433,8 +1437,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	struct curseg_info *seg_i = CURSEG_I(sbi, CURSEG_HOT_NODE);
 	u64 kbytes_written;
 	int err;
-	static unsigned int dbgcnt = 0;
-	dbgcnt += 1;
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 
 	/* Flush all the NAT/SIT pages */
 	f2fs_sync_meta_pages(sbi, META, LONG_MAX, FS_CP_META_IO);
@@ -1458,7 +1461,13 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 		ckpt->alloc_type[i + CURSEG_HOT_DATA] =
 				curseg_alloc_type(sbi, i + CURSEG_HOT_DATA);
 	}
-
+	
+	/*save discard journal block count to ckpt*/
+	unsigned int discard_segcnt = (unsigned int) atomic_read(&ddmc->seg_cnt);
+	ckpt->discard_journal_block_count = cpu_to_le32((discard_segcnt % ENTRIES_IN_DJ_BLOCK)? 
+			discard_segcnt / ENTRIES_IN_DJ_BLOCK + 1 : 
+			discard_segcnt / ENTRIES_IN_DJ_BLOCK);
+	
 	/* 2 cp + n data seg summary + orphan inode blocks */
 	data_sum_blocks = f2fs_npages_for_summary_flush(sbi, false);
 	spin_lock_irqsave(&sbi->cp_lock, flags);
@@ -1497,8 +1506,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	
 	block_t end_of_discard_journal = 0;
 	/*end_of_disard_journal is boundary that limits discard journaling in ckpt*/
-	/*the reason for -1 is consideration of 2nd ckpt pack*/
-	end_of_discard_journal = start_blk + sbi->blocks_per_seg - 1;
+	end_of_discard_journal = start_blk + sbi->blocks_per_seg;
 	/* write nat bits */
 	if (enabled_nat_bits(sbi, cpc)) {
 		__u64 cp_ver = cur_cp_version(ckpt);
@@ -1508,7 +1516,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 		*(__le64 *)nm_i->nat_bits = cpu_to_le64(cp_ver);
 
 		blk = start_blk + sbi->blocks_per_seg - nm_i->nat_bits_blocks;
-		end_of_discard_journal = blk - 1;
+		end_of_discard_journal = blk;
 		for (i = 0; i < nm_i->nat_bits_blocks; i++)
 			f2fs_update_meta_page(sbi, nm_i->nat_bits +
 					(i << F2FS_BLKSIZE_BITS), blk + i);
@@ -1540,8 +1548,12 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 		f2fs_write_node_summaries(sbi, start_blk);
 		start_blk += NR_CURSEG_NODE_TYPE;
 	}
+
+	/* write discard journals. discard journal follows 2nd cp pack*/	
+	block_t discard_journal_start_blk = 0;
+	discard_journal_start_blk = start_blk+1; 
 	//printk("[JW DBG] %s: start_blk: %u\n", __func__, start_blk);
-	start_blk = f2fs_write_discard_journals(sbi, start_blk, end_of_discard_journal, dbgcnt);
+	f2fs_write_discard_journals(sbi, discard_journal_start_blk, end_of_discard_journal);
 
 	/* update user_block_counts */
 	sbi->last_valid_block_count = sbi->total_valid_block_count;

@@ -156,6 +156,7 @@ struct f2fs_checkpoint {
 	__le16 cur_data_blkoff[MAX_ACTIVE_DATA_LOGS];
 	__le32 ckpt_flags;		/* Flags : umount and journal_present */
 	__le32 cp_pack_total_block_count;	/* total # of one cp pack */
+	__le32 discard_journal_block_count;	/*IFLBA: discard journal blk cnt*/
 	__le32 cp_pack_start_sum;	/* start block number of data summary */
 	__le32 valid_node_count;	/* Total number of valid nodes */
 	__le32 valid_inode_count;	/* Total number of valid inodes */

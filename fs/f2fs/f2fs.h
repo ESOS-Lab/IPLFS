@@ -3366,6 +3366,7 @@ void f2fs_stop_discard_thread(struct f2fs_sb_info *sbi);
 bool f2fs_issue_discard_timeout(struct f2fs_sb_info *sbi);
 void f2fs_clear_prefree_segments(struct f2fs_sb_info *sbi,
 					struct cp_control *cpc);
+
 void f2fs_dirty_to_prefree(struct f2fs_sb_info *sbi);
 block_t f2fs_get_unusable_blocks(struct f2fs_sb_info *sbi);
 int f2fs_disable_cp_again(struct f2fs_sb_info *sbi, block_t unusable);
@@ -3432,8 +3433,7 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi,
 			struct cp_control *cpc);
 
 block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
-	       		block_t start_blk, block_t journal_limit_addr,
-			unsigned int dbgcnt);
+	       		block_t start_blk, block_t journal_limit_addr);
 /*
  * checkpoint.c
  */
@@ -3463,6 +3463,7 @@ void f2fs_release_orphan_inode(struct f2fs_sb_info *sbi);
 void f2fs_add_orphan_inode(struct inode *inode);
 void f2fs_remove_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino);
 int f2fs_recover_orphan_inodes(struct f2fs_sb_info *sbi);
+int f2fs_flush_discard_journals(struct f2fs_sb_info *sbi);
 int f2fs_get_valid_checkpoint(struct f2fs_sb_info *sbi);
 void f2fs_update_dirty_page(struct inode *inode, struct page *page);
 void f2fs_remove_dirty_inode(struct inode *inode);

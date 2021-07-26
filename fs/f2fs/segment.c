@@ -2052,6 +2052,7 @@ static void release_discard_addr(struct discard_entry *entry)
 	kmem_cache_free(discard_entry_slab, entry);
 }
 
+
 void f2fs_release_discard_addrs(struct f2fs_sb_info *sbi)
 {
 	struct list_head *head = &(SM_I(sbi)->dcc_info->entry_list);
@@ -2084,10 +2085,10 @@ void f2fs_clear_prefree_segments(struct f2fs_sb_info *sbi,
 	struct discard_entry *entry, *this;
 	//struct dirty_seglist_info *dirty_i = DIRTY_I(sbi);
 	//unsigned long *prefree_map = dirty_i->dirty_segmap[PRE];
-	unsigned int start = 0, end = -1;
-	unsigned int secno, start_segno;
+	//unsigned int start = 0, end = -1;
+	//unsigned int secno, start_segno;
 	bool force = (cpc->reason & CP_DISCARD);
-	bool need_align = f2fs_lfs_mode(sbi) && __is_large_section(sbi);
+	//bool need_align = f2fs_lfs_mode(sbi) && __is_large_section(sbi);
 
 	/*
 	mutex_lock(&dirty_i->seglist_lock);
@@ -2180,6 +2181,110 @@ skip:
 
 
 
+static bool add_discard_journal(struct f2fs_sb_info *sbi, struct discard_journal *dj)
+{
+        
+        struct discard_entry *de = NULL;
+        struct list_head *head = &SM_I(sbi)->dcc_info->entry_list;
+
+        if (!f2fs_hw_support_discard(sbi)){
+		panic("Why HW not support discard!!");
+                return false;
+        }
+        if (!f2fs_realtime_discard_enable(sbi)){// || 
+                //SM_I(sbi)->dcc_info->nr_discards >=
+                //        SM_I(sbi)->dcc_info->max_discards){
+                panic("Why discard not accepted?");
+                return false;
+        }
+
+
+        de = f2fs_kmem_cache_alloc(discard_entry_slab,
+        	                               GFP_F2FS_ZERO);
+
+        
+	de->start_blkaddr = le32_to_cpu(dj->start_blkaddr);
+        list_add_tail(&de->list, head);
+	memcpy(de->discard_map, dj->discard_map, DISCARD_BLOCK_MAP_SIZE);
+
+	return true;		
+
+}
+
+int f2fs_flush_discard_journals(struct f2fs_sb_info *sbi)
+{
+
+	block_t start_blk, discard_journal_blocks, i, j;
+	start_blk = __start_cp_addr(sbi) +
+		le32_to_cpu(F2FS_CKPT(sbi)->cp_pack_total_block_count);
+	int err = 0;
+
+	discard_journal_blocks = le32_to_cpu(F2FS_CKPT(sbi)->discard_journal_block_count);
+
+	f2fs_ra_meta_pages(sbi, start_blk, discard_journal_blocks, META_CP, true);
+
+	for (i = 0; i < discard_journal_blocks; i++) {
+		struct page *page;
+		struct discard_journal_block *dj_blk;
+
+		page = f2fs_get_meta_page(sbi, start_blk + i);
+		if (IS_ERR(page)) {
+			err = PTR_ERR(page);
+			goto fail;
+		}
+
+		dj_blk = (struct discard_journal_block *)page_address(page);
+
+		for (j = 0; j < le32_to_cpu(dj_blk->entry_cnt); j++) {
+			struct discard_journal *dj;
+
+			dj = &dj_blk->entries[j];
+			if (!add_discard_journal(sbi, dj)){
+				f2fs_put_page(page, 1);
+				goto fail;
+			}
+		}
+		f2fs_put_page(page, 1);
+	}
+
+
+	/*This part is modification of f2fs_clear_prefree_segments*/
+	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
+	struct list_head *head = &dcc->entry_list;
+	struct discard_entry *entry, *this;
+	
+	list_for_each_entry_safe(entry, this, head, list) {
+		unsigned int cur_pos = 0, next_pos, len, total_len = 0;
+		bool is_valid = test_bit_le(0, entry->discard_map);
+
+find_next:
+		if (is_valid) {
+			next_pos = find_next_zero_bit_le(entry->discard_map,
+					sbi->blocks_per_seg, cur_pos);
+			len = next_pos - cur_pos;
+
+			f2fs_issue_discard(sbi, entry->start_blkaddr + cur_pos,
+									len);
+			total_len += len;
+		} else {
+			next_pos = find_next_bit_le(entry->discard_map,
+					sbi->blocks_per_seg, cur_pos);
+		}
+
+		cur_pos = next_pos;
+		is_valid = !is_valid;
+
+		if (cur_pos < sbi->blocks_per_seg)
+			goto find_next;
+
+		release_discard_addr(entry);
+	}
+
+	wake_up_discard_thread(sbi, true);
+
+fail:
+	panic("[JW DBG] %s: discard journal flushing error! \n");
+}
 
 
 static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
@@ -2213,19 +2318,6 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 
         SM_I(sbi)->ddmc_info = ddmc;
 	return 0;
-/*
-init_thread:
-        dcc->f2fs_issue_discard = kthread_run(issue_discard_thread, sbi,
-                                "f2fs_discard-%u:%u", MAJOR(dev), MINOR(dev));
-        if (IS_ERR(dcc->f2fs_issue_discard)) {
-                err = PTR_ERR(dcc->f2fs_issue_discard);
-                kfree(dcc);
-                SM_I(sbi)->dcc_info = NULL;
-                return err;
-        }
-
-        return err;
-*/
 
 }
 
@@ -4448,8 +4540,7 @@ void f2fs_write_node_summaries(struct f2fs_sb_info *sbi, block_t start_blk)
 }
 
 block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi, 
-					block_t start_blk, block_t journal_limit_addr,
-					unsigned int dbgcnt)
+					block_t start_blk, block_t journal_limit_addr)
 {
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
@@ -4790,7 +4881,7 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	//if (atomic_read(&ddmc->blk_cnt) != 0)
 	//	panic("flush_dynamic_discard_maps(): blk_cnt not set to zero!\n");
 	if (!hash_empty(ht))
-		panic("hash must be emptry after flushing all");
+		panic("hash must be empty after flushing all");
 	if (atomic_read(&ddmc->node_cnt) != 0)
 		panic("flush_dynamic_discard_maps(): node_cnt not set to zero!\n");
 
