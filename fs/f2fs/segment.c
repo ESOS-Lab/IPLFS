@@ -2220,6 +2220,9 @@ int f2fs_flush_discard_journals(struct f2fs_sb_info *sbi)
 	int err = 0;
 
 	discard_journal_blocks = le32_to_cpu(F2FS_CKPT(sbi)->discard_journal_block_count);
+	//printk("[JW DBG] %s: dj blocks %u when filling super \n", __func__, discard_journal_blocks);
+	if (discard_journal_blocks == 0)
+		return 1;
 
 	f2fs_ra_meta_pages(sbi, start_blk, discard_journal_blocks, META_CP, true);
 
@@ -2282,6 +2285,7 @@ find_next:
 
 	wake_up_discard_thread(sbi, true);
 
+	return 1;
 fail:
 	panic("[JW DBG] %s: discard journal flushing error! \n");
 }
