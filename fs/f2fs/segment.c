@@ -1519,12 +1519,12 @@ static int __issue_discard_cmd(struct f2fs_sb_info *sbi,
 	struct blk_plug plug;
 	int i, issued;
 	bool io_interrupted = false;
-	static unsigned int issue_cnt = 0;
-	static unsigned int order_cnt = 0;
-	static unsigned int pend_cnt = 0;
-	int rtr = 0;
-	issue_cnt += 1;
-	printk("[JW DBG] %s: discard issue cnt: %u \n", __func__, issue_cnt);
+	//static unsigned int issue_cnt = 0;
+	//static unsigned int order_cnt = 0;
+	//static unsigned int pend_cnt = 0;
+	//int rtr = 0;
+	//issue_cnt += 1;
+	//printk("[JW DBG] %s: discard issue cnt: %u \n", __func__, issue_cnt);
 
 
 	if (dpolicy->timeout)
@@ -1540,14 +1540,13 @@ retry:
 	//	if (i + 1 < dpolicy->granularity)
 	//		break;
 
-		if (i < DEFAULT_DISCARD_GRANULARITY && dpolicy->ordered){
-			pend_cnt += issued;
-			printk("[JW DBG] %s: discard pend cnt: %u \n", __func__, pend_cnt);
-			rtr = __issue_discard_cmd_orderly(sbi, dpolicy);
-			order_cnt += rtr;
-			printk("[JW DBG] %s: discard order cnt: %u \n", __func__, order_cnt);
-			return rtr;
-		}
+		if (i < DEFAULT_DISCARD_GRANULARITY && dpolicy->ordered)
+			return  __issue_discard_cmd_orderly(sbi, dpolicy);
+			//pend_cnt += issued;
+			//printk("[JW DBG] %s: discard pend cnt: %u \n", __func__, pend_cnt);
+			//order_cnt += rtr;
+			//printk("[JW DBG] %s: discard order cnt: %u \n", __func__, order_cnt);
+			//return rtr;
 		pend_list = &dcc->pend_list[i];
 
 		mutex_lock(&dcc->cmd_lock);
@@ -1591,9 +1590,9 @@ next:
 	if (!issued && io_interrupted)
 		issued = -1;
 
-	pend_cnt += issued;
-	printk("[JW DBG] %s: discard pend cnt: %u \n", __func__, pend_cnt);
-	printk("[JW DBG] %s: discard order cnt: %u \n", __func__, order_cnt);
+	//pend_cnt += issued;
+	//printk("[JW DBG] %s: discard pend cnt: %u \n", __func__, pend_cnt);
+	//printk("[JW DBG] %s: discard order cnt: %u \n", __func__, order_cnt);
 	return issued;
 }
 
