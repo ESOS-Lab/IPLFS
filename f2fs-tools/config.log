@@ -14,7 +14,7 @@ hostname = juwon-B460MAORUSPRO
 uname -m = x86_64
 uname -r = 5.11.0+
 uname -s = Linux
-uname -v = #134 SMP Thu Jul 22 18:51:47 KST 2021
+uname -v = #139 SMP Thu Jul 29 21:10:56 KST 2021
 
 /usr/bin/uname -p = unknown
 /bin/uname -X     = unknown

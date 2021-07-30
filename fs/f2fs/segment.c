@@ -4591,6 +4591,7 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 		}
 		dst_dj = &dst_dj_blk->entries[didx++];
 		dst_dj->start_blkaddr = cpu_to_le32(entry->start_blkaddr);
+		printk("[JW DBG] %s: start_sector: %u, start_blkaddr%u\n", __func__, entry->start_blkaddr*8, entry->start_blkaddr);	
 		memcpy(dst_dj->discard_map, entry->discard_map, DISCARD_BLOCK_MAP_SIZE);
 
 		if (didx == ENTRIES_IN_DJ_BLOCK){
@@ -4838,7 +4839,7 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
                                                         GFP_F2FS_ZERO);
                			de->start_blkaddr = START_BLOCK(sbi, p_segno);
                 		list_add_tail(&de->list, head);
-				//printk("\n[JW DBG] %s: segno: %u\n", __func__, p_segno);
+				printk("[JW DBG] %s: start_sector: %u, start_blkaddr: %u, segno: %u\n", __func__, de->start_blkaddr*8, de->start_blkaddr, p_segno);
 				segcnt += 1;
 				atomic_inc(&ddmc->seg_cnt);
 				
@@ -4879,8 +4880,11 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	struct list_head *p;
 	bool force = (cpc->reason & CP_DISCARD);
 	int lpcnt = 0;
+        struct list_head *head = &SM_I(sbi)->dcc_info->entry_list;
 	if (atomic_read(&ddmc->seg_cnt) != 0)
 		panic("flush_dynamic_discard_maps(): seg_cnt not set to zero!\n");
+	if (!list_empty(head))
+		printk("[JW DBG] %s: dcc entry list not initialized!! \n", __func__);
 
 	while(!list_empty(head_ddm)){
 		p = head_ddm->next;
