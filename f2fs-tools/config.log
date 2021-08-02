@@ -14,7 +14,7 @@ hostname = juwon-B460MAORUSPRO
 uname -m = x86_64
 uname -r = 5.11.0+
 uname -s = Linux
-uname -v = #139 SMP Thu Jul 29 21:10:56 KST 2021
+uname -v = #141 SMP Mon Aug 2 14:38:57 KST 2021
 
 /usr/bin/uname -p = unknown
 /bin/uname -X     = unknown
@@ -33,6 +33,8 @@ PATH: /usr/sbin
 PATH: /usr/bin
 PATH: /sbin
 PATH: /bin
+PATH: /usr/games
+PATH: /usr/local/games
 PATH: /snap/bin
 
 

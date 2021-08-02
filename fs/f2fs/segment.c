@@ -4569,12 +4569,14 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	unsigned int discard_segcnt = (unsigned int) atomic_read(&ddmc->seg_cnt);
 	struct page *page = NULL;
 	unsigned int didx = 0;
+	static int cnt = 0;
 	block_t tmp_dblkcnt = 0;
 	block_t dblkcnt = (discard_segcnt % ENTRIES_IN_DJ_BLOCK)? 
 			discard_segcnt / ENTRIES_IN_DJ_BLOCK + 1 : 
 			discard_segcnt / ENTRIES_IN_DJ_BLOCK;
 	block_t blk = start_blk;
 
+	cnt += 1; 
 	if (start_blk + dblkcnt >= journal_limit_addr)
 		panic("[JW DBG] %s: discard seg exceeded cp pack capacity\n", __func__);
 		
@@ -4591,7 +4593,7 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 		}
 		dst_dj = &dst_dj_blk->entries[didx++];
 		dst_dj->start_blkaddr = cpu_to_le32(entry->start_blkaddr);
-		//printk("[JW DBG] %s: start_sector: %u, start_blkaddr%u\n", __func__, entry->start_blkaddr*8, entry->start_blkaddr);	
+		//printk("[JW DBG] %s: cnt: %d, start_sector: %u, start_blkaddr%u\n", __func__, cnt, entry->start_blkaddr*8, entry->start_blkaddr);	
 		memcpy(dst_dj->discard_map, entry->discard_map, DISCARD_BLOCK_MAP_SIZE);
 
 		if (didx == ENTRIES_IN_DJ_BLOCK){
@@ -4805,7 +4807,7 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 	unsigned int start_in_seg, end_in_seg;
 	unsigned int segcnt = 0;
 	//int localcnt = 0;
-
+	//printk("[JW DBG] %s: new DDM flush!!: ddmkey: %u\n", __func__, ddmkey);
         if (!f2fs_hw_support_discard(sbi)){
 		panic("Why HW not support discard!!");
                 return false;
@@ -4816,19 +4818,20 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
                 panic("Why discard not accepted?");
                 return false;
         }
-        while (SM_I(sbi)->dcc_info->nr_discards <=
-                                SM_I(sbi)->dcc_info->max_discards) {
+        /*while (SM_I(sbi)->dcc_info->nr_discards <=
+                                SM_I(sbi)->dcc_info->max_discards) {*/
+	while(1){
                 start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
                 if (start >= max_blocks)
                         break;
 
                 end = __find_rev_next_zero_bit(ddmap, max_blocks, start + 1);
+		
 		recover_info_from_ddm(sbi, ddmkey, start, &start_segno, &start_offset);
-		recover_info_from_ddm(sbi, ddmkey, end, &end_segno, &end_offset);
-		//localcnt += 1;
-		//if (start_segno == 2 || end_segno == 2){
-		//	printk("[JW DBG] %s: %d's loop: localcnt: %d : start segno: %lld, off: %u, end segno: %lld, off: %u , max_blocks: %d || 37120's segno: %u, off: %u, ddmkey: %lld, start: %u, end: %u\n", __func__, lpcnt, localcnt, start_segno, start_offset, end_segno, end_offset, max_blocks, GET_SEGNO(sbi, 37120), GET_BLKOFF_FROM_SEG0(sbi, 37120), ddmkey, start, end );
-		//}
+		recover_info_from_ddm(sbi, ddmkey, end-1, &end_segno, &end_offset);
+		//if (start_segno  % 300 == 0 || end_segno % 300 ==0)
+		//printk("[JW DBG] %s: ddmkey: %u start: %u end: %u, s_segno: %u, soff: %u, e_segno: %u, eoff: %u\n", __func__, ddmkey, start, end, start_segno, start_offset, end_segno, end_offset);
+		
 		/*set bitmap for each segment*/
 		start_in_seg = start_offset;
 		for (p_segno = start_segno; p_segno <= end_segno; p_segno++){
@@ -4849,7 +4852,7 @@ static bool flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_c
 			} else {
 				end_in_seg = end_offset;
 			}
-                	for (i = start_in_seg; i < end_in_seg; i++){
+                	for (i = start_in_seg; i <= end_in_seg; i++){
 				//check_discarded_addr(de->start_blkaddr, i, 37120);
 				//check_discarded_addr(de->start_blkaddr, i, 37121);
                        		__set_bit_le(i, (void *)de->discard_map);
