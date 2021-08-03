@@ -1804,7 +1804,8 @@ static int issue_discard_thread(void *data)
 		issued = __issue_discard_cmd(sbi, &dpolicy);
 		if (issued > 0) {
 			__wait_all_discard_cmd(sbi, &dpolicy);
-			wait_ms = dpolicy.min_interval;
+			//wait_ms = dpolicy.min_interval;
+			wait_ms = dpolicy.max_interval;
 		} else if (issued == -1){
 			wait_ms = f2fs_time_to_wait(sbi, DISCARD_TIME);
 			if (!wait_ms)
