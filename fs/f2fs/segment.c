@@ -1126,8 +1126,8 @@ static void __init_discard_policy(struct f2fs_sb_info *sbi,
 	dpolicy->ordered = false;
 	dpolicy->granularity = granularity;
 
-	//dpolicy->max_requests = DEF_MAX_DISCARD_REQUEST;
-	dpolicy->max_requests = 5000000;//DEF_MAX_DISCARD_REQUEST;
+	dpolicy->max_requests = DEF_MAX_DISCARD_REQUEST;
+	//dpolicy->max_requests = 5000000;//DEF_MAX_DISCARD_REQUEST;
 	dpolicy->io_aware_gran = MAX_PLIST_NUM;
 	dpolicy->timeout = false;
 
@@ -1804,8 +1804,8 @@ static int issue_discard_thread(void *data)
 		issued = __issue_discard_cmd(sbi, &dpolicy);
 		if (issued > 0) {
 			__wait_all_discard_cmd(sbi, &dpolicy);
-			//wait_ms = dpolicy.min_interval;
-			wait_ms = dpolicy.max_interval;
+			wait_ms = dpolicy.min_interval;
+			//wait_ms = dpolicy.max_interval;
 		} else if (issued == -1){
 			wait_ms = f2fs_time_to_wait(sbi, DISCARD_TIME);
 			if (!wait_ms)
