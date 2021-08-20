@@ -583,6 +583,9 @@ struct dynamic_discard_map {
 	struct rb_entry rbe;
 	unsigned char *dc_map;
 	struct list_head list;
+	atomic_t changed_aft_cp;
+	struct list_head history_list;
+
 
 };
 
@@ -601,8 +604,10 @@ struct dynamic_discard_map_control {
 	atomic_t node_cnt;
 	atomic_t blk_cnt;
 	atomic_t seg_cnt;
+	atomic_t history_seg_cnt;
 	unsigned int segs_per_node;		/*number of segments each node manages*/
 	struct list_head head;
+	struct list_head history_head;
 	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
 };
 
