@@ -1622,7 +1622,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	//int nid7_syn = 0;
 	//static int jw_cp_cnt = 0;
 	mutex_lock(&ddmc->ddm_lock);	
-	printk("f2fs CP start!! ddmc node cnt: %d\n", ddmc->node_cnt);
+	//printk("f2fs CP start!! ddmc node cnt: %d\n", ddmc->node_cnt);
 	mutex_unlock(&ddmc->ddm_lock);	
 	if (f2fs_readonly(sbi->sb) || f2fs_hw_is_readonly(sbi))
 		return -EROFS;
