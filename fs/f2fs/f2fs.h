@@ -586,8 +586,18 @@ struct dynamic_discard_map {
 	atomic_t changed_aft_cp;
 
 	struct list_head history_list; /*existing all ddm list*/
+};
 
 
+struct discard_range{
+	unsigned int start_blkaddr;
+	unsigned int len;
+};
+
+struct discard_range_entry {
+	struct discard_range discard_range_array[DISCARD_RANGE_MAX_NUM];
+	struct list_head list; 			/* discard range entry list */
+	unsigned int cnt; 			/* valid number of discard range */
 };
 
 #define dynamic_discard_map(ptr, type, member) container_of(ptr, type, member)
@@ -602,14 +612,19 @@ struct dynamic_discard_map_control {
 	struct rb_root_cached root;		/* root of discard map rb-tree */
 	struct mutex ddm_lock;
 	
-	atomic_t node_cnt;
+	atomic_t node_cnt;			/* dynamic discard map node count */
 	atomic_t blk_cnt;
-	atomic_t seg_cnt;
+	atomic_t dj_seg_cnt;			/* number of segments for discard journal bitmap */
+	atomic_t dj_range_cnt;			/* number of discard journal range */
 	atomic_t history_seg_cnt;
 	unsigned int segs_per_node;		/*number of segments each node manages*/
 	//unsigned int count;
-	struct list_head head;
-	struct list_head history_head;
+	struct list_head head;			/* To save updated ddm. */
+	struct list_head history_head;		/* contain every ddm entry */
+	
+	/* discard range enttry */
+	atomic_t drange_entry_cnt;
+	struct list_head discard_range_head;		/* long discard journal list */
 	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
 };
 
@@ -3470,7 +3485,7 @@ void f2fs_release_orphan_inode(struct f2fs_sb_info *sbi);
 void f2fs_add_orphan_inode(struct inode *inode);
 void f2fs_remove_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino);
 int f2fs_recover_orphan_inodes(struct f2fs_sb_info *sbi);
-int f2fs_flush_discard_journals(struct f2fs_sb_info *sbi);
+int f2fs_recover_discard_journals(struct f2fs_sb_info *sbi);
 int f2fs_get_valid_checkpoint(struct f2fs_sb_info *sbi);
 void f2fs_update_dirty_page(struct inode *inode, struct page *page);
 void f2fs_remove_dirty_inode(struct inode *inode);

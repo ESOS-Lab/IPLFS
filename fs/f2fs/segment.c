@@ -29,6 +29,7 @@ static struct kmem_cache *discard_cmd_slab;
 static struct kmem_cache *sit_entry_set_slab;
 static struct kmem_cache *inmem_entry_slab;
 static struct kmem_cache *discard_map_slab;
+static struct kmem_cache *discard_range_slab;
 DEFINE_HASHTABLE(ht, 7);
 
 static unsigned long __reverse_ulong(unsigned char *str)
@@ -1580,7 +1581,7 @@ retry:
 next:
 		mutex_unlock(&dcc->cmd_lock);
 
-		if (issued >= dpolicy->max_requests || io_interrupted)
+		if (issued >= dpolicy->max_requests)// || io_interrupted)
 			break;
 	}
 
@@ -2211,7 +2212,7 @@ skip:
 
 
 
-static bool add_discard_journal(struct f2fs_sb_info *sbi, struct discard_journal *dj)
+static bool add_discard_journal(struct f2fs_sb_info *sbi, struct discard_journal_bitmap *dj_map)
 {
         
         struct discard_entry *de = NULL;
@@ -2233,15 +2234,15 @@ static bool add_discard_journal(struct f2fs_sb_info *sbi, struct discard_journal
         	                               GFP_F2FS_ZERO);
 
         
-	de->start_blkaddr = le32_to_cpu(dj->start_blkaddr);
+	de->start_blkaddr = le32_to_cpu(dj_map->start_blkaddr);
         list_add_tail(&de->list, head);
-	memcpy(de->discard_map, dj->discard_map, DISCARD_BLOCK_MAP_SIZE);
+	memcpy(de->discard_map, dj_map->discard_map, DISCARD_BLOCK_MAP_SIZE);
 
 	return true;		
 
 }
 
-int f2fs_flush_discard_journals(struct f2fs_sb_info *sbi)
+int f2fs_recover_discard_journals(struct f2fs_sb_info *sbi)
 {
 
 	block_t start_blk, discard_journal_blocks, i, j;
@@ -2259,6 +2260,7 @@ int f2fs_flush_discard_journals(struct f2fs_sb_info *sbi)
 	for (i = 0; i < discard_journal_blocks; i++) {
 		struct page *page;
 		struct discard_journal_block *dj_blk;
+		struct discard_journal_block_info *dj_blk_info;
 
 		page = f2fs_get_meta_page(sbi, start_blk + i);
 		if (IS_ERR(page)) {
@@ -2267,12 +2269,14 @@ int f2fs_flush_discard_journals(struct f2fs_sb_info *sbi)
 		}
 
 		dj_blk = (struct discard_journal_block *)page_address(page);
+		dj_blk_info = (struct discard_journal_block_info *)&dj_blk->dj_block_info;
+		f2fs_bug_on(sbi, dj_blk_info->type != DJ_BLOCK_BITMAP);
+	
+		for (j = 0; j < le32_to_cpu(dj_blk_info->entry_cnt); j++) {
+			struct discard_journal_bitmap *dj_map;
 
-		for (j = 0; j < le32_to_cpu(dj_blk->entry_cnt); j++) {
-			struct discard_journal *dj;
-
-			dj = &dj_blk->entries[j];
-			if (!add_discard_journal(sbi, dj)){
+			dj_map = &dj_blk->bitmap_entries[j];
+			if (!add_discard_journal(sbi, dj_map)){
 				f2fs_put_page(page, 1);
 				goto fail;
 			}
@@ -2317,7 +2321,7 @@ find_next:
 
 	return 1;
 fail:
-	panic("[JW DBG] %s: discard journal flushing error! \n");
+	panic("[JW DBG] %s: discard journal flushing error! \n", __func__);
 }
 
 
@@ -2347,12 +2351,17 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 	
 	atomic_set(&ddmc->node_cnt, 0);
 	atomic_set(&ddmc->blk_cnt, 0);
-	atomic_set(&ddmc->seg_cnt, 0);
+	atomic_set(&ddmc->dj_seg_cnt, 0);
+	atomic_set(&ddmc->dj_range_cnt, 0);
 	atomic_set(&ddmc->history_seg_cnt, 0);
 	INIT_LIST_HEAD(&ddmc->head);
 	INIT_LIST_HEAD(&ddmc->history_head);
 
-        SM_I(sbi)->ddmc_info = ddmc;
+	atomic_set(&ddmc->drange_entry_cnt, 0);
+	INIT_LIST_HEAD(&ddmc->discard_range_head);
+	
+
+	SM_I(sbi)->ddmc_info = ddmc;
 	return 0;
 
 }
@@ -4586,53 +4595,36 @@ void f2fs_write_node_summaries(struct f2fs_sb_info *sbi, block_t start_blk)
 	write_normal_summaries(sbi, start_blk, CURSEG_HOT_NODE);
 }
 
-block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi, 
-					block_t start_blk, block_t journal_limit_addr)
+/* Write every discard bitmap journal to blk */
+static block_t write_discard_bitmap_journals(struct f2fs_sb_info *sbi, block_t *blk)
 {
-	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
 	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
 	struct list_head *head = &dcc->entry_list;
 	struct discard_entry *entry, *this;
-	struct discard_journal_block *dst_dj_blk = NULL;
-	struct discard_journal *dst_dj = NULL;
-	unsigned int discard_segcnt = (unsigned int) atomic_read(&ddmc->seg_cnt);
 	struct page *page = NULL;
+	struct discard_journal_block *dst_dj_blk;
+	struct discard_journal_block_info *dst_dj_blk_info;
 	unsigned int didx = 0;
-	static int cnt = 0;
-	block_t tmp_dblkcnt = 0;
-	block_t dblkcnt = (discard_segcnt % ENTRIES_IN_DJ_BLOCK)? 
-			discard_segcnt / ENTRIES_IN_DJ_BLOCK + 1 : 
-			discard_segcnt / ENTRIES_IN_DJ_BLOCK;
-
-	//printk("[JW DBG] %s: djblk cnt: %d, djblk capacity: %d \n", __func__, dblkcnt, journal_limit_addr - start_blk );
-	block_t blk = start_blk;
-
-	cnt += 1; 
-	if (start_blk + dblkcnt >= journal_limit_addr){
-		//panic("[JW DBG] %s: discard seg exceeded cp pack capacity\n", __func__);
-		printk("[JW DBG] %s: discard seg exceeded cp pack capacity\n", __func__);
-		atomic_xchg(&ddmc->seg_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
-		return 0;
-	}
-		
-	if (is_set_ckpt_flags(sbi, CP_COMPACT_SUM_FLAG))
-		panic("[JW DBG] %s: must not be compact ckpt", __func__);
-	
+	block_t tmp_blkcnt = 0;
+	/* write discard journal: bitmap-type */
 	list_for_each_entry_safe(entry, this, head, list) {
+		struct discard_journal_bitmap *dst_dj_map;
 		if (!page) {
-			page = f2fs_grab_meta_page(sbi, blk++);
+			page = f2fs_grab_meta_page(sbi, (*blk)++);
 			dst_dj_blk = (struct discard_journal_block *)page_address(page);
 			memset(dst_dj_blk, 0, sizeof(*dst_dj_blk));
+			dst_dj_blk_info = &dst_dj_blk->dj_block_info;
+			dst_dj_blk_info->type = (unsigned char) DJ_BLOCK_BITMAP;
 			didx = 0;
-			tmp_dblkcnt++;
+			tmp_blkcnt++;
 		}
-		dst_dj = &dst_dj_blk->entries[didx++];
-		dst_dj->start_blkaddr = cpu_to_le32(entry->start_blkaddr);
+		dst_dj_map = (struct discard_journal_bitmap *) &dst_dj_blk->bitmap_entries[didx++];
+		dst_dj_map->start_blkaddr = cpu_to_le32(entry->start_blkaddr);
 		//printk("[JW DBG] %s: cnt: %d, start_sector: %u, start_blkaddr%u\n", __func__, cnt, entry->start_blkaddr*8, entry->start_blkaddr);	
-		memcpy(dst_dj->discard_map, entry->discard_map, DISCARD_BLOCK_MAP_SIZE);
+		memcpy(dst_dj_map->discard_map, entry->discard_map, DISCARD_BLOCK_MAP_SIZE);
 
-		if (didx == ENTRIES_IN_DJ_BLOCK){
-			dst_dj_blk->entry_cnt = cpu_to_le32(didx);
+		if (didx == DJ_BITMAP_ENTRIES_IN_DJ_BLOCK){
+			dst_dj_blk_info->entry_cnt = cpu_to_le32(didx);
 			set_page_dirty(page);
 			f2fs_put_page(page, 1);
 			didx = 0;
@@ -4641,18 +4633,125 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 		release_discard_addr(entry);
 	}
 	if (didx > 0){
-		dst_dj_blk->entry_cnt = cpu_to_le32(didx);
+		dst_dj_blk_info->entry_cnt = cpu_to_le32(didx);
 		set_page_dirty(page);
 		f2fs_put_page(page, 1);
 	}
-	atomic_xchg(&ddmc->seg_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
+	return tmp_blkcnt;
+}
 
-	//printk("[JW DBG] %s: discard journal blk cnt: %u, real dblkcnt: %u, remaind entry cnt: %u\n", __func__, dblkcnt, tmp_dblkcnt, didx);	
-	return blk;
+static void release_discard_range(struct discard_range_entry *entry)
+{
+	list_del(&entry->list);
+	kmem_cache_free(discard_range_slab, entry);
+}
 
+/* Write every discard range journal to blk */
+static block_t write_discard_range_journals(struct f2fs_sb_info *sbi, block_t *blk)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct list_head *head = &ddmc->discard_range_head;
+	struct discard_range_entry *entry, *this;
+	struct page *page = NULL;
+	struct discard_journal_block *dst_dj_blk;
+	struct discard_journal_block_info *dst_dj_blk_info;
+	unsigned int didx = 0;
+	block_t tmp_blkcnt = 0;
+	int i;
+
+	list_for_each_entry_safe(entry, this, head, list) {
+		unsigned int dr_cnt_in_dre = entry->cnt;
+		for (i = 0; i < dr_cnt_in_dre; i++){
+			struct discard_range *dr;
+			struct discard_journal_range *dst_dj_range;
+			dr = (struct discard_range *) &entry->discard_range_array[i];
+
+			if (!page) {
+				page = f2fs_grab_meta_page(sbi, (*blk)++);
+				dst_dj_blk = (struct discard_journal_block *)page_address(page);
+				memset(dst_dj_blk, 0, sizeof(*dst_dj_blk));
+				dst_dj_blk_info = &dst_dj_blk->dj_block_info;
+				dst_dj_blk_info->type = (unsigned char) DJ_BLOCK_RANGE;
+				didx = 0;
+				tmp_blkcnt += 1;
+			}
+			dst_dj_range = (struct discard_journal_range *) &dst_dj_blk->range_entries[didx++];
+			dst_dj_range->start_blkaddr = cpu_to_le32(dr->start_blkaddr);
+			dst_dj_range->len = cpu_to_le32(dr->len);
+			//printk("[JW DBG] %s: cnt: %d, start_sector: %u, start_blkaddr%u\n", __func__, cnt, entry->start_blkaddr*8, entry->start_blkaddr);	
+	
+			if (didx == DJ_RANGE_ENTRIES_IN_DJ_BLOCK){
+				dst_dj_blk_info->entry_cnt = cpu_to_le32(didx);
+				set_page_dirty(page);
+				f2fs_put_page(page, 1);
+				didx = 0;
+				page = NULL;
+			}
+		}
+		release_discard_range(entry);
+	}
+	if (didx > 0){
+		dst_dj_blk_info->entry_cnt = cpu_to_le32(didx);
+		set_page_dirty(page);
+		f2fs_put_page(page, 1);
+	}
+	return tmp_blkcnt;
 }
 
 
+block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi, 
+					block_t start_blk, block_t journal_limit_addr)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
+	unsigned int discard_bitmap_segcnt = (unsigned int) atomic_read(&ddmc->dj_seg_cnt);
+	unsigned int discard_range_cnt = (unsigned int) atomic_read(&ddmc->dj_range_cnt);
+	static int cnt = 0;
+	block_t dblkcnt_check = (discard_bitmap_segcnt % DJ_BITMAP_ENTRIES_IN_DJ_BLOCK)? 
+			discard_bitmap_segcnt / DJ_BITMAP_ENTRIES_IN_DJ_BLOCK + 1 : 
+			discard_bitmap_segcnt / DJ_BITMAP_ENTRIES_IN_DJ_BLOCK;
+	
+	block_t total_dblkcnt, bitmap_dblkcnt, range_dblkcnt;
+	bitmap_dblkcnt = DISCARD_JOURNAL_BITMAP_BLOCKS(discard_bitmap_segcnt);
+	range_dblkcnt = DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt);
+	total_dblkcnt = bitmap_dblkcnt + range_dblkcnt;
+
+	if (dblkcnt_check != bitmap_dblkcnt)
+		panic("[JW DBG] %s: dblkcnt: %d, dblkcnt_check: %d \n", __func__, bitmap_dblkcnt, dblkcnt_check);
+	//printk("[JW DBG] %s: djblk cnt: %d, djblk capacity: %d \n", __func__, dblkcnt, journal_limit_addr - start_blk );
+
+	cnt += 1; 
+	if (start_blk + total_dblkcnt >= journal_limit_addr){
+		//panic("[JW DBG] %s: discard seg exceeded cp pack capacity\n", __func__);
+		printk("[JW DBG] %s: discard seg exceeded cp pack capacity\n", __func__);
+		atomic_set(&ddmc->dj_seg_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
+		atomic_set(&ddmc->dj_range_cnt, 0);
+		return 0;
+	}
+		
+	if (is_set_ckpt_flags(sbi, CP_COMPACT_SUM_FLAG))
+		panic("[JW DBG] %s: must not be compact ckpt", __func__);
+	
+	block_t blk, tmp_dblkcnt;
+        blk = start_blk;
+	tmp_dblkcnt = 0;
+	
+	/* write discard journal: bitmap-type*/
+	tmp_dblkcnt += write_discard_bitmap_journals(sbi, &blk);
+
+	/* write discard journal: range-type*/
+	tmp_dblkcnt += write_discard_range_journals(sbi, &blk);
+
+	if (tmp_dblkcnt != total_dblkcnt)
+		panic("[JW DBG] %s: total discard journal blk cnts not matching: real djblkcnt: %d, expected djblkcnt: %d", __func__, tmp_dblkcnt, total_dblkcnt);
+
+	//printk("[JW DBG] %s: discard journal blk cnt: %u, real dblkcnt: %u, remaind entry cnt: %u\n", __func__, dblkcnt, tmp_dblkcnt, didx);	
+
+	atomic_set(&ddmc->dj_seg_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
+	atomic_set(&ddmc->dj_range_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
+
+	return blk;
+}
 
 int f2fs_lookup_journal_in_cursum(struct f2fs_journal *journal, int type,
 					unsigned int val, int alloc)
@@ -4821,14 +4920,93 @@ static void check_discarded_addr(block_t start_baddr, int offs, block_t target_a
 		printk("[JW DBG] %s: target addr %u is discarded!!\n",__func__, target_addr);
 }
 
+static struct discard_range_entry *__create_discard_range_entry(void)
+{
+	struct discard_range_entry *dre;
+	//unsigned int count_down = SM_I(sbi)->ddmc_info->removal_count;
 
+	dre = f2fs_kmem_cache_alloc(discard_range_slab, GFP_NOFS);
+	INIT_LIST_HEAD(&dre->list);
+	dre->cnt = 0;
+	
+	return dre;
+}
+
+static void update_discard_range_entry(struct discard_range_entry *dre, unsigned int target_idx, 
+				block_t lstart, block_t len)
+{
+	struct discard_range *dr;
+	dr = (struct discard_range *) &dre->discard_range_array[target_idx];
+	dr->start_blkaddr = lstart;
+	dr->len = len;
+	dre->cnt += 1;
+}
+
+static void journal_discard_cmd(struct f2fs_sb_info *sbi, block_t lstart, block_t len)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct list_head *head = &ddmc->discard_range_head;
+	struct discard_range_entry *dre;
+	unsigned int target_idx;
+
+	if (list_empty(head) || 
+		list_last_entry(head, struct discard_range_entry, list)->cnt 
+								== DISCARD_RANGE_MAX_NUM)
+	{
+		dre = __create_discard_range_entry();
+		list_add_tail(&dre->list, head);
+	}
+	dre = list_last_entry(head, struct discard_range_entry, list);
+	target_idx = dre->cnt;
+	update_discard_range_entry(dre, target_idx, lstart, len);
+	atomic_inc(&ddmc->dj_range_cnt);
+}
+
+/* To save into discard journal, obtain previously issued but not yet submitted dicsard cmds */
+static int journal_pending_discard_cmds(struct f2fs_sb_info *sbi)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
+	struct list_head *pend_list;
+	struct discard_cmd *dc, *tmp;
+	int i, cmd_cnt;
+	cmd_cnt = 0;
+	
+	struct list_head *head = &ddmc->discard_range_head;
+	if (!list_empty(head)){
+		panic("[JW DBG] %s: not expected!!", __func__);
+	}
+
+	for (i = 0; i <= MAX_PLIST_NUM - 1; i++) {
+	//	if (dpolicy->timeout &&
+	//			f2fs_time_over(sbi, UMOUNT_DISCARD_TIMEOUT))
+	//		break;
+
+	//	if (i + 1 < dpolicy->granularity)
+	//		break;
+		pend_list = &dcc->pend_list[i];
+
+		mutex_lock(&dcc->cmd_lock);
+		if (list_empty(pend_list))
+			goto next;
+		if (unlikely(dcc->rbtree_check))
+			f2fs_bug_on(sbi, !f2fs_check_rb_tree_consistence(sbi,
+							&dcc->root, false));
+		list_for_each_entry_safe(dc, tmp, pend_list, list) {
+			journal_discard_cmd(sbi, dc->lstart, dc->len);
+			cmd_cnt += 1;
+		}
+next:
+		mutex_unlock(&dcc->cmd_lock);
+	}
+	return cmd_cnt;
+}
 
 //Notice!! This function always frees DDM. This can cause problem when number of blocks to be discarded is more than max_discards. The while loop stops when numblks to be discarded exceeds max_disacrds. This means DDM is freed while some of blks are not disacrded. This can cause orphan blocks. So this must be fixed. 
 static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_control *ddmc,
 					struct dynamic_discard_map *ddm, int print_history,
 					int small_nr_issued)
 {
-
         int max_blocks = sbi->blocks_per_seg * ddmc->segs_per_node;
 	unsigned int start = 0, end = -1;
         struct discard_entry *de = NULL;
@@ -4918,6 +5096,7 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 				//printk("[JW DBG] %s: issue discard", __func__);
 				
 				f2fs_issue_discard(sbi, startLBA, len);
+				journal_discard_cmd(sbi, startLBA, len);
 				nr_issued += 1;
 				//printk("[JW DBG] -2.2");
                 		//SM_I(sbi)->dcc_info->nr_discards += end - start;
@@ -4968,7 +5147,7 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
                 			list_add_tail(&de->list, head);
 				//printk("[JW DBG] %s: start_sector: %u, start_blkaddr: %u, segno: %u\n", __func__, de->start_blkaddr*8, de->start_blkaddr, p_segno);
 				//segcnt += 1;
-					atomic_inc(&ddmc->seg_cnt);
+					atomic_inc(&ddmc->dj_seg_cnt);
 					//printk("[JW DBG] 0");
 				//}
 				//else {
@@ -5001,8 +5180,6 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 
 				}
 				*/
-					
-
 			//}
 			//printk("%u ~ %u+%u  ", start_in_seg, start_in_seg, end_in_seg-start_in_seg);
 			last_target_segno = p_segno;
@@ -5060,9 +5237,11 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	static int prev_dcmd_cnt = 0;
 	static int small_dcmd_cnt = 0;
 	callcnt += 1;
+	//printk("[JW DBG] %s: bef discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
+	
+	/* check submitted discard cmd and advise how many small discard will be submitted */
 	cur_dcmd_cnt = (int) atomic_read(&dcc->discard_cmd_cnt );
 	nr_discard = prev_dcmd_cnt - cur_dcmd_cnt;
-	//printk("[JW DBG] %s: bef discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
 	if (nr_discard == 0 && prev_dcmd_cnt > 0){
 		printk("[JW DBG] %s: someting wrong. discard got stuck!! \n", __func__);
 	}
@@ -5075,10 +5254,15 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	}
 
 	atomic_set(&ddmc->history_seg_cnt, 0);
-	if (atomic_read(&ddmc->seg_cnt) != 0)
-		panic("flush_dynamic_discard_maps(): seg_cnt not set to zero!\n");
+	int dj_seg_cnt = atomic_read(&ddmc->dj_seg_cnt);
+	int dj_range_cnt = atomic_read(&ddmc->dj_range_cnt);
+	if (atomic_read(&ddmc->dj_seg_cnt) != 0 || atomic_read(&ddmc->dj_range_cnt) != 0)
+		panic("[JW DBG] %s: must be zero. dj_seg_cnt: %d, dj_range_cnt: %d!\n", __func__, dj_seg_cnt, dj_range_cnt);
 	if (!list_empty(head))
 		printk("[JW DBG] %s: dcc entry list not initialized!! \n", __func__);
+	
+	/* To save into discard journal, obtain issued but not submitted dicsard cmds*/
+	journal_pending_discard_cmds(sbi);
 
 	//while(!list_empty(head_ddm)){
 	/* large discard */
@@ -5151,7 +5335,7 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	int tmp2 = (int) atomic_read(&ddmc->node_cnt);
 	prev_dcmd_cnt = tmp;
 	//if (tmp > 1200000)
-	//printk("[JW DBG] %s: aft discard cmd count: %d in rbtree, discard seg cnt: %d , ddm node cnt: %d \n", __func__, tmp, ddmc->seg_cnt, tmp2);
+	//printk("[JW DBG] %s: aft discard cmd count: %d in rbtree, discard seg cnt: %d , ddm node cnt: %d \n", __func__, tmp, ddmc->dj_seg_cnt, tmp2);
 	atomic_set(&ddmc->history_seg_cnt, 0);
 	//atomic_xchg(&ddmc->blk_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
 	
@@ -6511,8 +6695,15 @@ int __init f2fs_create_segment_manager_caches(void)
 			sizeof(struct dynamic_discard_map));
 	if (!discard_map_slab)
 		goto destroy_inmem_page_entry;
+	
+	discard_range_slab = f2fs_kmem_cache_create("f2fs_range_map",
+			sizeof(struct discard_range_entry));
+	if (!discard_range_slab)
+		goto destroy_discard_map;
 	return 0;
 
+destroy_discard_map:
+	kmem_cache_destroy(discard_map_slab);
 destroy_inmem_page_entry:
 	kmem_cache_destroy(inmem_entry_slab);
 destroy_sit_entry_set:
@@ -6532,4 +6723,5 @@ void f2fs_destroy_segment_manager_caches(void)
 	kmem_cache_destroy(discard_entry_slab);
 	kmem_cache_destroy(inmem_entry_slab);
 	kmem_cache_destroy(discard_map_slab);
+	kmem_cache_destroy(discard_range_slab);
 }

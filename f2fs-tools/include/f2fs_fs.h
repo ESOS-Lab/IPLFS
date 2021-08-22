@@ -903,21 +903,55 @@ struct f2fs_summary_block {
 	struct summary_footer footer;
 } __attribute__((packed));
 
-/*discard journal for IFLBA F2FS*/
+/* discard journal for IFLBA F2FS */
 #define DISCARD_BLOCK_MAP_SIZE 64
-#define ENTRIES_IN_DJ_BLOCK 60  
-struct discard_journal{
+struct discard_journal_bitmap{
 	__le32 start_blkaddr;
 	unsigned char discard_map[DISCARD_BLOCK_MAP_SIZE];
 } __attribute__((packed));
 
-
-struct discard_journal_block{
-	__le32 entry_cnt;	
-	struct discard_journal entries[ENTRIES_IN_DJ_BLOCK];
+struct discard_journal_range {
+	__le32 start_blkaddr;
+	__le32 len;
 } __attribute__((packed));
 
+enum {
+	DJ_BLOCK_BITMAP,
+	DJ_BLOCK_RANGE
+};
 
+struct discard_journal_block_info {
+	unsigned char type; 	/* bitmap or range */
+	__le32 entry_cnt;	/* number of bitmap or number of range */
+} __attribute__((packed));
+
+#define DJ_BLOCK_FREE_SPACE (F2FS_BLKSIZE - sizeof(struct discard_journal_block_info)) 
+
+#define DJ_BITMAP_ENTRIES_IN_DJ_BLOCK (DJ_BLOCK_FREE_SPACE / \
+				sizeof(struct discard_journal_bitmap) )
+
+#define DJ_RANGE_ENTRIES_IN_DJ_BLOCK (DJ_BLOCK_FREE_SPACE / \
+				sizeof(struct discard_journal_range) )
+
+struct discard_journal_block{
+	struct discard_journal_block_info dj_block_info;
+	union {	
+		struct discard_journal_bitmap bitmap_entries[DJ_BITMAP_ENTRIES_IN_DJ_BLOCK];
+		struct discard_journal_range range_entries[DJ_RANGE_ENTRIES_IN_DJ_BLOCK];
+	}
+} __attribute__((packed));
+
+#define DISCARD_JOURNAL_BITMAP_BLOCKS(discard_seg_cnt)	\
+	(discard_seg_cnt % DJ_BITMAP_ENTRIES_IN_DJ_BLOCK ? \
+	 	discard_seg_cnt / DJ_BITMAP_ENTRIES_IN_DJ_BLOCK + 1  : \
+		discard_seg_cnt / DJ_BITMAP_ENTRIES_IN_DJ_BLOCK )
+
+#define DISCARD_RANGE_MAX_NUM 40
+
+#define DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt)	\
+	(discard_range_cnt % DJ_RANGE_ENTRIES_IN_DJ_BLOCK ? \
+	 	discard_range_cnt / DJ_RANGE_ENTRIES_IN_DJ_BLOCK + 1  : \
+		discard_range_cnt / DJ_RANGE_ENTRIES_IN_DJ_BLOCK )
 
 /*
  * For directory operations

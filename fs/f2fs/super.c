@@ -3779,7 +3779,7 @@ try_onemore:
 		goto reset_checkpoint;
 
 	/*discard discard journal*/
-	f2fs_flush_discard_journals(sbi);
+	f2fs_recover_discard_journals(sbi);
 
 	/* recover fsynced data */
 	if (!test_opt(sbi, DISABLE_ROLL_FORWARD) &&

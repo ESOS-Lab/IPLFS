@@ -1463,10 +1463,11 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	}
 	
 	/*save discard journal block count to ckpt*/
-	unsigned int discard_segcnt = (unsigned int) atomic_read(&ddmc->seg_cnt);
-	ckpt->discard_journal_block_count = cpu_to_le32((discard_segcnt % ENTRIES_IN_DJ_BLOCK)? 
-			discard_segcnt / ENTRIES_IN_DJ_BLOCK + 1 : 
-			discard_segcnt / ENTRIES_IN_DJ_BLOCK);
+	unsigned int discard_bitmap_segcnt = (unsigned int) atomic_read(&ddmc->dj_seg_cnt);
+	unsigned int discard_range_cnt = (unsigned int) atomic_read(&ddmc->dj_range_cnt);
+	ckpt->discard_journal_block_count = cpu_to_le32(
+			DISCARD_JOURNAL_BITMAP_BLOCKS(discard_bitmap_segcnt)
+			+ DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt)); 
 	
 	/* 2 cp + n data seg summary + orphan inode blocks */
 	data_sum_blocks = f2fs_npages_for_summary_flush(sbi, false);
@@ -1551,7 +1552,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	/* write discard journals. discard journal follows 2nd cp pack*/	
 	block_t discard_journal_start_blk = 0;
-	discard_journal_start_blk = start_blk+1; 
+	discard_journal_start_blk = start_blk+1; //add + 1 to for 2nd cp pack
 	//printk("[JW DBG] %s: start_blk: %u\n", __func__, start_blk);
 	f2fs_write_discard_journals(sbi, discard_journal_start_blk, end_of_discard_journal);
 
