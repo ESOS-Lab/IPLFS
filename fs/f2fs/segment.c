@@ -1154,7 +1154,9 @@ static void __init_discard_policy(struct f2fs_sb_info *sbi,
 		dpolicy->io_aware = false;
 		/* we need to issue all to keep CP_TRIMMED_FLAG */
 		dpolicy->granularity = 1;
-		dpolicy->timeout = true;
+		dpolicy->ordered = true;
+		dpolicy->max_requests = 500000000;//DEF_MAX_DISCARD_REQUEST;
+		//dpolicy->timeout = true;
 	}
 }
 
@@ -1177,6 +1179,7 @@ static int __submit_discard_cmd(struct f2fs_sb_info *sbi,
 	int flag = dpolicy->sync ? REQ_SYNC : 0;
 	block_t lstart, start, len, total_len;
 	int err = 0;
+
 
 	if (dc->state != D_PREP)
 		return 0;
@@ -1574,14 +1577,14 @@ retry:
 			//printk("[JW DBG] %s: submit discard", __func__);
 			__submit_discard_cmd(sbi, dpolicy, dc, &issued);
 
-			if (issued >= dpolicy->max_requests)
+			if (issued >= dpolicy->max_requests && dpolicy->type != DPOLICY_UMOUNT)
 				break;
 		}
 		blk_finish_plug(&plug);
 next:
 		mutex_unlock(&dcc->cmd_lock);
 
-		if (issued >= dpolicy->max_requests)// || io_interrupted)
+		if (issued >= dpolicy->max_requests && dpolicy->type != DPOLICY_UMOUNT)// || io_interrupted)
 			break;
 	}
 
@@ -4716,9 +4719,7 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	range_dblkcnt = DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt);
 	total_dblkcnt = bitmap_dblkcnt + range_dblkcnt;
 
-	if (dblkcnt_check != bitmap_dblkcnt)
-		panic("[JW DBG] %s: dblkcnt: %d, dblkcnt_check: %d \n", __func__, bitmap_dblkcnt, dblkcnt_check);
-	//printk("[JW DBG] %s: djblk cnt: %d, djblk capacity: %d \n", __func__, dblkcnt, journal_limit_addr - start_blk );
+	//printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
 
 	cnt += 1; 
 	if (start_blk + total_dblkcnt >= journal_limit_addr){
@@ -5086,7 +5087,6 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 		if (!print_history && !small_force){
 			/* issue every long discard cmd */
 			if (len > 512){
-
 				for (i = start; i < end; i ++){
 					//if (!f2fs_test_and_set_bit(i, ddm->dc_map));
 					if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
@@ -5101,6 +5101,10 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 				//printk("[JW DBG] -2.2");
                 		//SM_I(sbi)->dcc_info->nr_discards += end - start;
 				continue;
+			} else if (len > 64){
+				/* Use discard range journal to reduce number of discard bitmap journal*/
+				journal_discard_cmd(sbi, startLBA, len);
+				
 			}
 		} else if (small_force){
 			/* issue small discard in ascending order. */
