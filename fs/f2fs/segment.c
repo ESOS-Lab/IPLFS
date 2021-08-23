@@ -4718,7 +4718,6 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	bitmap_dblkcnt = DISCARD_JOURNAL_BITMAP_BLOCKS(discard_bitmap_segcnt);
 	range_dblkcnt = DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt);
 	total_dblkcnt = bitmap_dblkcnt + range_dblkcnt;
-
 	//printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
 
 	cnt += 1; 
@@ -4744,7 +4743,7 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	tmp_dblkcnt += write_discard_range_journals(sbi, &blk);
 
 	if (tmp_dblkcnt != total_dblkcnt)
-		panic("[JW DBG] %s: total discard journal blk cnts not matching: real djblkcnt: %d, expected djblkcnt: %d", __func__, tmp_dblkcnt, total_dblkcnt);
+		printk("[JW DBG] %s: total discard journal blk cnts not matching: real djblkcnt: %d, expected djblkcnt: %d", __func__, tmp_dblkcnt, total_dblkcnt);
 
 	//printk("[JW DBG] %s: discard journal blk cnt: %u, real dblkcnt: %u, remaind entry cnt: %u\n", __func__, dblkcnt, tmp_dblkcnt, didx);	
 
@@ -4924,7 +4923,6 @@ static void check_discarded_addr(block_t start_baddr, int offs, block_t target_a
 static struct discard_range_entry *__create_discard_range_entry(void)
 {
 	struct discard_range_entry *dre;
-	//unsigned int count_down = SM_I(sbi)->ddmc_info->removal_count;
 
 	dre = f2fs_kmem_cache_alloc(discard_range_slab, GFP_NOFS);
 	INIT_LIST_HEAD(&dre->list);
@@ -4975,16 +4973,10 @@ static int journal_pending_discard_cmds(struct f2fs_sb_info *sbi)
 	
 	struct list_head *head = &ddmc->discard_range_head;
 	if (!list_empty(head)){
-		panic("[JW DBG] %s: not expected!!", __func__);
+		printk("[JW DBG] %s: not expected!!", __func__);
 	}
 
 	for (i = 0; i <= MAX_PLIST_NUM - 1; i++) {
-	//	if (dpolicy->timeout &&
-	//			f2fs_time_over(sbi, UMOUNT_DISCARD_TIMEOUT))
-	//		break;
-
-	//	if (i + 1 < dpolicy->granularity)
-	//		break;
 		pend_list = &dcc->pend_list[i];
 
 		mutex_lock(&dcc->cmd_lock);
@@ -5003,10 +4995,21 @@ next:
 	return cmd_cnt;
 }
 
+static bool is_empty_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_control *ddmc,
+					struct dynamic_discard_map *ddm)
+{
+        int max_blocks = sbi->blocks_per_seg * ddmc->segs_per_node;
+	unsigned int start = 0, end = -1;
+	unsigned long *ddmap = (unsigned long *)ddm->dc_map;
+
+	start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
+        return start >= max_blocks;
+}
+
 //Notice!! This function always frees DDM. This can cause problem when number of blocks to be discarded is more than max_discards. The while loop stops when numblks to be discarded exceeds max_disacrds. This means DDM is freed while some of blks are not disacrded. This can cause orphan blocks. So this must be fixed. 
 static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_control *ddmc,
 					struct dynamic_discard_map *ddm, int print_history,
-					int small_nr_issued)
+					int small_nr_issued, bool issue_all)
 {
         int max_blocks = sbi->blocks_per_seg * ddmc->segs_per_node;
 	unsigned int start = 0, end = -1;
@@ -5023,7 +5026,6 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 	unsigned int start_in_seg, end_in_seg;
 	unsigned int offset_in_ddm;
 	unsigned static int cnt_list[128];
-	int dj_exist = 0;
 	int nr_issued = 0;
 	bool small_force = (small_nr_issued > 0);
 	static int rmv_by_small_discard = 0;
@@ -5034,42 +5036,29 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 	}
 	//unsigned int segcnt = 0;
 	//int localcnt = 0;
-	//printk("[JW DBG] %s: new DDM flush!!: ddmkey: %u\n", __func__, ddmkey);
         if (!f2fs_hw_support_discard(sbi)){
 		panic("Why HW not support discard!!");
                 return -1;
         }
-        if (!f2fs_realtime_discard_enable(sbi)){/* || 
-                SM_I(sbi)->dcc_info->nr_discards >=
-                        SM_I(sbi)->dcc_info->max_discards){*/
+        if (!f2fs_realtime_discard_enable(sbi)){
                 panic("Why discard not accepted?");
                 return -1;
         }
-        /*while (SM_I(sbi)->dcc_info->nr_discards <=
-                                SM_I(sbi)->dcc_info->max_discards) {*/
 	while(1){
-		//printk("[JW DBG] 0.1");
                 start = __find_rev_next_bit(ddmap, max_blocks, end + 1);
                 if (start >= max_blocks)
                         break;
-		//printk("[JW DBG] 0.2");
 
                 end = __find_rev_next_zero_bit(ddmap, max_blocks, start + 1);
-		//printk("[JW DBG] 0.3");
 		
 		recover_info_from_ddm(sbi, ddmkey, start, &start_segno, &start_offset);
-		//printk("[JW DBG] 0.4");
 		recover_info_from_ddm(sbi, ddmkey, end-1, &end_segno, &end_offset);
-		//if (start_segno  % 300 == 0 || end_segno % 300 ==0)
-		//printk("[JW DBG] %s: ddmkey: %u start: %u end: %u, s_segno: %u, soff: %u, e_segno: %u, eoff: %u\n", __func__, ddmkey, start, end, start_segno, start_offset, end_segno, end_offset);
 		
 		/*set bitmap for each segment*/
 		unsigned int startLBA, endLBA, len;
 		startLBA = START_BLOCK(sbi, start_segno) + start_offset;
 		endLBA = START_BLOCK(sbi, end_segno) + end_offset;
 		len = endLBA - startLBA + 1;
-		if (len != end - start)
-			panic("[JW DBG] %s:  len must be same!!", __func__);
 		
 		if (print_history){
 			if (len > 1024)
@@ -5078,58 +5067,53 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 				cnt_list[(len-1)/8] += 1;
 			else if (len <= 0)
 				printk("[JW DBG] %s: weird! len must be positive", __func__);
-
 			continue;
-			//printk("[JW DBG] %s: discard range: %u ~ %u ", __func__, START_BLOCK(sbi, start_segno) + start_offset, START_BLOCK(sbi, end_segno) + end_offset);
-
 		}
 		/* issue discard cmd to discard thread */
 		if (!print_history && !small_force){
-			/* issue every long discard cmd */
-			if (len > 512){
+			/* Use discard range journal to reduce number of discard bitmap journal*/
+			if (len > 64){
+				journal_discard_cmd(sbi, startLBA, len);
+				/* issue every long discard cmd */
+				if (len > 512 || issue_all){
+					for (i = start; i < end; i ++){
+						if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
+							panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
+	
+					}
+					
+					f2fs_issue_discard(sbi, startLBA, len);
+					nr_issued += 1;
+				}
+				continue;
+			}
+			else if (issue_all){
+				/* issue but dj_bitmap format*/
 				for (i = start; i < end; i ++){
-					//if (!f2fs_test_and_set_bit(i, ddm->dc_map));
 					if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
 						panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
-
 				}
-				//printk("[JW DBG] %s: issue discard", __func__);
-				
 				f2fs_issue_discard(sbi, startLBA, len);
-				journal_discard_cmd(sbi, startLBA, len);
 				nr_issued += 1;
-				//printk("[JW DBG] -2.2");
-                		//SM_I(sbi)->dcc_info->nr_discards += end - start;
-				continue;
-			} else if (len > 64){
-				/* Use discard range journal to reduce number of discard bitmap journal*/
-				journal_discard_cmd(sbi, startLBA, len);
-				
 			}
 		} else if (small_force){
 			/* issue small discard in ascending order. */
 			/* This helps to reduce dynamic discard map node having small discards. */
-			//printk("[JW DBG] -3");
 			if (small_nr_issued - nr_issued > 0){
-				//printk("[JW DBG] -3.1");
 				for (i = start; i < end; i ++){
 					if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
 						panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
 
 				}
-				//printk("[JW DBG] %s: issue discard", __func__);
 				f2fs_issue_discard(sbi, startLBA, len);
 				nr_issued += 1;
-				//printk("[JW DBG] 3");
 				continue;
 			} else {
-				//printk("[JW DBG] -3.2");
 				return nr_issued;
 			}
 		}
 
 		start_in_seg = start_offset;
-
 		for (p_segno = start_segno; p_segno <= end_segno; p_segno++){
 			int dcmd_created = 0;
 
@@ -5138,63 +5122,27 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 			} else {
 				end_in_seg = end_offset;
 			}
-			dj_exist = 1;
 
 			if (first || last_target_segno != p_segno){
-				//if (!print_history){
-					//printk("[JW DBG] -1");
-					/* create discard bitmap for discard journal */
-					dcmd_created = 1;
-                			de = f2fs_kmem_cache_alloc(discard_entry_slab,
-                                                        GFP_F2FS_ZERO);
-               				de->start_blkaddr = START_BLOCK(sbi, p_segno);
-                			list_add_tail(&de->list, head);
-				//printk("[JW DBG] %s: start_sector: %u, start_blkaddr: %u, segno: %u\n", __func__, de->start_blkaddr*8, de->start_blkaddr, p_segno);
-				//segcnt += 1;
-					atomic_inc(&ddmc->dj_seg_cnt);
-					//printk("[JW DBG] 0");
-				//}
-				//else {
-				//	atomic_inc(&ddmc->history_seg_cnt);
-				//}
+				dcmd_created = 1;
+         			de = f2fs_kmem_cache_alloc(discard_entry_slab,
+                                                 GFP_F2FS_ZERO);
+        			de->start_blkaddr = START_BLOCK(sbi, p_segno);
+         			list_add_tail(&de->list, head);
+				atomic_inc(&ddmc->dj_seg_cnt);
 				
 			}
-			//if (!history && dcmd_created){
-				//printk("[JW DBG] 1");
                 	for (i = start_in_seg; i <= end_in_seg; i++){
-				//check_discarded_addr(de->start_blkaddr, i, 37120);
-				//check_discarded_addr(de->start_blkaddr, i, 37121);
                 		__set_bit_le(i, (void *)de->discard_map);
-					//atomic_dec(&ddmc->blk_cnt);
 			}
-				//printk("[JW DBG] 2");
-
-				/*
-				get_ddm_info(sbi, p_segno, start_in_seg, &tmp_ddmkey, &offset_in_ddm);
-				//printk("[JW DBG] 3");
-				if (ddmkey != tmp_ddmkey)
-					panic("[JW DBG] %s: ddmkey must be same", __func__);
-
-				for (i = offset_in_ddm; 
-					i <= offset_in_ddm + (end_in_seg - start_in_seg);
-					i ++){
-					//if (!f2fs_test_and_set_bit(i, ddm->dc_map));
-					if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
-						panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
-
-				}
-				*/
-			//}
-			//printk("%u ~ %u+%u  ", start_in_seg, start_in_seg, end_in_seg-start_in_seg);
+			
 			last_target_segno = p_segno;
 			start_in_seg = 0;
 
 		}
-		//if (!history)
-                //	SM_I(sbi)->dcc_info->nr_discards += end - start;
 		first = false;
         }
-	//printk("[JW DBG] 4");
+
 	if (print_history){
 		for (i = 0; i < 128; i ++){
 			if (cnt_list[i] > 0)
@@ -5202,28 +5150,29 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 		}
 		return 0;
 	}
-	//printk("[JW DBG] 5");
-	if (small_force){
-		//printk("[JW DBG] 6.1");
-		rmv_by_small_discard += 1;
-		//if (rmv_by_small_discard % 10 == 0)
-			//printk("[JW DBG] %s: removed by small discard!!\n", __func__, rmv_by_small_discard);
-        	__remove_dynamic_discard_map(sbi, ddm);
-		//printk("[JW DBG] 6.2");
-	}
-	else if (!small_force && !dj_exist){
-		//printk("[JW DBG] 5.1");
-        	__remove_dynamic_discard_map(sbi, ddm);
-		//printk("[JW DBG] 5.2");
-	}
-	//printk("[JW DBG] 6");
-	//printk("[JW DBG] end");
 
-        //__remove_dynamic_discard_map(sbi, ddm);
-	//printk("[JW DBG] %s: seg cnt: %u\n", __func__, segcnt);
+	if (small_force){
+		rmv_by_small_discard += 1;
+		
+		if (!is_empty_ddm(sbi, ddmc, ddm))
+			printk("[JW DBG] %s: 1: not empty ddm!!, must not be removed!\n", __func__, rmv_by_small_discard);
+
+		__remove_dynamic_discard_map(sbi, ddm);
+	}
+	else if (!small_force){
+		if (is_empty_ddm(sbi, ddmc, ddm)){
+			__remove_dynamic_discard_map(sbi, ddm);
+		}
+	}
+	else if(issue_all){
+		if (!is_empty_ddm(sbi, ddmc, ddm))
+			printk("[JW DBG] %s: 3: not empty ddm!!, must not be removed!\n", __func__, rmv_by_small_discard);
+        	__remove_dynamic_discard_map(sbi, ddm);
+	}
 
         return nr_issued;
 }
+
 
 void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 {
@@ -5233,6 +5182,7 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	struct list_head *history_head_ddm = &ddmc->history_head;
 	struct list_head *p;
 	bool force = (cpc->reason & CP_DISCARD);
+	bool issue_all = (cpc->reason & CP_UMOUNT);
 	int lpcnt = 0;
         struct list_head *head = &SM_I(sbi)->dcc_info->entry_list;
 	int tmp, nr_discard, nr_issued = 0, cur_dcmd_cnt;
@@ -5241,17 +5191,18 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	static int prev_dcmd_cnt = 0;
 	static int small_dcmd_cnt = 0;
 	callcnt += 1;
-	//printk("[JW DBG] %s: bef discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
 	
+	//printk("[JW DBG] %s", __func__);
 	/* check submitted discard cmd and advise how many small discard will be submitted */
 	cur_dcmd_cnt = (int) atomic_read(&dcc->discard_cmd_cnt );
 	nr_discard = prev_dcmd_cnt - cur_dcmd_cnt;
+	//printk("[JW DBG] %s: umount: bef discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
 	if (nr_discard == 0 && prev_dcmd_cnt > 0){
-		printk("[JW DBG] %s: someting wrong. discard got stuck!! \n", __func__);
+		printk("[JW DBG] %s: someting wrong. discard got stuck!!, dcmd cnt: %d \n", __func__, prev_dcmd_cnt);
 	}
 	if (cur_dcmd_cnt == 0){
 		discard_limit = discard_limit *6/5 + 5;
-	}else{
+	} else{
 		discard_limit = nr_discard - cur_dcmd_cnt;
 		if (discard_limit < 0)
 			discard_limit = 0;
@@ -5268,56 +5219,32 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	/* To save into discard journal, obtain issued but not submitted dicsard cmds*/
 	journal_pending_discard_cmds(sbi);
 
-	//while(!list_empty(head_ddm)){
 	/* large discard */
 	list_for_each_entry_safe(ddm, tmpddm, history_head_ddm, history_list) {
-		//p = head_ddm->next;
-		//list_del(p);
-		//ddm = dynamic_discard_map(p, struct dynamic_discard_map, list);
-                //printk("flush_dynamic_discard_maps: DDM node_cnt: %d\n", ddmc->node_cnt);
-		//list_del(&ddm->list);
 		if (force){
 			panic("flush_dynamic_discard_maps: not expected!!");
         		__remove_dynamic_discard_map(sbi, ddm);
 		} else {
-			//printk("[JW DBG] flush_one_ddm start");
-                	nr_issued += flush_one_ddm(sbi, ddmc, ddm, 0, 0);
-			//if (atomic_read(&ddm->changed_aft_cp) != 1){
-			//	printk("[JW DBG] %s: weird. changed_after_cp must be one", __func__);
-			//} else {
-			//	atomic_set(&ddm->changed_aft_cp, 0);
-			//}
-			//printk("[JW DBG] flush_one_ddm done");
+                	nr_issued += flush_one_ddm(sbi, ddmc, ddm, 0, 0, issue_all);
 		}
-		//lpcnt += 1;
 	}
-	//printk("[JW DBG] history start");
 	
+	if (issue_all){
+		goto finish;
+	}
 	/* small discard */
 	list_for_each_entry_safe(ddm, tmpddm, history_head_ddm, history_list) {
 
 		if (discard_limit - nr_issued > 0){
-			//printk("[JW DBG] flush_one_ddm start small force");
-                	tmp = flush_one_ddm(sbi, ddmc, ddm, 0, discard_limit - nr_issued);
+                	tmp = flush_one_ddm(sbi, ddmc, ddm, 0, discard_limit - nr_issued, 0);
 			nr_issued += tmp;
 			small_dcmd_cnt += tmp;
 			//if (callcnt % 30 == 0)
 				//printk("[JW DBG] %s: small discard occurs: %d !!\n", __func__, small_dcmd_cnt);
-			//printk("[JW DBG] flush_one_ddm end small force");
 		} else {
 			break;
 		}
-		//lpcnt += 1;
 	}
-	/*	
-	while (discard_limit - nr_issued > 0){
-		p = history_head_ddm->next;
-		ddm = dynamic_discard_map(p, struct dynamic_discard_map, history_list);
-		printk("[JW DBG] flush_one_ddm start small force");
-                nr_issued += flush_one_ddm(sbi, ddmc, ddm, 1, 0, discard_limit - nr_issued);
-		printk("[JW DBG] flush_one_ddm end small force");
-	}
-	*/
 	/*if (callcnt % 60 == 0){
 		list_for_each_entry_safe(ddm, tmpddm, history_head_ddm, history_list) {
 			//p = history_head_ddm->next;
@@ -5334,22 +5261,12 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 		}
 	}*/
 	//printk("[JW DBG] history end");
-
+finish:
 	tmp = (int) atomic_read(&dcc->discard_cmd_cnt );
 	int tmp2 = (int) atomic_read(&ddmc->node_cnt);
 	prev_dcmd_cnt = tmp;
-	//if (tmp > 1200000)
 	//printk("[JW DBG] %s: aft discard cmd count: %d in rbtree, discard seg cnt: %d , ddm node cnt: %d \n", __func__, tmp, ddmc->dj_seg_cnt, tmp2);
 	atomic_set(&ddmc->history_seg_cnt, 0);
-	//atomic_xchg(&ddmc->blk_cnt, 0);//reset blk_cnt to zero; blk_cnt is for debugging
-	
-	//if (atomic_read(&ddmc->blk_cnt) != 0)
-	//	panic("flush_dynamic_discard_maps(): blk_cnt not set to zero!\n");
-	//if (!hash_empty(ht))
-	//	panic("hash must be empty after flushing all");
-	//if (atomic_read(&ddmc->node_cnt) != 0)
-	//	panic("flush_dynamic_discard_maps(): node_cnt not set to zero!\n");
-	//printk("[JW DBG] func end");
 
 }
 
