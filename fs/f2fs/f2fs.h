@@ -272,6 +272,7 @@ struct discard_entry {
 	struct list_head list;	/* list head */
 	block_t start_blkaddr;	/* start blockaddr of current segment */
 	unsigned char discard_map[SIT_VBLOCK_MAP_SIZE];	/* segment discard bitmap */
+	struct list_head ddm_list;
 };
 
 /* default discard granularity of inner discard thread, unit: block count */
@@ -582,10 +583,13 @@ struct dynamic_discard_map {
 	/* key in rb_entry is segno*/	
 	struct rb_entry rbe;
 	unsigned char *dc_map;
-	struct list_head list; 	/* updated ddm list after last cp*/
-	atomic_t changed_aft_cp;
+
+	struct list_head dirty_list; 	/* dirty list*/
+	atomic_t is_dirty;		/* DDM is dirty?*/
 
 	struct list_head history_list; /*existing all ddm list*/
+	struct list_head drange_journal_list; 	/* holding this ddm's discard range journal*/
+	struct list_head dmap_journal_list;	/* holding this ddm's discard bitmap journal */
 };
 
 
@@ -598,6 +602,7 @@ struct discard_range_entry {
 	struct discard_range discard_range_array[DISCARD_RANGE_MAX_NUM];
 	struct list_head list; 			/* discard range entry list */
 	unsigned int cnt; 			/* valid number of discard range */
+	struct list_head ddm_list; 			
 };
 
 #define dynamic_discard_map(ptr, type, member) container_of(ptr, type, member)
@@ -619,12 +624,14 @@ struct dynamic_discard_map_control {
 	atomic_t history_seg_cnt;
 	unsigned int segs_per_node;		/*number of segments each node manages*/
 	//unsigned int count;
-	struct list_head head;			/* To save updated ddm. */
+	struct list_head dirty_head;			/* To save updated ddm. */
 	struct list_head history_head;		/* contain every ddm entry */
 	
 	/* discard range enttry */
 	atomic_t drange_entry_cnt;
 	struct list_head discard_range_head;		/* long discard journal list */
+	struct list_head discard_map_head;		/* small discard journal list */
+	struct list_head issued_discard_head;		/* issued discard cmd list */
 	/* struct rw_semaphore ddm_sema;	to protect SIT cache */
 };
 
@@ -3451,6 +3458,7 @@ unsigned int f2fs_usable_segs_in_sec(struct f2fs_sb_info *sbi,
 unsigned int f2fs_usable_blks_in_seg(struct f2fs_sb_info *sbi,
 			unsigned int segno);
 
+void issue_and_clean_all_ddm(struct f2fs_sb_info *sbi);
 void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, 
 			struct cp_control *cpc);
 

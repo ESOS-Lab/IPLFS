@@ -1620,6 +1620,8 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	unsigned long long ckpt_ver;
 	int err = 0;
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	struct dynamic_discard_map *ddm, *tmpddm;
+	struct list_head *history_head_ddm = &ddmc->history_head;
 	//int nid7_syn = 0;
 	//static int jw_cp_cnt = 0;
 	mutex_lock(&ddmc->ddm_lock);	
@@ -1701,6 +1703,12 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	//f2fs_save_inmem_curseg(sbi);
 
 	err = do_checkpoint(sbi, cpc);
+
+	/* Umount case: issue every discard journals, and remove all ddm nodes. */	
+	if (cpc->reason & CP_UMOUNT){
+		issue_and_clean_all_ddm(sbi);
+	}
+
 	if (err){
 		f2fs_release_discard_addrs(sbi);
 		printk("[JW DBG] %s: do_checkpoint returns error, not expected!, also modify f2fs_release_discard_addrs\n", __func__);
