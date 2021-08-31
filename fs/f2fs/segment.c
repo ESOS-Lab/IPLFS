@@ -4740,15 +4740,17 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	block_t blk, tmp_dblkcnt;
         blk = start_blk;
 	tmp_dblkcnt = 0;
-	
+	block_t drange_cnt, dmap_cnt;
+
 	/* write discard journal: bitmap-type*/
-	tmp_dblkcnt += write_discard_bitmap_journals(sbi, &blk);
+	dmap_cnt = write_discard_bitmap_journals(sbi, &blk);
 
 	/* write discard journal: range-type*/
-	tmp_dblkcnt += write_discard_range_journals(sbi, &blk);
+	drange_cnt = write_discard_range_journals(sbi, &blk);
 
+	tmp_dblkcnt = drange_cnt + dmap_cnt;
 	if (tmp_dblkcnt != total_dblkcnt)
-		printk("[JW DBG] %s: total discard journal blk cnts not matching: real djblkcnt: %d, expected djblkcnt: %d", __func__, tmp_dblkcnt, total_dblkcnt);
+		printk("[JW DBG] %s: total discard journal blk cnts not matching: real djblkcnt: %d, expected djblkcnt: %d, real range: %d exp range: %d, real_dmap: %d, exp dmap: %d", __func__, tmp_dblkcnt, total_dblkcnt, drange_cnt, range_dblkcnt, dmap_cnt, bitmap_dblkcnt);
 
 	//printk("[JW DBG] %s: discard journal blk cnt: %u, real dblkcnt: %u, remaind entry cnt: %u\n", __func__, dblkcnt, tmp_dblkcnt, didx);	
 
@@ -5087,6 +5089,135 @@ static void remove_ddm_journals(struct f2fs_sb_info *sbi, struct dynamic_discard
 		printk("[JW DBG] %s: dmap_journal_head list not empty!!", __func__);
 }
 
+static void clear_ddm_bitmap(struct f2fs_sb_info *sbi, struct dynamic_discard_map *ddm, 
+				unsigned int start_blkaddr, unsigned int end_blkaddr)
+{
+	unsigned int start_ofs, end_ofs, ddm_soff, ddm_eoff;
+	unsigned long long s_segno, e_segno, s_ddmkey, e_ddmkey;
+	int i;
+	
+	s_segno = GET_SEGNO(sbi, start_blkaddr);
+	start_ofs = GET_BLKOFF_FROM_SEG0(sbi, start_blkaddr);
+	e_segno = GET_SEGNO(sbi, end_blkaddr);
+	end_ofs = GET_BLKOFF_FROM_SEG0(sbi, end_blkaddr);
+	/* clear ddm's bitmap */
+	get_ddm_info(sbi, s_segno, start_ofs, &s_ddmkey, &ddm_soff);
+	get_ddm_info(sbi, e_segno, end_ofs, &e_ddmkey, &ddm_eoff);
+	if (s_ddmkey != e_ddmkey)
+		printk("[JW DBG] %s: ddm key not match!", __func__);
+	
+	for (i = ddm_soff; i <= ddm_eoff; i ++){
+		if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
+			panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, ddmkey: %d", __func__, i, ddm->key );
+	}
+}
+
+
+static int issue_small_discards_of_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map *ddm,
+	       				int small_nr_issued)
+{
+	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
+	unsigned long long ddmkey = ddm->key;
+	struct list_head *ddm_drange_list = &ddm->drange_journal_list;
+	struct list_head *ddm_dmap_list = &ddm->dmap_journal_list;
+	int i;
+	int nr_issued = 0;
+	bool small_force = (small_nr_issued > 0);
+
+        if (!f2fs_hw_support_discard(sbi)){
+		panic("Why HW not support discard!!");
+                return -1;
+        }
+        if (!f2fs_realtime_discard_enable(sbi)){
+                panic("Why discard not accepted?");
+                return -1;
+        }
+
+	if (list_empty(&ddm->drange_journal_list) && list_empty(&ddm->dmap_journal_list)){
+		printk("[JW DBG] %s: not expected!! ddm's drange journal and dmap journal are empty!!", __func__);	
+	}
+	if (!small_force)
+		return 0;
+	
+	/* issue drange type: longer small discards */
+	struct discard_range_entry *dre, *tmpdre;
+	list_for_each_entry_safe(dre, tmpdre, ddm_drange_list, ddm_list) {
+		unsigned int dr_cnt = dre->cnt;
+		for (i = 0; i < dr_cnt; i++){
+			struct discard_range *dr;
+			dr = (struct discard_range *) &dre->discard_range_array[dr_cnt-i-1];
+			f2fs_issue_discard(sbi, dr->start_blkaddr, dr->len);
+			
+			clear_ddm_bitmap(sbi, ddm, dr->start_blkaddr, 
+						dr->start_blkaddr + dr->len - 1);
+			
+			dre->cnt -= 1;
+			atomic_dec(&ddmc->dj_range_cnt);
+			nr_issued += 1;
+			if (small_nr_issued <= nr_issued)
+				return nr_issued;
+		}
+		release_discard_range(dre);
+	}
+
+	/* issue dmap type: small discards first */
+	struct discard_entry *de, *tmpde;
+	list_for_each_entry_safe(de, tmpde, ddm_dmap_list, ddm_list) {
+		unsigned int cur_pos = 0, next_pos, len;
+		bool is_valid = test_bit_le(0, de->discard_map);
+find_next:
+		if (is_valid) {
+			next_pos = find_next_zero_bit_le(de->discard_map,
+					sbi->blocks_per_seg, cur_pos);
+			len = next_pos - cur_pos;
+
+			f2fs_issue_discard(sbi, de->start_blkaddr + cur_pos,
+									len);
+			nr_issued += 1;
+
+			/* clear discard entry's bitmap */
+			for (i = cur_pos; i < next_pos; i++)
+				__clear_bit_le(i, (void *)de->discard_map);
+
+			/* clear ddm's bitmap */
+			clear_ddm_bitmap(sbi, ddm, de->start_blkaddr + cur_pos, 
+						de->start_blkaddr + next_pos - 1);
+		} else {
+			next_pos = find_next_bit_le(de->discard_map,
+					sbi->blocks_per_seg, cur_pos);
+		}
+	
+		cur_pos = next_pos;
+		is_valid = !is_valid;
+
+		if (cur_pos < sbi->blocks_per_seg){
+			if (small_nr_issued <= nr_issued){
+				return nr_issued;
+			} else {
+				goto find_next;
+			}
+		}
+		
+		release_discard_addr(de);
+		atomic_dec(&ddmc->dj_seg_cnt);
+
+		if (small_nr_issued <= nr_issued)
+			return nr_issued;
+	}
+	
+	if (!list_empty(&ddm->drange_journal_list) || !list_empty(&ddm->dmap_journal_list)){
+		printk("[JW DBG] %s: not expected!! ddm's drange journal and dmap journal must be empty!!", __func__);	
+	}
+	
+	if (!is_empty_ddm(sbi, ddmc, ddm)){
+		printk("[JW DBG] %s: not expected!! ddm map must be empty", __func__);	
+	}
+	__remove_dynamic_discard_map(sbi, ddm);
+	return nr_issued;
+
+}
+
+
 static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_control *ddmc,
 					struct dynamic_discard_map *ddm, int print_history,
 					int small_nr_issued, bool issue_all)
@@ -5390,6 +5521,7 @@ static void issue_all_discard_journals(struct f2fs_sb_info *sbi)
 			dr = (struct discard_range *) &dre->discard_range_array[i];
 			f2fs_issue_discard(sbi, dr->start_blkaddr, dr->len);
 		}
+		atomic_set(&ddmc->dj_range_cnt, atomic_read(&ddmc->dj_range_cnt) - dre->cnt);
 		release_discard_range(dre);
 	}
 
@@ -5410,7 +5542,7 @@ find_next:
 			next_pos = find_next_bit_le(de->discard_map,
 					sbi->blocks_per_seg, cur_pos);
 		}
-skip:
+		
 		cur_pos = next_pos;
 		is_valid = !is_valid;
 
@@ -5418,6 +5550,7 @@ skip:
 			goto find_next;
 
 		release_discard_addr(de);
+		atomic_dec(&ddmc->dj_seg_cnt);
 	}
 }
 
@@ -5472,6 +5605,7 @@ static int update_dirty_dynamic_discard_map(struct f2fs_sb_info *sbi)
 
 	return nr_issued;
 }
+
 void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 {
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
@@ -5541,7 +5675,8 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	list_for_each_entry_safe(ddm, tmpddm, history_head_ddm, history_list) {
 		if (discard_limit - nr_issued > 0){
 			//printk("[JW DBG] %s 2", __func__);
-                	tmp = flush_one_ddm(sbi, ddmc, ddm, 0, discard_limit - nr_issued, 0);
+			tmp = issue_small_discards_of_ddm(sbi, ddm, discard_limit - nr_issued);
+                	//tmp = flush_one_ddm(sbi, ddmc, ddm, 0, discard_limit - nr_issued, 0);
 			//printk("[JW DBG] %s 2-1", __func__);
 			nr_issued += tmp;
 			small_dcmd_cnt += tmp;
