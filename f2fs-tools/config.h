@@ -36,7 +36,7 @@
 #define HAVE_INTTYPES_H 1
 
 /* Use blkid */
-#define HAVE_LIBBLKID 1
+/* #undef HAVE_LIBBLKID */
 
 /* Use libselinux */
 #define HAVE_LIBSELINUX 1

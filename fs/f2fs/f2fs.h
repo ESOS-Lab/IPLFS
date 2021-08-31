@@ -612,7 +612,8 @@ struct dynamic_discard_map_control {
 	struct hlist_head *ht;
 	unsigned int hbits;
 	//struct mutex *per_entry_lck_list;
-
+	
+	unsigned int long_threshold;		/* determine to issue discard directly or not*/
 	/*rb tree version*/
 	struct rb_root_cached root;		/* root of discard map rb-tree */
 	struct mutex ddm_lock;

@@ -2370,7 +2370,7 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 	//ddmc->ht_lkc_list = f2fs_kzalloc(sbi, sizeof(struct mutex)*pow(2, 7));
 	ddmc->segs_per_node = 300;  
 	
-	
+	ddmc->long_threshold = 512;	
 	atomic_set(&ddmc->node_cnt, 0);
 	atomic_set(&ddmc->blk_cnt, 0);
 	atomic_set(&ddmc->dj_seg_cnt, 0);
@@ -5454,7 +5454,7 @@ static int construct_ddm_journals(struct f2fs_sb_info *sbi, struct dynamic_disca
 		if (len > 64){
 			/* issue every long discard cmd */
 			/* Do not journal long discard cuz it is journalized when journaling pend_list */
-			if (len > 512){
+			if (len > ddmc->long_threshold){
 				for (i = start; i < end; i ++){
 					if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
 						panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
@@ -5629,12 +5629,15 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	nr_discard = prev_dcmd_cnt - cur_dcmd_cnt;
 	//printk("[JW DBG] %s: umount: bef discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
 	if (nr_discard == 0 && prev_dcmd_cnt > 0){
-		printk("[JW DBG] %s: someting wrong. discard got stuck!!, dcmd cnt: %d \n", __func__, prev_dcmd_cnt);
+		ddmc->long_threshold = 50000;
+		//printk("[JW DBG] %s: someting wrong. discard got stuck!!, dcmd cnt: %d \n", __func__, prev_dcmd_cnt);
 	}
 	if (cur_dcmd_cnt == 0){
 		discard_limit = discard_limit *6/5 + 5;
+		ddmc->long_threshold = 2048;
 	} else{
 		discard_limit = nr_discard - cur_dcmd_cnt;
+		ddmc->long_threshold = ddmc->long_threshold * 6 / 5;
 		if (discard_limit < 0)
 			discard_limit = 0;
 	}
