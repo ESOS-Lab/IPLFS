@@ -2648,6 +2648,11 @@ static void update_dynamic_discard_map(struct f2fs_sb_info *sbi, unsigned int se
 		if (!ddm){
 			return;	
 		}
+		if (atomic_read(&ddm->is_dirty) == 0){
+			atomic_set(&ddm->is_dirty, 1);
+			list_add_tail(&ddm->dirty_list, dirty_head);
+			//printk("[JW DBG] %s: ddm added to dirty list %u!!\n", __func__, ddmkey);
+		}
 		if (f2fs_test_and_clear_bit(offset_in_ddm, ddm->dc_map))
 			atomic_dec(&ddmc->blk_cnt);
 	}

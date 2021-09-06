@@ -17,7 +17,7 @@ old_library='libf2fs_format.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' -luuid -L../lib /home/nobleminsu/Infinite-LBA-new/Infinite-LBA/f2fs-tools/lib/libf2fs.la'
+dependency_libs=' -luuid -L../lib /usr/src/linux-5.11/f2fs-tools/lib/libf2fs.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -39,4 +39,4 @@ dlpreopen=''
 
 # Directory that this library needs to be installed in:
 libdir='/usr/local/lib'
-relink_command="(cd /home/nobleminsu/Infinite-LBA-new/Infinite-LBA/f2fs-tools/mkfs; /bin/bash \"/home/nobleminsu/Infinite-LBA-new/Infinite-LBA/f2fs-tools/libtool\"  --tag CC --mode=relink gcc -DWITH_BLKDISCARD -g -O2 -luuid -L../lib -lf2fs -version-info 2:0:0 -o libf2fs_format.la -rpath /usr/local/lib libf2fs_format_la-f2fs_format_main.lo libf2fs_format_la-f2fs_format.lo libf2fs_format_la-f2fs_format_utils.lo @inst_prefix_dir@)"
+relink_command="(cd /usr/src/linux-5.11/f2fs-tools/mkfs; /bin/bash \"/usr/src/linux-5.11/f2fs-tools/libtool\"  --tag CC --mode=relink gcc -DWITH_BLKDISCARD -g -O2 -luuid -L../lib -lf2fs -version-info 2:0:0 -o libf2fs_format.la -rpath /usr/local/lib libf2fs_format_la-f2fs_format_main.lo libf2fs_format_la-f2fs_format.lo libf2fs_format_la-f2fs_format_utils.lo @inst_prefix_dir@)"
