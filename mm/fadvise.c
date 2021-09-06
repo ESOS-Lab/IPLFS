@@ -38,7 +38,7 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
 	pgoff_t start_index;
 	pgoff_t end_index;
 	unsigned long nrpages;
-	static int cnt = 0;
+	//static int cnt = 0;
 
 	inode = file_inode(file);
 	if (S_ISFIFO(inode->i_mode))
@@ -110,11 +110,11 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
 	case POSIX_FADV_NOREUSE:
 		break;
 	case POSIX_FADV_DONTNEED:
-		cnt += 1;
-		if (cnt > 5)
-			break;
+		//cnt += 1;
+		//if (cnt > 5)
+		//	break;
 
-		printk("[JW DBG] %s: POSIX_FADV_DONTNEED!! \n", __func__);
+		//printk("[JW DBG] %s: POSIX_FADV_DONTNEED!! \n", __func__);
 		if (!inode_write_congested(mapping->host))
 			__filemap_fdatawrite_range(mapping, offset, endbyte,
 						   WB_SYNC_NONE);
