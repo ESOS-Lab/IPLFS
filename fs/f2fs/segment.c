@@ -5133,9 +5133,9 @@ static int issue_small_discards_of_ddm(struct f2fs_sb_info *sbi, struct dynamic_
                 return -1;
         }
 
-	if (list_empty(&ddm->drange_journal_list) && list_empty(&ddm->dmap_journal_list)){
-		printk("[JW DBG] %s: not expected!! ddm's drange journal and dmap journal are empty!!", __func__);	
-	}
+	//if (list_empty(&ddm->drange_journal_list) && list_empty(&ddm->dmap_journal_list)){
+		//printk("[JW DBG] %s: not expected!! ddm's drange journal and dmap journal are empty!!", __func__);	
+	//}
 	if (!small_force)
 		return 0;
 	
