@@ -424,12 +424,18 @@ struct f2fs_configuration {
 #define NR_CURSEG_TYPE	(NR_CURSEG_DATA_TYPE + NR_CURSEG_NODE_TYPE)
 
 enum {
-	CURSEG_HOT_DATA	= 0,	/* directory entry blocks */
-	CURSEG_WARM_DATA,	/* data blocks */
-	CURSEG_COLD_DATA,	/* multimedia or GCed data blocks */
+//	CURSEG_HOT_DATA	= 0,	/* directory entry blocks */
+//	CURSEG_WARM_DATA,	/* data blocks */
+//	CURSEG_COLD_DATA,	/* multimedia or GCed data blocks */
+//	CURSEG_HOT_NODE,	/* direct node blocks of directory files */
+//	CURSEG_WARM_NODE,	/* direct node blocks of normal files */
+//	CURSEG_COLD_NODE,	/* indirect node blocks */
+	CURSEG_COLD_DATA=0,	/* multimedia or GCed data blocks */
+	CURSEG_COLD_NODE,	/* indirect node blocks */
 	CURSEG_HOT_NODE,	/* direct node blocks of directory files */
 	CURSEG_WARM_NODE,	/* direct node blocks of normal files */
-	CURSEG_COLD_NODE,	/* indirect node blocks */
+	CURSEG_HOT_DATA,	/* directory entry blocks */
+	CURSEG_WARM_DATA,	/* data blocks */
 	NO_CHECK_TYPE
 };
 

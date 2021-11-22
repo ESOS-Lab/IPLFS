@@ -2934,12 +2934,34 @@ static unsigned int get_free_zone(struct f2fs_sb_info *sbi)
 	return zone + 1;
 }
 
+static unsigned int get_free_zone_in_superzone(struct f2fs_sb_info *sbi, int type)
+{
+	int i;
+	unsigned int zone, szone;
+	unsigned int total_zones = MAIN_SECS(sbi) / sbi->secs_per_zone;
+
+	down_read(&SM_I(sbi)->curseg_zone_lock);
+	zone = CURSEG_I(sbi, i)->zone;
+	szone = GET_SUPERZONE_FROM_ZONE(sbi, zone);
+	if (NR_CURSEG_TYPE != 6){
+		printk("%s: ?????????", __func__);
+		f2fs_bug_on(sbi, 1);
+	}
+	if (szone != GET_SUPERZONE_FROM_ZONE(sbi, ++zone) && type != NR_CURSEG_TYPE - 1){
+		printk("%s: exceed superzone!!, type: %d", __func__, type);
+		f2fs_bug_on(sbi, 1);
+	}
+	up_read(&SM_I(sbi)->curseg_zone_lock);
+	return zone;
+}
 static void get_new_segment_IFLBA(struct f2fs_sb_info *sbi,
 			unsigned int *newseg, bool new_sec, int type)
 {
 	unsigned int segno, secno, zoneno;
 	unsigned int old_secno = GET_SEC_FROM_SEG(sbi, *newseg);
-
+	struct curseg_info *curseg = CURSEG_I(sbi, type);
+	if (curseg->segno == NULL_SEGNO)
+		panic("%s: unexpected\n", __func__);
 	//find next free segment in section
 	if (!new_sec && ((*newseg + 1) % sbi->segs_per_sec)) {
 		segno = *newseg + 1;
@@ -2954,7 +2976,8 @@ static void get_new_segment_IFLBA(struct f2fs_sb_info *sbi,
 		goto got_it;
 	}
 	//find next free zone
-	zoneno = get_free_zone(sbi);
+	//zoneno = get_free_zone(sbi);
+	zoneno = get_free_zone_in_superzone(sbi, type);
 	secno = zoneno * sbi->secs_per_zone;
 	segno = secno * sbi->segs_per_sec;
 
@@ -6180,15 +6203,71 @@ static int build_free_segmap(struct f2fs_sb_info *sbi)
 	return 0;
 }
 
-static int build_curseg(struct f2fs_sb_info *sbi)
-{
-       struct curseg_info *array;
-       int i;
 
-       array = f2fs_kzalloc(sbi, array_size(NR_CURSEG_TYPE,
+static inline struct curseg_info *JW_set_zone(struct f2fs_sb_info *sbi, int type)
+{
+	static int initialized[NR_CURSEG_TYPE] = {0};
+	int i;
+	unsigned int zone = 0,superzone, segno, secno;
+	struct summary_footer *sum_footer;
+	unsigned short seg_type = type;
+	struct curseg_info *curseg = (struct curseg_info *)(SM_I(sbi)->curseg_array + type);
+	struct curseg_info *tmp_curseg;
+	//initial case
+       	zone = GET_ZONE_FROM_SEG(sbi, GET_SEGNO(sbi, MAIN_BLKADDR(sbi)));
+	superzone = GET_SUPERZONE_FROM_ZONE(sbi, zone);
+	printk("%s: start zone %d!!!!!", __func__, superzone);
+        down_read(&SM_I(sbi)->curseg_zone_lock);
+        if (initialized[type] == 0){
+        	for (i = 0; i < NR_CURSEG_TYPE; i++){
+			if (initialized[i] && i != type){
+                             tmp_curseg = (struct curseg_info *)(SM_I(sbi)->curseg_array + i);
+		             superzone = max(superzone, GET_SUPERZONE_FROM_ZONE(sbi, tmp_curseg->zone));
+			}
+                }
+		initialized[type] = 1;
+		
+		superzone += 1;
+		zone = superzone * ZONES_PER_SUPERZONE;
+		secno = zone * sbi->secs_per_zone;
+                segno = secno * sbi->segs_per_sec;
+                curseg->next_segno = segno;
+                
+		curseg->inited = true;
+                curseg->segno = curseg->next_segno;
+                
+		//down_write(&SM_I(sbi)->curseg_zone_lock);
+		curseg->zone = GET_ZONE_FROM_SEG(sbi, curseg->segno);
+		printk("%s: type %d final zone %d!!!!!", __func__, type, curseg->zone);
+		//up_write(&SM_I(sbi)->curseg_zone_lock);
+		
+		curseg->next_blkoff = 0;
+		curseg->next_segno = NULL_SEGNO;
+		
+		sum_footer = &(curseg->sum_blk->footer);
+		memset(sum_footer, 0, sizeof(struct summary_footer));
+		
+		sanity_check_seg_type(sbi, seg_type);
+		
+		if (IS_DATASEG(seg_type))
+		        SET_SUM_TYPE(sum_footer, SUM_TYPE_DATA);
+		if (IS_NODESEG(seg_type))
+		        SET_SUM_TYPE(sum_footer, SUM_TYPE_NODE);
+	}
+	up_read(&SM_I(sbi)->curseg_zone_lock);
+	return (struct curseg_info *) (SM_I(sbi)->curseg_array + type);
+}
+
+
+static int build_curseg(struct f2fs_sb_info *sbi)               
+{                                                               
+       struct curseg_info *array;                               
+       int i;                                                   
+                                                                
+       array = f2fs_kzalloc(sbi, array_size(NR_CURSEG_TYPE,     
                                        sizeof(*array)), GFP_KERNEL);
-       if (!array)
-               return -ENOMEM;
+       if (!array)                                              
+               return -ENOMEM;                                  
 
        SM_I(sbi)->curseg_array = array;
 
@@ -6896,7 +6975,7 @@ int f2fs_build_segment_manager(struct f2fs_sb_info *sbi)
        struct f2fs_super_block *raw_super = F2FS_RAW_SUPER(sbi);
        struct f2fs_checkpoint *ckpt = F2FS_CKPT(sbi);
        struct f2fs_sm_info *sm_info;
-       int err;
+       int err, i;
 
        sm_info = f2fs_kzalloc(sbi, sizeof(struct f2fs_sm_info), GFP_KERNEL);
        if (!sm_info)
@@ -6959,6 +7038,12 @@ int f2fs_build_segment_manager(struct f2fs_sb_info *sbi)
        err = build_sit_entries(sbi);
        if (err)
                return err;
+      
+       printk("%s: NR_CURSEG_TYPE: %d, CURSEG_HOT_DATA: %d", __func__, NR_CURSEG_TYPE, CURSEG_HOT_DATA);
+       int tttmp = (NR_CURSEG_TYPE > 6)? 6: NR_CURSEG_TYPE;
+       for (i = CURSEG_HOT_DATA; i < CURSEG_HOT_DATA + tttmp; i++) {
+	       JW_set_zone(sbi, i);
+       }
 
        //init_free_segmap(sbi);
        //err = build_dirty_segmap(sbi);
