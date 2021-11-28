@@ -6238,7 +6238,7 @@ static inline struct curseg_info *JW_set_zone(struct f2fs_sb_info *sbi, int type
                 
 		//down_write(&SM_I(sbi)->curseg_zone_lock);
 		curseg->zone = GET_ZONE_FROM_SEG(sbi, curseg->segno);
-		printk("%s: type %d final zone %d!!!!!", __func__, type, curseg->zone);
+		printk("%s: type %d  superzone: %d zone: %d curseg_zone: %d secno: %d segno: %d !!!!!", __func__, type, superzone, zone, curseg->zone, secno, segno);
 		//up_write(&SM_I(sbi)->curseg_zone_lock);
 		
 		curseg->next_blkoff = 0;
@@ -6255,6 +6255,7 @@ static inline struct curseg_info *JW_set_zone(struct f2fs_sb_info *sbi, int type
 		        SET_SUM_TYPE(sum_footer, SUM_TYPE_NODE);
 	}
 	up_read(&SM_I(sbi)->curseg_zone_lock);
+	printk("type: %d, startblkaddr: 0x%x, segno: %d", type, START_BLOCK(sbi, curseg->segno), curseg->segno);
 	return (struct curseg_info *) (SM_I(sbi)->curseg_array + type);
 }
 

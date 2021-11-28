@@ -3090,7 +3090,7 @@ static void init_sb_info(struct f2fs_sb_info *sbi)
 	sbi->blocks_per_seg = 1 << sbi->log_blocks_per_seg;
 	sbi->segs_per_sec = le32_to_cpu(raw_super->segs_per_sec);
 	sbi->secs_per_zone = le32_to_cpu(raw_super->secs_per_zone);
-	sbi->secs_per_zone = 10240;
+	sbi->secs_per_zone = 8192;
 	sbi->total_sections = le32_to_cpu(raw_super->section_count);
 	sbi->total_node_count =
 		(le32_to_cpu(raw_super->segment_count_nat) / 2)
