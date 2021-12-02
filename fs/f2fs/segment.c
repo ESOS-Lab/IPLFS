@@ -2943,11 +2943,13 @@ static unsigned int get_free_zone_in_superzone(struct f2fs_sb_info *sbi, int typ
 	down_read(&SM_I(sbi)->curseg_zone_lock);
 	zone = CURSEG_I(sbi, i)->zone;
 	szone = GET_SUPERZONE_FROM_ZONE(sbi, zone);
-	if (NR_CURSEG_TYPE != 6){
+
+	//if (NR_CURSEG_TYPE != 6){
+	if (type > CURSEG_WARM_DATA){
 		printk("%s: ?????????", __func__);
 		f2fs_bug_on(sbi, 1);
 	}
-	if (szone != GET_SUPERZONE_FROM_ZONE(sbi, ++zone) && type != NR_CURSEG_TYPE - 1){
+	if (szone != GET_SUPERZONE_FROM_ZONE(sbi, ++zone)){// && type != NR_CURSEG_TYPE - 1){
 		printk("%s: exceed superzone!!, type: %d", __func__, type);
 		f2fs_bug_on(sbi, 1);
 	}
