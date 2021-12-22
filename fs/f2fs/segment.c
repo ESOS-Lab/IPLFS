@@ -2368,7 +2368,8 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 	ddmc->ht = ht;
 	ddmc->hbits = 7;
 	//ddmc->ht_lkc_list = f2fs_kzalloc(sbi, sizeof(struct mutex)*pow(2, 7));
-	ddmc->segs_per_node = 300;  
+	//ddmc->segs_per_node = 300;  
+	ddmc->segs_per_node = 512;  
 	
 	ddmc->long_threshold = 512;	
 	atomic_set(&ddmc->node_cnt, 0);
