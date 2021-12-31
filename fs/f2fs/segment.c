@@ -2938,7 +2938,7 @@ static unsigned int get_free_zone(struct f2fs_sb_info *sbi)
 static unsigned int get_free_zone_in_superzone(struct f2fs_sb_info *sbi, int type)
 {
 	int i;
-	unsigned int zone, szone;
+	unsigned int zone, new_zone, szone;
 	unsigned int total_zones = MAIN_SECS(sbi) / sbi->secs_per_zone;
 
 	down_read(&SM_I(sbi)->curseg_zone_lock);
@@ -2946,16 +2946,17 @@ static unsigned int get_free_zone_in_superzone(struct f2fs_sb_info *sbi, int typ
 	szone = GET_SUPERZONE_FROM_ZONE(sbi, zone);
 
 	//if (NR_CURSEG_TYPE != 6){
+	up_read(&SM_I(sbi)->curseg_zone_lock);
 	if (type > CURSEG_WARM_DATA){
 		printk("%s: ?????????", __func__);
 		f2fs_bug_on(sbi, 1);
 	}
-	if (szone != GET_SUPERZONE_FROM_ZONE(sbi, ++zone)){// && type != NR_CURSEG_TYPE - 1){
+	new_zone = zone + 1;
+	if (szone != GET_SUPERZONE_FROM_ZONE(sbi, new_zone)){// && type != NR_CURSEG_TYPE - 1){
 		printk("%s: exceed superzone!!, type: %d", __func__, type);
 		f2fs_bug_on(sbi, 1);
 	}
-	up_read(&SM_I(sbi)->curseg_zone_lock);
-	return zone;
+	return new_zone;
 }
 static void get_new_segment_IFLBA(struct f2fs_sb_info *sbi,
 			unsigned int *newseg, bool new_sec, int type)
