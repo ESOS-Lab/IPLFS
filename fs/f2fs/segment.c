@@ -2937,12 +2937,11 @@ static unsigned int get_free_zone(struct f2fs_sb_info *sbi)
 
 static unsigned int get_free_zone_in_superzone(struct f2fs_sb_info *sbi, int type)
 {
-	int i;
 	unsigned int zone, new_zone, szone;
 	unsigned int total_zones = MAIN_SECS(sbi) / sbi->secs_per_zone;
 
 	down_read(&SM_I(sbi)->curseg_zone_lock);
-	zone = CURSEG_I(sbi, i)->zone;
+	zone = CURSEG_I(sbi, type)->zone;
 	szone = GET_SUPERZONE_FROM_ZONE(sbi, zone);
 
 	//if (NR_CURSEG_TYPE != 6){
@@ -2951,7 +2950,9 @@ static unsigned int get_free_zone_in_superzone(struct f2fs_sb_info *sbi, int typ
 		printk("%s: ?????????", __func__);
 		f2fs_bug_on(sbi, 1);
 	}
+	//printk("%s: type: %d perv zoneno: %d", __func__, type, zone );
 	new_zone = zone + 1;
+	//printk("%s: type: %d new zoneno: %d", __func__, type, new_zone );
 	if (szone != GET_SUPERZONE_FROM_ZONE(sbi, new_zone)){// && type != NR_CURSEG_TYPE - 1){
 		printk("%s: exceed superzone!!, type: %d", __func__, type);
 		f2fs_bug_on(sbi, 1);
@@ -2982,11 +2983,16 @@ static void get_new_segment_IFLBA(struct f2fs_sb_info *sbi,
 	//find next free zone
 	//zoneno = get_free_zone(sbi);
 	zoneno = get_free_zone_in_superzone(sbi, type);
+	//printk("%s: type: %d new zoneno: %d", __func__, type, zoneno );
 	secno = zoneno * sbi->secs_per_zone;
 	segno = secno * sbi->segs_per_sec;
 
 got_it:
 	/* set it as dirty segment in free segmap */
+	//if (segno % 64 == 0){
+	//	printk("%s: type: %d prevsegno: %d segno: %d zoneno: %d", __func__, type, curseg->segno, segno, GET_ZONE_FROM_SEG(sbi, segno));
+	//}
+	
 	*newseg = segno;
 
 }
