@@ -5259,6 +5259,8 @@ find_next:
 }
 
 
+
+#define LONG_DISCARD_THRESHOLD 1024 
 static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_control *ddmc,
 					struct dynamic_discard_map *ddm, int print_history,
 					int small_nr_issued, bool issue_all)
@@ -5321,7 +5323,7 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 		len = endLBA - startLBA + 1;
 		
 		if (print_history){
-			if (len > 1024)
+			if (len > LONG_DISCARD_THRESHOLD)
 				cnt_list[127] += 1;
 			else if (len > 0)
 				cnt_list[(len-1)/8] += 1;
@@ -5436,8 +5438,6 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
         return nr_issued;
 }
 
-
-
 //Notice!! This function always frees DDM. This can cause problem when number of blocks to be discarded is more than max_discards. The while loop stops when numblks to be discarded exceeds max_disacrds. This means DDM is freed while some of blks are not disacrded. This can cause orphan blocks. So this must be fixed. 
 static int construct_ddm_journals(struct f2fs_sb_info *sbi, struct dynamic_discard_map *ddm,
 					int *discard_limit)
@@ -5497,7 +5497,7 @@ static int construct_ddm_journals(struct f2fs_sb_info *sbi, struct dynamic_disca
 			/* issue every long discard cmd */
 			/* Do not journal long discard cuz it is journalized when journaling pend_list */
 			//if (len > ddmc->long_threshold){
-			if (len > 1024 && *discard_limit > 0){
+			if (len > LONG_DISCARD_THRESHOLD && *discard_limit > 0){
 				for (i = start; i < end; i ++){
 					if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
 						panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
@@ -5650,6 +5650,7 @@ static int update_dirty_dynamic_discard_map(struct f2fs_sb_info *sbi, int *disca
 	return nr_issued;
 }
 
+#define W_SIZE  5
 void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 {
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
@@ -5662,8 +5663,8 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	int i, tmp, nr_discard, nr_issued = 0, cur_dcmd_cnt, nr_small_discard, nr_issued_sum;
 	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
 	static int discard_limit = 0, prev_dcmd_cnt = 0, small_dcmd_cnt = 0, small_act_cnt = 0;	
-	static int nr_issued_array[5] = {0,0,0,0,0};
-	int ar_len = 5;
+	static int nr_issued_array[W_SIZE] = {0,0,0,0,0};
+	/*ar*/
 	//printk("[JW DBG] %s: start!", __func__);
 	/* check submitted discard cmd and advise how many small discard will be submitted */
 	cur_dcmd_cnt = (int) atomic_read(&dcc->discard_cmd_cnt );
@@ -5673,15 +5674,15 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 		ddmc->long_threshold = 50000;
 		//printk("[JW DBG] %s: someting wrong. discard got stuck!!, dcmd cnt: %d \n", __func__, prev_dcmd_cnt);
 	}
-	if (cur_dcmd_cnt == 0){
-		discard_limit = discard_limit *6/5 + 5;
-		ddmc->long_threshold = 2048;
-	} else{
-		discard_limit = (nr_discard - cur_dcmd_cnt)*1/6;
-		ddmc->long_threshold = ddmc->long_threshold * 6 / 5;
-		if (discard_limit < 0)
-			discard_limit = 0;
-	}
+	// if (cur_dcmd_cnt == 0){
+	// 	discard_limit = discard_limit *6/5 + 5;
+	// 	ddmc->long_threshold = 2048;
+	// } else{
+	// 	discard_limit = (nr_discard - cur_dcmd_cnt)*1/6;
+	// 	ddmc->long_threshold = ddmc->long_threshold * 6 / 5;
+	// 	if (discard_limit < 0)
+	// 		discard_limit = 0;
+	// }
 	//printk("[JW DBG] %s: umount: discard limit: %d prev: %d submitted_discard: %d , \n", __func__, discard_limit, prev_dcmd_cnt, nr_discard);
 
 	/*
@@ -5694,10 +5695,12 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 		printk("[JW DBG] %s: dcc entry list not initialized!! \n", __func__);
 	*/
 	nr_issued_sum = 0;
-	for (i=0; i < ar_len; i++){
+	for (i=0; i < W_SIZE; i++){
 		nr_issued_sum += nr_issued_array[i];
 	}
-	discard_limit = min( max(15-nr_issued_sum, 0), discard_limit);
+	/*15 is */
+	//discard_limit = min( max(150000-nr_issued_sum, 0), discard_limit);
+	discard_limit = max(150000-nr_issued_sum, 0);
 
 	/* large discard */
 	//printk("[JW DBG] %s: 1", __func__);
@@ -5785,10 +5788,10 @@ finish:
 	tmp = (int) atomic_read(&dcc->discard_cmd_cnt );
 	int tmp2 = (int) atomic_read(&ddmc->node_cnt);
 	prev_dcmd_cnt = tmp;
-	for (i = 0; i < ar_len-1; i++){
+	for (i = 0; i < W_SIZE-1; i++){
 		nr_issued_array[i] = nr_issued_array[i+1];
 	}
-	nr_issued_array[ar_len-1] = nr_issued;
+	nr_issued_array[W_SIZE-1] = nr_issued;
 	//printk("[JW DBG] %s end!!", __func__);
 	//printk("[JW DBG] %s: aft discard cmd count: %d in rbtree, discard seg cnt: %d , ddm node cnt: %d \n", __func__, tmp, ddmc->dj_seg_cnt, tmp2);
 	//atomic_set(&ddmc->history_seg_cnt, 0);
