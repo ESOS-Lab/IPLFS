@@ -2946,7 +2946,8 @@ static unsigned int get_free_zone_in_superzone(struct f2fs_sb_info *sbi, int typ
 
 	//if (NR_CURSEG_TYPE != 6){
 	up_read(&SM_I(sbi)->curseg_zone_lock);
-	if (type > CURSEG_WARM_DATA){
+	//if (type > CURSEG_WARM_DATA){
+	if (type >= NR_PERSISTENT_LOG){
 		printk("%s: ?????????", __func__);
 		f2fs_bug_on(sbi, 1);
 	}
