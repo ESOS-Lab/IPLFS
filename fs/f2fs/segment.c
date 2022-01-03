@@ -4762,7 +4762,7 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	bitmap_dblkcnt = DISCARD_JOURNAL_BITMAP_BLOCKS(discard_bitmap_segcnt);
 	range_dblkcnt = DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt);
 	total_dblkcnt = bitmap_dblkcnt + range_dblkcnt;
-	//printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
+	printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
 
 	cnt += 1; 
 	if (start_blk + total_dblkcnt >= journal_limit_addr){
