@@ -5715,12 +5715,6 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
                 	nr_issued += flush_one_ddm(sbi, ddmc, ddm, 0, 0, issue_all);
 		}
 	}*/
-	remove_issued_discard_cmds(sbi);
-	//printk("[JW DBG] %s 3-1", __func__);
-	
-	/* To save into discard journal, obtain issued but not completed dicsard cmds*/
-	//printk("[JW DBG] %s 4", __func__);
-	journal_issued_discard_cmds(sbi);
 
 	/* UNMOUNT case */	
 	if (issue_all){
@@ -5767,12 +5761,12 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 journal_issued_discard:
 	/* Journal pending discard cmds */
 	//printk("[JW DBG] %s 3", __func__);
-	//remove_issued_discard_cmds(sbi);
+	remove_issued_discard_cmds(sbi);
 	//printk("[JW DBG] %s 3-1", __func__);
 	
 	/* To save into discard journal, obtain issued but not completed dicsard cmds*/
 	//printk("[JW DBG] %s 4", __func__);
-	//journal_issued_discard_cmds(sbi);
+	journal_issued_discard_cmds(sbi);
 	//printk("[JW DBG] %s 4-1", __func__);
 	
 	/*if (callcnt % 60 == 0){
