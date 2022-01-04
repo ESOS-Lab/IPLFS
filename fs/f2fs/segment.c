@@ -4762,7 +4762,7 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	bitmap_dblkcnt = DISCARD_JOURNAL_BITMAP_BLOCKS(discard_bitmap_segcnt);
 	range_dblkcnt = DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt);
 	total_dblkcnt = bitmap_dblkcnt + range_dblkcnt;
-	printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
+	//printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
 
 	cnt += 1; 
 	if (start_blk + total_dblkcnt >= journal_limit_addr){
@@ -5498,21 +5498,20 @@ static int construct_ddm_journals(struct f2fs_sb_info *sbi, struct dynamic_disca
 			/* issue every long discard cmd */
 			/* Do not journal long discard cuz it is journalized when journaling pend_list */
 			//if (len > ddmc->long_threshold){
-			if (len > LONG_DISCARD_THRESHOLD && *discard_limit > 0){
-				for (i = start; i < end; i ++){
-					if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
-						panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
+			//if (len > LONG_DISCARD_THRESHOLD && *discard_limit > 0){
+			for (i = start; i < end; i ++){
+				if (!f2fs_test_and_clear_bit(i, ddm->dc_map))
+					panic("[JW DBG] %s: weird. must be one but zero bit. offset: %d, segno: %d, ddmkey: %d", __func__, i, p_segno, ddmkey );
 	
-				}
-				
-				f2fs_issue_discard(sbi, startLBA, len);
-				nr_issued += 1;
-				*discard_limit -= 1;
 			}
-			else{
+			
+			f2fs_issue_discard(sbi, startLBA, len);
+			nr_issued += 1;
+			*discard_limit -= 1;
+			/*else{
 				//journal_discard_cmd(sbi, startLBA, len);
 				add_discard_range_journal(sbi, startLBA, len, ddm);
-			}
+			}*/
 			continue;
 		}
 
@@ -5716,6 +5715,12 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
                 	nr_issued += flush_one_ddm(sbi, ddmc, ddm, 0, 0, issue_all);
 		}
 	}*/
+	remove_issued_discard_cmds(sbi);
+	//printk("[JW DBG] %s 3-1", __func__);
+	
+	/* To save into discard journal, obtain issued but not completed dicsard cmds*/
+	//printk("[JW DBG] %s 4", __func__);
+	journal_issued_discard_cmds(sbi);
 
 	/* UNMOUNT case */	
 	if (issue_all){
@@ -5762,12 +5767,12 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 journal_issued_discard:
 	/* Journal pending discard cmds */
 	//printk("[JW DBG] %s 3", __func__);
-	remove_issued_discard_cmds(sbi);
+	//remove_issued_discard_cmds(sbi);
 	//printk("[JW DBG] %s 3-1", __func__);
 	
 	/* To save into discard journal, obtain issued but not completed dicsard cmds*/
 	//printk("[JW DBG] %s 4", __func__);
-	journal_issued_discard_cmds(sbi);
+	//journal_issued_discard_cmds(sbi);
 	//printk("[JW DBG] %s 4-1", __func__);
 	
 	/*if (callcnt % 60 == 0){
