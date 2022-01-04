@@ -4762,7 +4762,7 @@ block_t f2fs_write_discard_journals(struct f2fs_sb_info *sbi,
 	bitmap_dblkcnt = DISCARD_JOURNAL_BITMAP_BLOCKS(discard_bitmap_segcnt);
 	range_dblkcnt = DISCARD_JOURNAL_RANGE_BLOCKS(discard_range_cnt);
 	total_dblkcnt = bitmap_dblkcnt + range_dblkcnt;
-	//printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
+	printk("[JW DBG] %s: total_djblk cnt: %d, djblk capacity: %d, map_djblk: %d, range_djblk: %d \n", __func__, total_dblkcnt, journal_limit_addr - start_blk , bitmap_dblkcnt, range_dblkcnt);
 
 	cnt += 1; 
 	if (start_blk + total_dblkcnt >= journal_limit_addr){
@@ -5669,7 +5669,7 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	/* check submitted discard cmd and advise how many small discard will be submitted */
 	cur_dcmd_cnt = (int) atomic_read(&dcc->discard_cmd_cnt );
 	nr_discard = prev_dcmd_cnt - cur_dcmd_cnt;
-	//printk("[JW DBG] %s: umount: bef discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
+	printk("[JW DBG] %s start. cur discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
 	if (nr_discard == 0 && prev_dcmd_cnt > 0){
 		ddmc->long_threshold = 50000;
 		//printk("[JW DBG] %s: someting wrong. discard got stuck!!, dcmd cnt: %d \n", __func__, prev_dcmd_cnt);
@@ -5793,7 +5793,7 @@ finish:
 	}
 	nr_issued_array[W_SIZE-1] = nr_issued;
 	//printk("[JW DBG] %s end!!", __func__);
-	//printk("[JW DBG] %s: aft discard cmd count: %d in rbtree, discard seg cnt: %d , ddm node cnt: %d \n", __func__, tmp, ddmc->dj_seg_cnt, tmp2);
+	printk("[JW DBG] %s: aft discard cmd count: %d in rbtree, discard seg cnt: %d , ddm node cnt: %d \n", __func__, tmp, ddmc->dj_seg_cnt, tmp2);
 	//atomic_set(&ddmc->history_seg_cnt, 0);
 
 }
