@@ -2370,6 +2370,8 @@ static int create_dynamic_discard_map_control(struct f2fs_sb_info *sbi)
 	//ddmc->ht_lkc_list = f2fs_kzalloc(sbi, sizeof(struct mutex)*pow(2, 7));
 	//ddmc->segs_per_node = 300;  
 	ddmc->segs_per_node = 512;  
+	//ddmc->segs_per_node = 256;  
+	//ddmc->segs_per_node = 1024;  
 	
 	ddmc->long_threshold = 512;	
 	atomic_set(&ddmc->node_cnt, 0);
@@ -5441,7 +5443,7 @@ static int flush_one_ddm(struct f2fs_sb_info *sbi, struct dynamic_discard_map_co
 
 //Notice!! This function always frees DDM. This can cause problem when number of blocks to be discarded is more than max_discards. The while loop stops when numblks to be discarded exceeds max_disacrds. This means DDM is freed while some of blks are not disacrded. This can cause orphan blocks. So this must be fixed. 
 static int construct_ddm_journals(struct f2fs_sb_info *sbi, struct dynamic_discard_map *ddm,
-					int *discard_limit)
+					int *discard_limit, int* lcnt, int *scnt)
 {
 	struct dynamic_discard_map_control *ddmc = SM_I(sbi)->ddmc_info;
         int max_blocks = sbi->blocks_per_seg * ddmc->segs_per_node;
@@ -5508,12 +5510,14 @@ static int construct_ddm_journals(struct f2fs_sb_info *sbi, struct dynamic_disca
 			f2fs_issue_discard(sbi, startLBA, len);
 			nr_issued += 1;
 			*discard_limit -= 1;
-			/*else{
-				//journal_discard_cmd(sbi, startLBA, len);
-				add_discard_range_journal(sbi, startLBA, len, ddm);
-			}*/
+			*lcnt += 1;
 			continue;
-		}
+		} /*else if (len > 16){
+			//journal_discard_cmd(sbi, startLBA, len);
+			add_discard_range_journal(sbi, startLBA, len, ddm);
+			continue;
+		}*/
+		*scnt += 1;
 
 		start_in_seg = start_offset;
 		for (p_segno = start_segno; p_segno <= end_segno; p_segno++){
@@ -5604,7 +5608,7 @@ static int update_dirty_dynamic_discard_map(struct f2fs_sb_info *sbi, int *disca
 	struct list_head *dirty_head = &ddmc->dirty_head;
 	struct dynamic_discard_map *ddm, *tmpddm;
 	int nr_issued = 0;
-	int len = 0;
+	int len = 0, lcnt =0, scnt=0;
 	/*
 	list_for_each_entry_safe(ddm, tmpddm, dirty_head, dirty_list) {
 		len += 1;	
@@ -5620,7 +5624,7 @@ static int update_dirty_dynamic_discard_map(struct f2fs_sb_info *sbi, int *disca
 		remove_ddm_journals(sbi, ddm);
 		//printk("[JW DBG] %s: 2", __func__);
 		//printk("[JW DBG] %s: start construction dj of ddm %u", __func__, ddm->key);
-                nr_issued += construct_ddm_journals(sbi, ddm, discard_limit);
+                nr_issued += construct_ddm_journals(sbi, ddm, discard_limit, &lcnt, &scnt);
 		//printk("[JW DBG] %s: del dirty list of ddm %u", __func__, ddm->key);
 		list_del(&ddm->dirty_list);
 		//printk("[JW DBG] %s: ddm %u handling done", __func__, ddm->key);
@@ -5635,7 +5639,7 @@ static int update_dirty_dynamic_discard_map(struct f2fs_sb_info *sbi, int *disca
 			}
 		}
 	}
-
+	printk("%s: long hole: %d, short hole: %d", __func__, lcnt, scnt);
 	
 	//list_for_each_entry_safe(ddm, tmpddm, dirty_head, dirty_list) {
 	//	printk("[JW DBG] %s: 4", __func__);
@@ -5669,7 +5673,7 @@ void flush_dynamic_discard_maps(struct f2fs_sb_info *sbi, struct cp_control *cpc
 	/* check submitted discard cmd and advise how many small discard will be submitted */
 	cur_dcmd_cnt = (int) atomic_read(&dcc->discard_cmd_cnt );
 	nr_discard = prev_dcmd_cnt - cur_dcmd_cnt;
-	printk("[JW DBG] %s start. cur discard cmd count: %d submitted_discard: %d , \n", __func__, cur_dcmd_cnt, nr_discard);
+	printk("[JW DBG] %s start. cur discard cmd count: %d submitted_discard: %d ddmnodecnt: %d", __func__, cur_dcmd_cnt, nr_discard, (int) atomic_read(&ddmc->node_cnt));
 	if (nr_discard == 0 && prev_dcmd_cnt > 0){
 		ddmc->long_threshold = 50000;
 		//printk("[JW DBG] %s: someting wrong. discard got stuck!!, dcmd cnt: %d \n", __func__, prev_dcmd_cnt);
