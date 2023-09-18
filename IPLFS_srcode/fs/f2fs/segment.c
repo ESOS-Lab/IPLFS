@@ -801,29 +801,6 @@ static void __locate_dirty_segment(struct f2fs_sb_info *sbi, unsigned int segno,
 	if (!test_and_set_bit(segno, dirty_i->dirty_segmap[dirty_type]))
 		dirty_i->nr_dirty[dirty_type]++;
 
-	/*if (dirty_type == DIRTY) {
-		struct seg_entry *sentry = get_seg_entry(sbi, segno);
-		enum dirty_type t = sentry->type;
-
-		if (unlikely(t >= DIRTY)) {
-			f2fs_bug_on(sbi, 1);
-			return;
-		}
-		if (!test_and_set_bit(segno, dirty_i->dirty_segmap[t]))
-			dirty_i->nr_dirty[t]++;
-
-		if (__is_large_section(sbi)) {
-			unsigned int secno = GET_SEC_FROM_SEG(sbi, segno);
-			block_t valid_blocks =
-				get_valid_blocks(sbi, segno, true);
-
-			f2fs_bug_on(sbi, unlikely(!valid_blocks ||
-					valid_blocks == BLKS_PER_SEC(sbi)));
-
-			if (!IS_CURSEC(sbi, secno))
-				set_bit(secno, dirty_i->dirty_secmap);
-		}
-	}*/
 }
 
 static void __remove_dirty_segment(struct f2fs_sb_info *sbi, unsigned int segno,
@@ -878,25 +855,6 @@ static void locate_dirty_segment(struct f2fs_sb_info *sbi, unsigned int segno)
 
 	if (segno == NULL_SEGNO || IS_CURSEG(sbi, segno))
 		return;
-	/*
-	usable_blocks = f2fs_usable_blks_in_seg(sbi, segno);
-	mutex_lock(&dirty_i->seglist_lock);
-
-	valid_blocks = get_valid_blocks(sbi, segno, false);
-	//ckpt_valid_blocks = get_ckpt_valid_blocks(sbi, segno);
-
-	if (valid_blocks == 0 && (!is_sbi_flag_set(sbi, SBI_CP_DISABLED) ||
-		ckpt_valid_blocks == usable_blocks)) {
-		//__locate_dirty_segment(sbi, segno, PRE);
-		//__remove_dirty_segment(sbi, segno, DIRTY);
-	} else if (valid_blocks < usable_blocks) {
-		//__locate_dirty_segment(sbi, segno, DIRTY);
-	} else {
-		// Recovery routine with SSR needs this 
-		//__remove_dirty_segment(sbi, segno, DIRTY);
-	}
-	mutex_unlock(&dirty_i->seglist_lock);
-	*/
 }
 
 /* This moves currently empty dirty blocks to prefree. Must hold seglist_lock */
@@ -4023,15 +3981,9 @@ static void update_device_state(struct f2fs_io_info *fio)
 
 static void do_write_page(struct f2fs_summary *sum, struct f2fs_io_info *fio)
 {
-	/*static block_t nid7_addr = 0;
-	static int data_wrtcnt = 0;
-	static int node_wrtcnt = 0;
-	static int wrtcnt = 0;
-	*/
 	int type = __get_segment_type(fio);
 	bool keep_order = (f2fs_lfs_mode(fio->sbi) && type == CURSEG_COLD_DATA);
 
-	//struct node_info ni;
 	struct f2fs_sb_info *sbi = F2FS_P_SB(fio->page);	
 
 	if (keep_order)
@@ -4049,47 +4001,7 @@ reallocate:
 		fio->old_blkaddr = fio->new_blkaddr;
 		goto reallocate;
 	}
-	//
-	//f2fs_get_node_info(sbi, nid_of_node(fio->page), &ni);
-	/*if ((fio->new_blkaddr == nid7_addr) || (fio->old_blkaddr == nid7_addr) && nid7_addr != 0){
-		printk("[JW DBG] %s: other detected!! fio type is NODE %d, ino: %u, oldblkaddr: %u, newblkaddr: %u,  \n",
-				 __func__, fio->type == NODE, fio->ino, fio->old_blkaddr , fio->new_blkaddr);
-	}
-	if (nid_of_node(fio->page) == 7){
-		printk("[JW DBG] %s: fio type is NODE %d, ino: %u, oldblkaddr: %u, newblkaddr: %u,  \n",
-				 __func__, fio->type == NODE, fio->ino, fio->old_blkaddr , fio->new_blkaddr);
-		if (fio->type == NODE){
-			printk("\t nodefooter[nid:%u,ino%u,ofs:%u,cpver:%llu,blkaddr:%u]", 
-			  nid_of_node(fio->page), ino_of_node(fio->page),
-			  ofs_of_node(fio->page), cpver_of_node(fio->page),
-			  next_blkaddr_of_node(fio->page));
-			//panic("[JW DBG] %s: Just to check stackframe\n", __func__);
-			//printk("[JW DBG] %s: Intended Bug\n", __func__);
-			nid7_addr = fio->new_blkaddr;
-			//f2fs_bug_on(sbi, 1);
-		}
-	}*/
-	/*
-	wrtcnt += 1;
-	if (fio->type == NODE){
-		node_wrtcnt += 1;
-		if (node_wrtcnt % 50000 == 0)
-			printk("[JW DBG] %s: %ds write: Node write cnt: %d : ino: %u, oldblkaddr: %u, newblkaddr: %u,  \n",
-				 __func__, wrtcnt, node_wrtcnt, fio->ino, fio->old_blkaddr , fio->new_blkaddr);
-		
-	}
 
-	else if (fio->type == DATA){
-		data_wrtcnt += 1;
-		if (data_wrtcnt % 50000 == 0)
-			printk("[JW DBG] %s: %ds write: Data write cnt: %d : ino: %u, oldblkaddr: %u, newblkaddr: %u,  \n",
-				 __func__, wrtcnt, data_wrtcnt, fio->ino, fio->old_blkaddr , fio->new_blkaddr);
-
-	}
-	if (wrtcnt%50000==0)//{
-		printk("[JW DBG] %s: %ds write: is_NODE %d, ino: %u, oldblkaddr: %u, newblkaddr: %u,  \n",
-				 __func__, wrtcnt, fio->type == NODE, fio->ino, fio->old_blkaddr , fio->new_blkaddr);
-	//}*/
 	update_device_state(fio);
 
 	if (keep_order)
