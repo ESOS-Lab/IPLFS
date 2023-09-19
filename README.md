@@ -15,3 +15,6 @@ original_kernel: vanilla kernel used as comparator in the paper.
 
 ## Credit
 IPLFS was mainly developed by Juwon Kim @OSLAB-KAIST (joo97508@gmail.com)
+
+## Experiment Data
+We upload Experiment Data of the paper at the IPLFS experiment data.xlsx. You can check it at the master branch. 
