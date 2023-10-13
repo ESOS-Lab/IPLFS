@@ -1,0 +1,30 @@
+[   63.141064] exp-fig-12b.sh (5046): drop_caches: 3
+[   85.454024] f2fs_build_segment_manager: NR_CURSEG_TYPE: 8, CURSEG_HOT_DATA: 0
+[   85.455840] F2FS-fs (nvme0n1p1): Found nat_bits in checkpoint
+[   85.573051] F2FS-fs (nvme0n1p1): Mounted with checkpoint version = 4f9e157
+[   86.760564] [JW DBG] generic_fadvise: POSIX_FADV_DONTNEED!! 
+[ 1297.112069] nvme nvme0: I/O 2 QID 1 timeout, aborting
+[ 1297.112079] nvme nvme0: I/O 41 QID 1 timeout, aborting
+[ 1297.112083] nvme nvme0: I/O 43 QID 1 timeout, aborting
+[ 1297.112086] nvme nvme0: I/O 44 QID 1 timeout, aborting
+[ 1327.832558] nvme nvme0: I/O 2 QID 1 timeout, reset controller
+[ 1358.552925] nvme nvme0: I/O 16 QID 0 timeout, reset controller
+[ 1405.778717] nvme nvme0: Device not ready; aborting reset, CSTS=0x1
+[ 1405.801772] nvme nvme0: Abort status: 0x371
+[ 1405.801775] nvme nvme0: Abort status: 0x371
+[ 1405.801777] nvme nvme0: Abort status: 0x371
+[ 1405.801779] nvme nvme0: Abort status: 0x371
+[ 1422.341327] nvme nvme0: Device not ready; aborting reset, CSTS=0x1
+[ 1422.341333] nvme nvme0: Removing after probe failure status: -19
+[ 1438.871129] nvme nvme0: Device not ready; aborting reset, CSTS=0x1
+[ 1438.871269] nvme0n1: detected capacity change from 0 to 483119104
+[ 1438.871403] blk_update_request: I/O error, dev nvme0n1, sector 9073053984 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0
+[ 1438.871412] blk_update_request: I/O error, dev nvme0n1, sector 9073056032 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0
+[ 1438.871416] blk_update_request: I/O error, dev nvme0n1, sector 9073049888 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0
+[ 1438.871421] blk_update_request: I/O error, dev nvme0n1, sector 9073043744 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0
+[ 1438.871424] blk_update_request: I/O error, dev nvme0n1, sector 9073045792 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0
+[ 1438.871428] blk_update_request: I/O error, dev nvme0n1, sector 9073144080 op 0x1:(WRITE) flags 0x100000 phys_seg 2 prio class 0
+[ 1438.871432] blk_update_request: I/O error, dev nvme0n1, sector 9073143064 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0
+[ 1438.871436] blk_update_request: I/O error, dev nvme0n1, sector 9073142048 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0
+[ 1438.871602] blk_update_request: I/O error, dev nvme0n1, sector 9073142032 op 0x1:(WRITE) flags 0x100000 phys_seg 2 prio class 0
+[ 1438.871606] blk_update_request: I/O error, dev nvme0n1, sector 9073141016 op 0x1:(WRITE) flags 0x104000 phys_seg 127 prio class 0

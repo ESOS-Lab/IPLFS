@@ -1,0 +1,9 @@
+Filebench Version 1.5-alpha3
+0.000: Allocated 173MB of shared memory
+0.012: File-server Version 3.0 personality successfully loaded
+0.012: Populating and pre-allocating filesets
+0.076: bigfileset populated: 94208 files, avg. dir. width = 20, avg. dir. depth = 3.8, 0 leafdirs, 188740.485MB total size
+0.076: Removing bigfileset tree (if exists)
+0.082: Pre-allocating directories in bigfileset tree
+0.181: Pre-allocating files in bigfileset tree
+3.154: Aborting...

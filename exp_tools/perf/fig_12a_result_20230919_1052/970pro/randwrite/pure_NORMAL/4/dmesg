@@ -1,0 +1,3 @@
+[   70.409066] exp-fig-12a.sh (5415): drop_caches: 3
+[   73.075596] F2FS-fs (nvme0n1p1): Found nat_bits in checkpoint
+[   73.140103] F2FS-fs (nvme0n1p1): Mounted with checkpoint version = 13077343
