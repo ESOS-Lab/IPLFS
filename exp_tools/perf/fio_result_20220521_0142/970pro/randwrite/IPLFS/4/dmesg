@@ -1,0 +1,12 @@
+[ 2955.653040] exp-fig-14-b.sh (3763): drop_caches: 3
+[ 3044.526845] nvme nvme0: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0x10
+[ 3044.583377] blk_update_request: I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
+[ 3044.634866] nvme 0000:02:00.0: enabling device (0000 -> 0002)
+[ 3044.634997] nvme nvme0: Removing after probe failure status: -19
+[ 3044.666855] nvme0n1: detected capacity change from 0 to 483119104
+[ 3044.666897] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[ 3044.666909] ldm_validate_partition_table(): Disk read failed.
+[ 3044.666916] Dev nvme0n1: unable to read RDB block 0
+[ 3044.666926]  nvme0n1: unable to read partition table
+[ 3044.666934] nvme0n1: partition table beyond EOD, truncated
+[ 3116.370972] rfkill: input handler enabled

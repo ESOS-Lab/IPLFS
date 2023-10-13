@@ -1,0 +1,5 @@
+[   98.305327] exp-fig-12b.sh (6274): drop_caches: 3
+[  120.609798] f2fs_build_segment_manager: NR_CURSEG_TYPE: 8, CURSEG_HOT_DATA: 0
+[  120.611556] F2FS-fs (nvme0n1p1): Found nat_bits in checkpoint
+[  120.711519] F2FS-fs (nvme0n1p1): Mounted with checkpoint version = 7f3b1f9d
+[  121.886980] [JW DBG] generic_fadvise: POSIX_FADV_DONTNEED!! 

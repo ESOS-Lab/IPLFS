@@ -1,0 +1,80 @@
+#kiops
+#set terminal postscript eps enhanced color dashed dashlength 3 \
+#	                linewidth 2 rounded font "Helvetica, 32"
+#
+##set output "/home/juwon/IFLBA_test/gnuscript/graph_fio_cmp_kiops.eps"
+#set output "/home/juwon/IFLBA_test/gnuscript/tmp.eps"
+#set key inside right bottom vertical font "Helvetica, 28"
+#
+#
+#set yrange [0:11]
+#
+#set xlabel "Time (sec)" font "Helvetica, 32"
+#set ylabel "KIOPS" font "Helvetica, 32"
+#
+#set term postscript size 7.5,3
+##set term postscript size 5,20
+#
+##plot "/home/juwon/IFLBA_test/gnuscript/NORMAL_fio_kiops" with lines title 'Normal' linecolor rgb 'black' lw 4, "/home/juwon/IFLBA_test/gnuscript/IFLBA_fio_kiops" with lines title 'IFLBA' linecolor rgb 'red' lw 4
+#
+#plot "/home/juwon/IFLBA_test/gnuscript/fio_direct_discard/IFLBA_direct_discard_kiops" with lines title 'direct discard IFLBA' linecolor rgb 'black' lw 4, "/home/juwon/IFLBA_test/gnuscript/discard_journal_kiops" with lines title 'discard_journal IFLBA' linecolor rgb 'red' lw 4
+
+
+#latency
+#set terminal postscript eps enhanced color dashed dashlength 3 \
+#	                linewidth 2 rounded font "Helvetica, 32"
+#
+#set output "/home/juwon/IFLBA_test/gnuscript/graph_fio_cmp_lat.eps"
+#set key inside left top horizontal font "Helvetica, 28"
+#
+#
+#set yrange [0:1000]
+#
+#set xlabel "Time (sec)" font "Helvetica, 32"
+#set ylabel "latency (msec)" font "Helvetica, 32"
+#
+#set term postscript size 7.5,3
+##set term postscript size 5,20
+#
+#plot "/home/juwon/IFLBA_test/gnuscript/NORMAL_fio_lat" with lines title 'Normal' linecolor rgb 'black' lw 4, "/home/juwon/IFLBA_test/gnuscript/IFLBA_fio_lat" with lines title 'IFLBA' linecolor rgb 'red' lw 4
+
+
+
+#blktrace analysis
+set terminal postscript eps enhanced color dashed dashlength 3 \
+	                linewidth 2 rounded font "Helvetica, 32"
+
+set output "/home/juwon/IFLBA_test/gnuscript/tmp_durtrace.eps"
+#set output "/home/juwon/IFLBA_test/gnuscript/graph_ycsb_rocks_blkwrite.eps"
+set key outside top horizontal font "Helvetica, 28"
+
+
+set yrange [0:500]
+
+set xlabel "Time (sec)" font "Helvetica, 32"
+set ylabel "Latency (usec)" font "Helvetica, 32"
+#set xrange [0:600]
+set term postscript size 7.5,4
+#set term postscript size 6,6
+#set term postscript size 5,20
+
+#plot "/home/juwon/IFLBA_test/gnuscript/blk_write_ycsb_rocks" using 4:8 title 'Write' linecolor rgb 'black' lw 4, "/home/juwon/IFLBA_test/gnuscript/blk_discard_ycsb_rocks" using 4:8 title 'Discard' linecolor rgb 'red' lw 4
+#plot "/home/juwon/IFLBA_test/gnuscript/fio_good_result/blk_write_NORMAL" using 4:8 title 'Write' linecolor rgb 'black' lw 4, "/home/juwon/IFLBA_test/gnuscript/fio_good_result/discard_NORMAL" using 4:8 title 'Discard' linecolor rgb 'red' lw 4
+
+#plot "/home/juwon/IFLBA_test/gnuscript//blk_write_mobiDB" using 4:8 title 'Write' linecolor rgb 'black' lw 4
+
+#plot "/home/juwon/IFLBA_test/gnuscript/blktrace_dur_tmp" using 2:3 title 'Latency between Dispatch and Complete' linecolor rgb 'black'
+
+plot "/home/juwon/IFLBA_test/gnuscript/blktrace_dur_tmp" using 2:3 title 'Latency from complete to next remap' linecolor rgb 'black'
+
+#plot "/home/juwon/IFLBA_test/gnuscript/blktrace_dur_tmp" using 2:3 title 'Latency from Remap to Complete' linecolor rgb 'black'
+#plot "/home/juwon/IFLBA_test/gnuscript/blkwrite_tmp" using 4:($8*512/1024/1024/1024) title 'Write' linecolor rgb 'black' lw 4, "/home/juwon/IFLBA_test/gnuscript/discard_tmp" using 4:($8*512/1024/1024/1024) title 'Discard' linecolor rgb 'red' lw 4
+
+
+
+
+#plot "/home/juwon/IFLBA_test/gnuscript/parsed_graph_NORMAL_noK" with lines linecolor rgb 'black' lw 1, "/home/juwon/IFLBA_test/gnuscript/parsed_graph_IFLBA_noK" with lines linecolor rgb 'red' lw 1
+#plot "/home/juwon/IFLBA_test/gnuscript/parsed_graph_IFLBA" with lines linecolor rgb 'red' lw 4
+#plot "/home/juwon/IFLBA_test/gnuscript/parsed_graph_IFLBA_noK" with lines linecolor rgb 'red' lw 1
+#plot 'res' using 1:($2/1000) with lines
+

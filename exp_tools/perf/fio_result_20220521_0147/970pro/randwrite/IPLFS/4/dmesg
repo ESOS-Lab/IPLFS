@@ -1,0 +1,22 @@
+[  117.348682] exp-fig-14b.sh (2318): drop_caches: 3
+[  125.469281] f2fs_build_segment_manager: NR_CURSEG_TYPE: 8, CURSEG_HOT_DATA: 0
+[  125.469285] JW_set_zone: start zone 0!!!!!
+[  125.469287] JW_set_zone: type 0  superzone: 1 zone: 128 curseg_zone: 128 secno: 1048576 segno: 1048576 !!!!!
+[  125.469289] type: 0, startblkaddr: 0x2002c400, segno: 1048576
+[  125.469291] JW_set_zone: start zone 0!!!!!
+[  125.469292] JW_set_zone: type 1  superzone: 2 zone: 256 curseg_zone: 256 secno: 2097152 segno: 2097152 !!!!!
+[  125.469294] type: 1, startblkaddr: 0x4002c400, segno: 2097152
+[  125.469296] JW_set_zone: start zone 0!!!!!
+[  125.469297] JW_set_zone: type 2  superzone: 3 zone: 384 curseg_zone: 384 secno: 3145728 segno: 3145728 !!!!!
+[  125.469298] type: 2, startblkaddr: 0x6002c400, segno: 3145728
+[  125.469300] JW_set_zone: start zone 0!!!!!
+[  125.469301] JW_set_zone: type 3  superzone: 4 zone: 512 curseg_zone: 512 secno: 4194304 segno: 4194304 !!!!!
+[  125.469302] type: 3, startblkaddr: 0x8002c400, segno: 4194304
+[  125.469304] JW_set_zone: start zone 0!!!!!
+[  125.469305] JW_set_zone: type 4  superzone: 5 zone: 640 curseg_zone: 640 secno: 5242880 segno: 5242880 !!!!!
+[  125.469306] type: 4, startblkaddr: 0xa002c400, segno: 5242880
+[  125.469308] JW_set_zone: start zone 0!!!!!
+[  125.469309] JW_set_zone: type 5  superzone: 6 zone: 768 curseg_zone: 768 secno: 6291456 segno: 6291456 !!!!!
+[  125.469310] type: 5, startblkaddr: 0xc002c400, segno: 6291456
+[  125.470262] F2FS-fs (nvme0n1p1): Found nat_bits in checkpoint
+[  125.582803] F2FS-fs (nvme0n1p1): Mounted with checkpoint version = 4bceaeb3
