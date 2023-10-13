@@ -1,0 +1,134 @@
+﻿We have two projects for IPLFS. 
+One is Linux Kernel with IPLFS filesystem (https://github.com/ESOS-Lab/IPLFS), 
+and the other is Interval Mapping FTL (https://github.com/ESOS-Lab/Interval_Mapping)
+, an OpenSSSD FTL firmware source code that supports IPLFS. 
+
+
+<OpenSSD Interval mapping>
+In the main branch of Interval Mapping repository, there are two folders, 
+IntervalMapping-FTL for the interval mapping FTL, and OriginalDsm-FTL for the original FTL. 
+We use Xilinx SDK to run OpenSSD. 
+I assume that you can build OpenSSD on Xilinx SDK 
+so let me skip the details of building and running OpenSSD. 
+To run Interval Mapping on OpenSSD, 
+please use IntervalMapping-FTL source code. 
+Otherwise, please use OriginaDsm-FTL to run vanilla page mapping FTL.
+
+
+<IPLFS Kernel>
+IPLFS has two major branches. 
+The branch “IPLFS-stable” is for IPLFS kernel(based on 5.11.0 Linux kernel), 
+and the branch named original kernel is vanilla Linux kernel 5.11.0 with f2fs. 
+Note that each branch consists of source code folder and f2fs-tools folder. 
+To mkfs and mount IPLFS, you are required to use f2fs-tools in IPLFS-stable branch, 
+not vanilla f2fs tools. 
+I assume that you can build kernel, so skip the details of kernel building process 
+(You can use booting_compile.sh script in kernel source code folder). 
+An folder ‘exp_tools’ contains a set of scripts for experiment. 
+
+
+
+
+Please refer to the instruction below to reproduce the results presented in our paper.
+
+
+When you finished compiling each kernel, please copy filesystem module (fs/f2fs/f2fs.ko) 
+to the exp_tools/perf/mod/ folder. 
+For IPLFS filesystem module, please name the filesystem module file as f2fs_IPLFS.ko. 
+For F2FS, please name the filesystme module file as f2fs_vanilla.ko. 
+These are for compatibility with experimental script. 
+
+
+---------------------------------------------------------------
+Experiment in Fig 12
+---------------------------------------------------------------
+We compare IPLFS and F2FS. 
+For IPLFS, please use ‘main’ branch in Interval Mapping repository and IPLFS-stable branch in IPLFS. 
+For F2FS, please use ‘main’ branch in Interval Mapping repository and original_kernel branch in IPLFS. 
+Please ensure that fio is installed on your experimental computer. 
+
+
+<Exp in Fig 12-a>
+After booting an experiment computer, please make a 30GB partition on OpenSSD by ‘fdisk’ command. 
+For example, if OpenSSD is at /dev/nvme0n1, type ‘sudo fdisk /dev/nvme0n1’, and make 30GB partition. 
+Note that the filesystem will be mounted on “/mnt” so please move important files on /mnt.  
+To run IPLFS and F2FS, please run exp-fig-12a_IPLFS.sh and exp-fig-12a_F2FS.sh, respectively. 
+This scripts automatically mount IPLFS module and F2FS module and run benchmark.
+(Those scripts are assuming openSSD is on /dev/nvmen1. 
+If not, please modify variable ‘DEV’ in those script and variable ‘DEV_partition’ in f2fs.sh)
+(Note that if mount fails, check that whether you are using appropriate f2fs tools. ) 
+After the experiment, you can find out a newly created directory 
+( ex. fio_result~~~/970pro/randwrite/4/)
+In the new directory, a file named “kiops_sum” contains timestamp and performance 
+(sum of each thread’s kiops).
+Please reboot system whenever each experiment has finished. 
+
+
+<Exp in Fig 12-b>
+Please make a full partition on OpenSSD by ‘fdisk’ command. 
+The procedure are same with Fig 12-a, except that you use exp-fig-12b_IPLFS.sh and exp-fig-12b_F2FS.sh. 
+
+
+
+---------------------------------------------------------------
+Experiments in Fig 14 and Fig 16
+---------------------------------------------------------------
+Fig 14 and 16 show the firmware behavior of OpenSSD such as FTL access latency and WAF. 
+We need to instrument the firmware behavior of OpenSSD. 
+We use a separate PC that can extract the internal performance data from OpenSSD. 
+The details of running the experiment and 
+instrumenting the internal behavior of firmware of our firmware algorithm is as follows.
+Use full partition for all the experiment.
+Please use ‘main’’ branch for the experiment in Fig 14.
+Please use ‘exp-getlatency’ branch for ‘get’ and 
+‘exp-setlatency’ branch for ‘set’ of the experiment in Fig 16.
+
+
+<Fig 14>
+run ‘sudo ./exp-fig-14_IPLFS.sh’ for IPLFS and ‘sudo ./exp-fig-14_vanilla.sh’ for F2FS. 
+To change the filesystem utilization, open ‘fileserver_fig14.f’ file 
+and uncomment any ‘set $nfiles=’ setting with the wanted utilization.
+
+
+<Fig 16>
+for experiment a: 
+# sudo ./exp-fig-16a_IPLFS.sh
+# sudo ./exp-fig-16a_F2FS.sh
+for experiment b:
+ # sudo ./exp-fig-16b_read_IPLFS.sh
+ # sudo ./exp-fig-16b_write_IPLFS.sh
+ # sudo ./exp-fig-16b_read_F2FS.sh
+ # sudo ./exp-fig-16b_write_F2FS.sh
+
+
+<openssd extract the performance data of the OpenSSD firwmare>
+In the SDK Terminal, you can check out the outputs.
+ 
+---------------------------------------------------------------
+Experiments in Fig 15, 16, and 17
+---------------------------------------------------------------
+We use trace driven simulation for these experiments.
+We run the workload and collect the IO trace. This trace is fed to the simulator. 
+The simulator simulates the behavior of the interval mapping 
+and generates the memory footprint for the interval mapping tree. 
+The simulator can disable the compaction option in the interval mapping.
+With trace driven simulation, 
+we examine the sizes of interval mapping tree with and without compaction, respectively.
+
+
+
+---------------------------------------------------------------
+How to run compaction simulation program
+---------------------------------------------------------------
+The compaction simulation program is located at exp_tools/compaction. 
+In the ‘test’ directory, there is file named ‘data_WARM_DATA’. 
+This file contains discarded range data from OpenSSD. 
+As specified in the paper, we conducted simulation only on warm data type 
+since warm data accounts for about 98% of total write volumes. 
+To run the compaction simulation, please run the following command. 
+# ./analy_compaction.sh test/data
+Then, file named ‘data_WARM_DATA_timestamp_compact-on_compact-off’ i
+will be returned in the ‘test’ directory. 
+In this file, the first column is timestamp, the second column is interval tree size with compaction. 
+The last column is interval tree size without compaction. 
+At the last line, the size of mapping area in use is provided.
